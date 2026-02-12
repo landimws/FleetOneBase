@@ -15,6 +15,16 @@ const __dirname = path.dirname(__filename);
  * Requer: isSuperAdmin middleware
  */
 class AdminEmpresasController {
+    constructor() {
+        // Bind methods to this instance
+        this.listAll = this.listAll.bind(this);
+        this.renderForm = this.renderForm.bind(this);
+        this.create = this.create.bind(this);
+        this.update = this.update.bind(this);
+        this.toggleStatus = this.toggleStatus.bind(this);
+        this.delete = this.delete.bind(this);
+    }
+
     /**
      * GET /admin/empresas
      * Lista todas as empresas do sistema (Exceto a Master ID 1)
@@ -75,10 +85,18 @@ class AdminEmpresasController {
 
     /**
      * POST /admin/empresas
-     * Cria nova empresa + banco isolado
+     * Cria ou Atualiza (Upsert) empresa
+     * Se vier ID no body, redireciona para Update.
      */
     async create(req, res) {
         try {
+            // [FIX] Suporte para Edição via Form Nativo (se JS falhar)
+            if (req.body.id) {
+                console.log('🔄 Detectada edição via POST. Redirecionando para Update...');
+                req.params.id = req.body.id;
+                return this.update(req, res);
+            }
+
             const { nome, cnpj, email, telefone, responsavel, cep, logradouro,
                 numero, bairro, cidade, estado } = req.body;
 
@@ -89,10 +107,12 @@ class AdminEmpresasController {
                 });
 
                 if (empresaExistente) {
-                    return res.status(400).json({
-                        success: false,
-                        message: 'CNPJ já cadastrado.'
-                    });
+                    // [UX] Verificar se a requisição espera JSON ou HTML
+                    if (req.xhr || req.headers.accept.indexOf('json') > -1) {
+                         return res.status(400).json({ success: false, message: 'CNPJ já cadastrado.' });
+                    } else {
+                         return res.send('<script>alert("CNPJ já cadastrado!"); history.back();</script>');
+                    }
                 }
             }
 
@@ -125,23 +145,26 @@ class AdminEmpresasController {
                 // Rollback: deletar empresa criada
                 await empresa.destroy();
 
-                return res.status(500).json({
-                    success: false,
-                    message: 'Erro ao criar banco de dados da empresa.'
-                });
+                if (req.xhr || req.headers.accept.indexOf('json') > -1) {
+                    return res.status(500).json({ success: false, message: 'Erro ao criar banco de dados da empresa.' });
+                } else {
+                     return res.send('<script>alert("Erro ao criar banco de dados!"); history.back();</script>');
+                }
             }
 
-            res.json({
-                success: true,
-                message: 'Empresa criada com sucesso!',
-                empresaId: empresa.id
-            });
+            if (req.xhr || req.headers.accept.indexOf('json') > -1) {
+                return res.json({ success: true, message: 'Empresa criada com sucesso!', empresaId: empresa.id });
+            } else {
+                return res.redirect('/admin/empresas');
+            }
+
         } catch (error) {
             console.error('Erro ao criar empresa:', error);
-            res.status(500).json({
-                success: false,
-                message: 'Erro ao criar empresa: ' + error.message
-            });
+             if (req.xhr || req.headers.accept.indexOf('json') > -1) {
+                res.status(500).json({ success: false, message: 'Erro ao criar empresa: ' + error.message });
+             } else {
+                return res.send(`<script>alert("Erro ao criar empresa: ${error.message}"); history.back();</script>`);
+             }
         }
     }
 
@@ -151,16 +174,14 @@ class AdminEmpresasController {
      */
     async update(req, res) {
         try {
-            const { id } = req.params;
+            const { id } = req.params; // Pode vir via req.body.id no POST acima
             console.log(`📝 [AdminEmpresasController] Update request para ID: ${id}`);
-            console.log('📦 [AdminEmpresasController] Body recebido:', JSON.stringify(req.body, null, 2));
 
             // [SECURITY] Não permitir editar ID 1
             if (parseInt(id) === 1) {
-                return res.status(403).json({
-                    success: false,
-                    message: 'Acesso negado. Empresa do sistema não pode ser editada.'
-                });
+                const msg = 'Acesso negado. Empresa do sistema não pode ser editada.';
+                if (req.xhr || req.headers.accept.indexOf('json') > -1) return res.status(403).json({ success: false, message: msg });
+                else return res.send(`<script>alert("${msg}"); history.back();</script>`);
             }
 
             const { nome, cnpj, email, telefone, responsavel, cep, logradouro,
@@ -169,10 +190,9 @@ class AdminEmpresasController {
             const empresa = await MasterDatabase.Empresa.findByPk(id);
 
             if (!empresa) {
-                return res.status(404).json({
-                    success: false,
-                    message: 'Empresa não encontrada.'
-                });
+                const msg = 'Empresa não encontrada.';
+                if (req.xhr || req.headers.accept.indexOf('json') > -1) return res.status(404).json({ success: false, message: msg });
+                else return res.send(`<script>alert("${msg}"); history.back();</script>`);
             }
 
             // Validar CNPJ único (se mudou)
@@ -182,10 +202,9 @@ class AdminEmpresasController {
                 });
 
                 if (empresaExistente) {
-                    return res.status(400).json({
-                        success: false,
-                        message: 'CNPJ já cadastrado.'
-                    });
+                    const msg = 'CNPJ já cadastrado em outra empresa.';
+                    if (req.xhr || req.headers.accept.indexOf('json') > -1) return res.status(400).json({ success: false, message: msg });
+                    else return res.send(`<script>alert("${msg}"); history.back();</script>`);
                 }
             }
 
@@ -203,16 +222,17 @@ class AdminEmpresasController {
                 estado: estado || null
             });
 
-            res.json({
-                success: true,
-                message: 'Empresa atualizada com sucesso!'
-            });
+            if (req.xhr || req.headers.accept.indexOf('json') > -1) {
+                return res.json({ success: true, message: 'Empresa atualizada com sucesso!' });
+            } else {
+                return res.redirect('/admin/empresas');
+            }
+
         } catch (error) {
             console.error('Erro ao atualizar empresa:', error);
-            res.status(500).json({
-                success: false,
-                message: 'Erro ao atualizar empresa.'
-            });
+            const msg = 'Erro ao atualizar empresa.';
+             if (req.xhr || req.headers.accept.indexOf('json') > -1) return res.status(500).json({ success: false, message: msg });
+             else return res.send(`<script>alert("${msg}"); history.back();</script>`);
         }
     }
 
