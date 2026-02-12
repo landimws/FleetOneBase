@@ -1,0 +1,98 @@
+<!-- Modal de Assistente de Negociação -->
+<div id="modalNegociacao"
+    style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999; align-items:center; justify-content:center; opacity:0; transition: opacity 0.3s;">
+    <div style="background:white; width:500px; max-width:95%; border-radius:8px; box-shadow:0 10px 25px rgba(0,0,0,0.2); overflow:hidden; transform:scale(0.9); transition: transform 0.3s;"
+        id="modalNegociacaoContent">
+        <div
+            style="background:#2c3e50; color:white; padding:15px 20px; display:flex; justify-content:space-between; align-items:center;">
+            <h3 style="margin:0; font-size:16px; font-weight:600;" id="tituloNegociacao">Assistente de Negociação</h3>
+            <button onclick="NegociacaoWizard.fechar()" type="button"
+                style="background:none; border:none; color:white; font-size:20px; cursor:pointer;">&times;</button>
+        </div>
+
+        <div style="padding:20px;">
+            <div id="resumoNegociacao"
+                style="background:#f8f9fa; padding:10px; border-radius:4px; margin-bottom:15px; font-size:13px; color:#555; border-left:4px solid #3498db;">
+                Calculando pendência...
+            </div>
+
+            <form id="formNegociacao" onsubmit="event.preventDefault();">
+                <input type="hidden" id="negTipo" value="">
+
+                <!-- OPÇÕES DÍVIDA -->
+                <div id="camposDivida" style="display:none;">
+                    <div style="margin-bottom:12px;">
+                        <label style="display:block; font-size:12px; font-weight:600; margin-bottom:4px;">Como será o
+                            pagamento?</label>
+                        <select id="negFormaPagamento" class="swal2-input" style="width:100%; margin:0; height:40px;">
+                            <option value="Boleto">Boleto Bancário</option>
+                            <option value="Pix">Pix / Transferência</option>
+                            <option value="Cartão">Cartão de Crédito</option>
+                            <option value="Especie">Espécie</option>
+                        </select>
+                    </div>
+
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:12px;">
+                        <div>
+                            <label
+                                style="display:block; font-size:12px; font-weight:600; margin-bottom:4px;">Parcelas</label>
+                            <input type="number" id="negQtdParcelas" class="swal2-input" value="1" min="1" max="48"
+                                style="width:100%; margin:0;" onchange="NegociacaoWizard.simular()">
+                        </div>
+                        <div>
+                            <label style="display:block; font-size:12px; font-weight:600; margin-bottom:4px;">1º
+                                Vencimento</label>
+                            <input type="date" id="negDataInicio" class="swal2-input" style="width:100%; margin:0;"
+                                onchange="NegociacaoWizard.simular()">
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom:12px;">
+                        <label
+                            style="display:block; font-size:12px; font-weight:600; margin-bottom:4px;">Periodicidade</label>
+                        <select id="negPeriodicidade" class="swal2-input" style="width:100%; margin:0; height:40px;"
+                            onchange="NegociacaoWizard.simular()">
+                            <option value="unico">Pagamento Único</option>
+                            <option value="semanal">Semanal</option>
+                            <option value="mensal">Mensal</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- OPÇÕES CRÉDITO (DEVOLUÇÃO) -->
+                <div id="camposCredito" style="display:none;">
+                    <div style="margin-bottom:12px;">
+                        <label style="display:block; font-size:12px; font-weight:600; margin-bottom:4px;">Data da
+                            Devolução</label>
+                        <input type="date" id="negDataDevolucao" class="swal2-input" style="width:100%; margin:0;">
+                    </div>
+                    <div style="margin-bottom:12px;">
+                        <label style="display:block; font-size:12px; font-weight:600; margin-bottom:4px;">Chave Pix /
+                            Dados Bancários</label>
+                        <input type="text" id="negDadosBancarios" class="swal2-input" style="width:100%; margin:0;"
+                            placeholder="Ex: CPF, Email ou Ag/Conta">
+                    </div>
+                </div>
+
+                <!-- SIMULAÇÃO FINAL -->
+                <div id="simulacaoResultado"
+                    style="margin-top:20px; border-top:1px solid #eee; padding-top:15px; text-align:right;">
+                    <span style="font-size:12px; color:#888;">Valor Total: <strong id="negValorTotal"
+                            style="color:#333;">R$ 0,00</strong></span><br>
+                    <span style="font-size:18px; color:#27ae60; font-weight:bold;" id="negResumoParcelas">1x de R$
+                        0,00</span>
+                </div>
+
+            </form>
+        </div>
+
+        <div
+            style="background:#f1f1f1; padding:15px 20px; text-align:right; display:flex; justify-content:flex-end; gap:10px;">
+            <button type="button" onclick="NegociacaoWizard.fechar()"
+                style="padding:10px 20px; border:1px solid #ccc; background:white; border-radius:4px; font-weight:600; cursor:pointer;">Cancelar</button>
+            <button type="button" onclick="NegociacaoWizard.salvar()" id="btnConfirmarNegociacao"
+                style="padding:10px 20px; border:none; background:#27ae60; color:white; border-radius:4px; font-weight:600; cursor:pointer;">Confirmar
+                e Gerar Contrato</button>
+        </div>
+    </div>
+</div>

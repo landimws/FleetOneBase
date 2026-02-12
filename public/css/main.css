@@ -1,0 +1,574 @@
+/* ========================================
+   VARIÁVEIS CSS GLOBAIS
+   ======================================== */
+:root {
+  /* Cores Primárias */
+  --color-primary: #9d00ff;
+  --color-primary-dark: #7a00cc;
+  --color-primary-darker: #8500d9;
+  --color-primary-light: #b84dff;
+
+  /* Cores Secundárias */
+  --color-success: #27ae60;
+  --color-danger: #e74c3c;
+  --color-warning: #f39c12;
+  --color-info: #3498db;
+
+  /* Cores Neutras */
+  --color-text: #2c3e50;
+  --color-text-muted: #7f8c8d;
+  --color-text-light: #94a3b8;
+  --color-border: #e2e8f0;
+  --color-border-dark: #cbd5e1;
+  --color-bg: #f5f5f5;
+  --color-bg-card: #ffffff;
+}
+
+/* ========================================
+   ESTILOS GLOBAIS
+   ======================================== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+  font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  font-variant-numeric: tabular-nums;
+  font-size: 14px;
+  background-color: #f5f5f5;
+  color: #333;
+  /* Remove scroll da página inteira para forçar scroll interno */
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ========================================
+   COMPONENTES GLOBAIS (Tabs & Forms)
+   ======================================== */
+
+/* Abas Modernas (Unified Header) */
+.tabs {
+  display: flex;
+  gap: 20px;
+  border-bottom: 2px solid #e2e8f0;
+  padding-bottom: 0;
+  margin-bottom: 20px;
+  align-items: center;
+  /* Garante alinhamento vertical */
+}
+
+.tab-btn {
+  background: none;
+  border: none;
+  font-weight: 600;
+  font-size: 1rem;
+  color: #64748b;
+  padding: 10px 15px;
+  cursor: pointer;
+  position: relative;
+  transition: color 0.2s;
+  font-family: 'Inter', sans-serif;
+}
+
+.tab-btn.active {
+  color: var(--color-primary);
+}
+
+.tab-btn.active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: var(--color-primary);
+  border-radius: 3px 3px 0 0;
+}
+
+.tab-btn:hover {
+  color: #475569;
+}
+
+/* Inputs Modernos (Unified Filters) */
+.form-modern {
+  display: block;
+  width: 100%;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 0.85rem;
+  color: #1e293b;
+  background: #fff;
+  height: 36px;
+  /* Altura padrão para alinhar com botões */
+  transition: border-color 0.2s, box-shadow 0.2s;
+  font-family: 'Inter', sans-serif;
+}
+
+.form-modern:focus {
+  border-color: var(--color-primary);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(157, 0, 255, 0.1);
+}
+
+/* Chips de Filtro */
+.quick-filters {
+  display: flex;
+  gap: 8px;
+  /* Espaçamento unificado */
+}
+
+.filter-chip {
+  background: transparent;
+  border: 1px solid #e2e8f0;
+  color: #64748b;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'Inter', sans-serif;
+}
+
+.filter-chip:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+}
+
+.filter-chip.active {
+  background: var(--color-primary);
+  color: white;
+  border-color: var(--color-primary);
+}
+
+/* Smart Search Container */
+.smart-search {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.smart-search input {
+  /* Herda .form-modern ou estilos inline se sobrescreverem, 
+      mas aqui definimos o padrão para limpeza */
+  border-radius: 20px !important;
+  /* Arredondado específico para busca */
+  padding-right: 35px !important;
+}
+
+.smart-search span#btn-smart-search {
+  position: absolute;
+  right: 12px;
+  color: #95a5a6;
+  cursor: pointer;
+}
+
+/* Menu Global - Premium Clean */
+.menu-global {
+  background-color: #ffffff;
+  color: #2c3e50;
+  padding: 0 24px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  /* Sombra mínima */
+  border-bottom: 1px solid #f0f0f0;
+  flex-shrink: 0;
+  z-index: 1000;
+}
+
+.menu-brand {
+  font-size: 18px;
+  font-weight: 700;
+  /* Mais bold */
+  margin-right: 48px;
+  /* Mais espaço */
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #2c3e50;
+  letter-spacing: -0.5px;
+}
+
+.menu-links {
+  display: flex;
+  height: 100%;
+}
+
+.menu-item {
+  color: #7f8c8d;
+  text-decoration: none;
+  padding: 0 24px;
+  /* Mais espaço clicável */
+  height: 100%;
+  display: flex;
+  align-items: center;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.2s;
+  border-bottom: 3px solid transparent;
+  position: relative;
+}
+
+.menu-item:hover {
+  background-color: transparent;
+  color: #9d00ff;
+  /* Texto Roxo no hover */
+}
+
+/* MUDANÇA DE TEMA: ROXO #9d00ff */
+
+.menu-item.active {
+  color: #9d00ff;
+  /* Texto Roxo */
+  border-bottom-color: #9d00ff;
+  background-color: transparent;
+  /* Remove bg escuro */
+}
+
+/* ... */
+
+.btn-table.btn-primary {
+  background-color: #9d00ff;
+  /* ROXO */
+  color: white;
+}
+
+.page-container {
+  padding: 20px;
+  max-width: 1600px;
+  width: 98%;
+  margin: 0 auto;
+  height: calc(100vh - 60px);
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 40px;
+}
+
+/* Conteúdo WIDE (Grid Semanal) - Ocupa TUDO */
+.page-container-wide {
+  padding: 10px;
+  /* Padding menor para aproveitar espaço */
+  max-width: none;
+  /* Sem limite */
+  width: 99.5%;
+  /* Tela cheia mesmo */
+  margin: 0 auto;
+  height: calc(100vh - 60px);
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 0;
+}
+
+/* Dashboard Container também Max Width */
+.dashboard-container {
+  padding: 20px;
+  max-width: 1600px;
+  width: 98%;
+  margin: 0 auto;
+  height: calc(100vh - 60px);
+  display: flex;
+  flex-direction: column;
+}
+
+.page-title {
+  margin-bottom: 20px;
+  flex-shrink: 0;
+}
+
+.page-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 15px;
+  background-color: white;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  flex-shrink: 0;
+}
+
+.search-container {
+  flex: 1;
+  max-width: 400px;
+}
+
+.search-input {
+  width: 100%;
+  padding: 10px 15px;
+  border: 1px solid #bdc3c7;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+/* Container da Tabela com Scroll Interno */
+.table-container {
+  background-color: white;
+  border-radius: 12px;
+  /* Arredondado igual Compras */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  flex-grow: 1;
+  overflow-y: auto;
+  position: relative;
+  border: 1px solid #e2e8f0;
+  /* Borda sutil */
+  margin: 0 20px;
+  /* Margem lateral padrão */
+  padding: 0 20px;
+  /* Padding interno padrão */
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+
+.data-table th {
+  padding: 6px 12px;
+  text-align: left;
+  border-bottom: 1px solid #ecf0f1;
+  font-size: 14px;
+  color: #2c3e50;
+}
+
+.data-table td {
+  padding: 6px 12px;
+  text-align: left;
+  border-bottom: none;
+  /* Modern Clean Look */
+  font-size: 14px;
+  color: #2c3e50;
+}
+
+.data-table th {
+  background-color: #fff;
+  /* Fundo branco no header */
+  color: #2c3e50;
+  /* Texto escuro */
+  font-weight: 600;
+  /* Peso semi-bold */
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  /* Fonte menor no header */
+  letter-spacing: 0.05em;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  border-bottom: 2px solid #e2e8f0;
+  /* Borda inferior mais forte */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+  /* Sombra muito sutil */
+}
+
+/* Classes utilitárias de alinhamento para tabelas */
+.text-left {
+  text-align: left !important;
+}
+
+.text-center {
+  text-align: center !important;
+}
+
+.text-right {
+  text-align: right !important;
+}
+
+.data-table tbody tr {
+  transition: background-color 0.15s ease;
+}
+
+.data-table tbody tr:hover {
+  background-color: #f8fafc;
+  /* Hover leve */
+}
+
+/* BADGES PADRONIZADOS */
+.badge {
+  padding: 4px 12px;
+  border-radius: 50px;
+  /* Pílula completa */
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: inline-block;
+}
+
+.badge-success {
+  background-color: #d1fae5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
+}
+
+.badge-warning {
+  background-color: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fde68a;
+}
+
+.badge-danger {
+  background-color: #fee2e2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}
+
+.badge-secondary {
+  background-color: #f3f4f6;
+  color: #4b5563;
+  border: 1px solid #e5e7eb;
+}
+
+.badge-primary {
+  background-color: #ede9fe;
+  color: #5b21b6;
+  border: 1px solid #ddd6fe;
+}
+
+/* BOTÕES GHOST PADRONIZADOS (Ícones Limpos) */
+.btn-sm-ghost {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 1.1rem;
+  padding: 6px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+  /* Cor padrão */
+}
+
+.btn-sm-ghost:hover {
+  background-color: #f1f5f9;
+  transform: translateY(-1px);
+}
+
+.btn-sm-ghost.text-primary {
+  color: var(--color-primary);
+}
+
+.btn-sm-ghost.text-primary:hover {
+  background-color: #f3e8ff;
+}
+
+.btn-sm-ghost.text-danger {
+  color: var(--color-danger);
+}
+
+.btn-sm-ghost.text-danger:hover {
+  background-color: #fee2e2;
+}
+
+.btn-sm-ghost.text-success {
+  color: var(--color-success);
+}
+
+.btn-sm-ghost.text-success:hover {
+  background-color: #d1fae5;
+}
+
+.btn-sm-ghost.text-warning {
+  color: var(--color-warning);
+}
+
+.btn-sm-ghost.text-warning:hover {
+  background-color: #fef3c7;
+}
+
+background-color: #e74c3c;
+color: white;
+}
+
+/* Badges */
+.badge {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.badge-success {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.badge-danger {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+/* Dashboard / Grid Específicos */
+.grid-container {
+  flex-grow: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: linear-gradient(180deg, #ffffff 0%, #f8f9fa 100%);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.04);
+  padding-bottom: 0;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border: 1px solid #e9ecef;
+}
+
+/* Scroll suave */
+.grid-container::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+/* Scrollbar Global */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f3f5;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  /* Cinza suave neutro */
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary, #9d00ff);
+  /* Roxo no hover */
+}
+
+/* Scrollbar específica para containers de tabela se necessário */
+.table-container::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+}
+
+.table-container::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary, #9d00ff);
+}
+
+/* Utilitários */
+.text-center {
+  text-align: center;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.text-left {
+  text-align: left;
+}

@@ -1,0 +1,321 @@
+<%- include('../../../partials/settings-nav') %>
+
+    <div class="content-header">
+        <div class="header-left">
+            <h1>Gerenciar Usuários</h1>
+            <p>Controle de acesso ao sistema</p>
+        </div>
+        <div class="header-right">
+            <button class="btn-primary" onclick="openUserModal()">
+                <i class="ph ph-plus"></i> Novo Usuário
+            </button>
+        </div>
+    </div>
+
+    <div class="card">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Usuário</th>
+                    <th>Função</th>
+                    <th>Status</th>
+                    <th>Criado em</th>
+                    <th width="100">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% usuarios.forEach(u=> { %>
+                    <tr>
+                        <td>
+                            <%= u.nome %>
+                        </td>
+                        <td>
+                            <%= u.username %>
+                        </td>
+                        <td>
+                            <span class="badge <%= u.role === 'admin' ? 'badge-purple' : 'badge-gray' %>">
+                                <%= u.role==='admin' ? 'Administrador' : 'Operador' %>
+                            </span>
+                        </td>
+                        <td>
+                            <span class="badge <%= u.ativo ? 'badge-success' : 'badge-danger' %>">
+                                <%= u.ativo ? 'Ativo' : 'Inativo' %>
+                            </span>
+                        </td>
+                        <td>
+                            <%= new Date(u.createdAt).toLocaleDateString('pt-BR') %>
+                        </td>
+                        <td class="actions-cell">
+                            <!-- FIX: Use data attribute for safe JSON handling -->
+                            <button class="btn-icon" onclick="editUser(this.dataset.user)"
+                                data-user="<%= JSON.stringify(u) %>" title="Editar">
+                                <i class="ph ph-pencil-simple"></i>
+                            </button>
+                            <% if (u.id !==user.id) { %>
+                                <button class="btn-icon delete" onclick="deleteUser('<%= u.id %>')" title="Excluir">
+                                    <i class="ph ph-trash"></i>
+                                </button>
+                                <% } %>
+                        </td>
+                    </tr>
+                    <% }) %>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Modal Usuário -->
+    <div id="user-modal" class="modal-overlay" style="display: none;">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modal-title">Novo Usuário</h3>
+                <button class="close-modal" onclick="closeUserModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="user-form" onsubmit="saveUser(event)">
+                    <input type="hidden" name="id" id="user-id">
+
+                    <div class="form-group">
+                        <label>Nome Completo</label>
+                        <input type="text" name="nome" id="user-nome" required class="form-input">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Nome de Usuário (Login)</label>
+                        <input type="text" name="username" id="user-username" required class="form-input">
+                    </div>
+
+                    <div class="form-group">
+                        <label id="label-password">Senha</label>
+                        <input type="password" name="password" id="user-password" class="form-input"
+                            placeholder="********">
+                        <small id="hint-password" style="color: #718096; display: none;">Deixe em branco para manter a
+                            atual.</small>
+                    </div>
+
+                    <div class="form-row" style="display: flex; gap: 16px;">
+                        <div class="form-group" style="flex: 1;">
+                            <label>Função</label>
+                            <select name="role" id="user-role" class="form-input">
+                                <option value="operador">Operador</option>
+                                <option value="admin">Administrador</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label>Status</label>
+                            <select name="ativo" id="user-ativo" class="form-input">
+                                <option value="true">Ativo</option>
+                                <option value="false">Inativo</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-actions" style="margin-top: 20px; text-align: right;">
+                        <button type="button" class="btn-secondary" onclick="closeUserModal()">Cancelar</button>
+                        <button type="submit" class="btn-primary">Salvar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openUserModal() {
+            document.getElementById('user-form').reset();
+            document.getElementById('user-id').value = '';
+            document.getElementById('modal-title').innerText = 'Novo Usuário';
+            document.getElementById('user-password').required = true;
+            document.getElementById('hint-password').style.display = 'none';
+
+            document.getElementById('user-modal').style.display = 'flex';
+        }
+
+        function editUser(userData) {
+            // Parse if it's a string (from data-attribute)
+            const user = typeof userData === 'string' ? JSON.parse(userData) : userData;
+
+            document.getElementById('user-id').value = user.id;
+            document.getElementById('user-nome').value = user.nome;
+            document.getElementById('user-username').value = user.username;
+            document.getElementById('user-role').value = user.role;
+            document.getElementById('user-ativo').value = user.ativo.toString();
+
+            document.getElementById('modal-title').innerText = 'Editar Usuário';
+            document.getElementById('user-password').required = false;
+            document.getElementById('hint-password').style.display = 'block';
+
+            document.getElementById('user-modal').style.display = 'flex';
+        }
+
+        function closeUserModal() {
+            document.getElementById('user-modal').style.display = 'none';
+        }
+
+        async function saveUser(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+            const id = data.id;
+
+            const url = id ? `/configuracoes/usuarios/${id}` : '/configuracoes/usuarios';
+            const method = id ? 'PUT' : 'POST';
+
+            try {
+                const response = await fetch(url, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    alert('Salvo com sucesso!');
+                    window.location.reload();
+                } else {
+                    alert('Erro: ' + (result.error || 'Erro desconhecido'));
+                }
+            } catch (error) {
+                console.error(error);
+                alert('Erro ao salvar.');
+            }
+        }
+
+        async function deleteUser(id) {
+            if (!confirm('Tem certeza que deseja excluir este usuário?')) return;
+
+            try {
+                const response = await fetch(`/configuracoes/usuarios/${id}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    window.location.reload();
+                } else {
+                    const result = await response.json();
+                    alert('Erro: ' + (result.error || 'Erro ao excluir.'));
+                }
+            } catch (error) {
+                console.error(error);
+                alert('Erro ao excluir.');
+            }
+        }
+    </script>
+
+    <style>
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .content-header h1 {
+            font-size: 24px;
+            color: #1a202c;
+            margin: 0;
+        }
+
+        .content-header p {
+            color: #718096;
+            margin: 4px 0 0;
+        }
+
+        .badge-purple {
+            background: #e9d8fd;
+            color: #553c9a;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .badge-gray {
+            background: #edf2f7;
+            color: #2d3748;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .badge-success {
+            background: #c6f6d5;
+            color: #276749;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .badge-danger {
+            background: #fed7d7;
+            color: #9b2c2c;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .btn-icon {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+            color: #718096;
+        }
+
+        .btn-icon:hover {
+            color: #4a5568;
+        }
+
+        .btn-icon.delete:hover {
+            color: #e53e3e;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            /* Center vertically */
+            justify-content: center;
+            /* Center horizontally */
+            z-index: 2000;
+            /* High z-index */
+        }
+
+        .modal {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            margin: auto;
+            /* Fallback centering */
+            position: relative;
+            animation: modalFadeIn 0.2s ease-out;
+        }
+
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>

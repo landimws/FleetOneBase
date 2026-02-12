@@ -1,0 +1,125 @@
+/* ... Existing Styles ... */
+
+/* COMMAND CENTER GRID */
+.command-center-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    padding: 15px 0;
+}
+
+/* KPI DECK (ROW 1) */
+.kpi-deck {
+    grid-column: span 3;
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    /* 8 Cards in one row to fill space */
+    gap: 15px;
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+.kpi-card {
+    background: white;
+    padding: 18px 10px;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    text-align: center;
+    border-left: 5px solid transparent;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 100px;
+}
+
+.kpi-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.kpi-card.success {
+    border-left-color: #27ae60;
+}
+
+.kpi-card.danger {
+    border-left-color: #e74c3c;
+}
+
+.kpi-card.warning {
+    border-left-color: #f39c12;
+}
+
+.kpi-card.info {
+    border-left-color: #3498db;
+}
+
+.kpi-card.neutral {
+    border-left-color: #95a5a6;
+}
+
+.kpi-title {
+    font-size: 0.85em;
+    color: #7f8c8d;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.kpi-value {
+    font-size: 1.4em;
+    font-weight: bold;
+    color: #2c3e50;
+    margin: 8px 0;
+}
+
+.kpi-trend {
+    font-size: 0.75em;
+    color: #95a5a6;
+}
+
+/* CHARTS (ROW 2 & 3) */
+.chart-section {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.chart-section h3 {
+    margin: 0 0 15px 0;
+    font-size: 1em;
+    color: #34495e;
+    border-bottom: 1px solid #f0f0f0;
+    padding-bottom: 10px;
+}
+
+/* WAR ROOM (ROW 4) */
+.war-room-section {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    border-top: 3px solid #e74c3c;
+    /* Red top to signify Alert/War Room */
+}
+
+.data-table.dense th,
+.data-table.dense td {
+    padding: 8px 10px;
+    font-size: 0.9em;
+}
+
+.badge-risk-high {
+    background-color: #ffebee;
+    color: #c62828;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: bold;
+}
+
+.badge-risk-med {
+    background-color: #fff3e0;
+    color: #ef6c00;
+    padding: 2px 6px;
+    border-radius: 4px;
+}

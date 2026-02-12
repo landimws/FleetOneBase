@@ -1,0 +1,64 @@
+<!-- MODAL DE LANÇAMENTO NA CARTEIRA -->
+<div id="modal-lancamento-carteira" class="modal-overlay" style="display: none;">
+    <div class="modal-content" style="max-width: 500px">
+        <div class="modal-header" style="background: #e67e22; color: white;">
+            <h2 style="color: white;">💸 Lançar Débito na Carteira</h2>
+            <button type="button" class="btn-icon-delete" onclick="fecharModalLancamento()"
+                style="color:white;">✕</button>
+        </div>
+        <div class="modal-body" style="padding: 20px;">
+            <form id="form-lancar-carteira">
+                <input type="hidden" id="lancar-multa-id">
+
+                <div class="form-group">
+                    <label>Cliente</label>
+                    <input type="text" id="lancar-cliente" readonly style="background: #f0f0f0;">
+                </div>
+
+                <div class="form-row" style="display:flex; gap:10px;">
+                    <div class="form-group" style="flex:1;">
+                        <label>Veículo</label>
+                        <input type="text" id="lancar-veiculo" readonly style="background: #f0f0f0;">
+                    </div>
+                    <div class="form-group" style="flex:1;">
+                        <label>Data Lanç.</label>
+                        <input type="date" id="lancar-data" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Descrição</label>
+                    <textarea id="lancar-descricao" rows="2" style="width:100%"></textarea>
+                </div>
+
+                <div class="form-row" style="display:flex; gap:10px;">
+                    <div class="form-group" style="flex:1;">
+                        <label>Valor Base (c/ Desconto)</label>
+                        <input type="number" id="lancar-valor-unit" step="0.01" readonly style="background:#f0f0f0">
+                    </div>
+                    <div class="form-group check-group"
+                        style="flex:0.5; display:flex; align-items:center; margin-top:20px;">
+                        <label class="checkbox-card" style="padding:5px;">
+                            <input type="checkbox" id="lancar-taxa">
+                            <span>+15% Taxa</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group"
+                    style="background: #e8f5e9; padding: 10px; border-radius: 6px; border: 1px solid #2ecc71; margin-top:10px;">
+                    <label style="color: #27ae60; font-weight:bold;">Total a Debitar</label>
+                    <input type="number" id="lancar-total" step="0.01"
+                        style="font-size:1.2em; font-weight:bold; color:#27ae60; background:transparent; border:none;"
+                        readonly>
+                </div>
+
+                <div class="form-actions" style="margin-top: 20px; display:flex; justify-content:flex-end; gap:10px;">
+                    <button type="button" class="btn-secondary" onclick="fecharModalLancamento()">Cancelar</button>
+                    <button type="submit" class="btn-primary" style="background: #e67e22;">LANÇAR
+                        DÉBITO</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

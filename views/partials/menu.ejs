@@ -1,0 +1,43 @@
+<nav class="menu-global">
+    <div class="menu-brand">
+        <span>🚗 Completo Locações</span>
+    </div>
+    <div class="menu-links">
+        <a href="/" class="menu-item <%= page === 'grid' ? 'active' : '' %>">Grid Semanal</a>
+        <a href="/veiculos" class="menu-item <%= page === 'veiculos' ? 'active' : '' %>">Veículos</a>
+        <a href="/clientes" class="menu-item <%= page === 'clientes' ? 'active' : '' %>">Clientes</a>
+        <a href="/analise" class="menu-item <%= page === 'dashboard' ? 'active' : '' %>">Análise</a>
+        <a href="/relatorios" class="menu-item <%= page === 'relatorios' ? 'active' : '' %>">Relatórios</a>
+        <a href="/carteira" class="menu-item <%= page === 'carteira' ? 'active' : '' %>">Carteira</a>
+        <a href="/multas" class="menu-item <%= page === 'multas' ? 'active' : '' %>">Multas</a>
+        <span class="menu-separator">|</span>
+        <a href="/financeiro/fornecedores"
+            class="menu-item <%= page === 'financeiro_fornecedores' ? 'active' : '' %>">Fornecedores</a>
+        <a href="/financeiro/compras" class="menu-item <%= page === 'financeiro_compras' ? 'active' : '' %>">Compras</a>
+        <a href="/financeiro/contas" class="menu-item <%= page === 'financeiro_contas' ? 'active' : '' %>">Contas a
+            Pagar</a>
+    </div>
+
+    <script>
+        // Fallback Client-Side Active State (Ensures reliability)
+        document.addEventListener('DOMContentLoaded', () => {
+            const path = window.location.pathname;
+            const items = document.querySelectorAll('.menu-global .menu-item');
+
+            // If we are in a finance sub-page, ensure we don't have multiple actives
+            if (path.includes('/financeiro/')) {
+                items.forEach(item => {
+                    const href = item.getAttribute('href');
+                    if (path.startsWith(href)) {
+                        item.classList.add('active');
+                    } else {
+                        // Only remove if it's a finance item to avoid side effects on other items (though unlikely)
+                        if (href.includes('/financeiro/')) {
+                            item.classList.remove('active');
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+</nav>

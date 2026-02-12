@@ -1,0 +1,80 @@
+<% // Default values if not provided const prefix=typeof addressPrefix !=='undefined' ? addressPrefix : 'input-' ; const
+    d=typeof data !=='undefined' ? data : {}; %>
+
+    <!-- Endereço Estruturado -->
+    <div class="form-section-title">Endereço</div>
+
+    <div class="form-row-grid" style="grid-template-columns: 120px 1fr;">
+        <div class="form-group">
+            <label for="<%= prefix %>cep">CEP</label>
+            <input type="text" id="<%= prefix %>cep" name="cep" value="<%= d.cep || '' %>" placeholder="00000-000"
+                maxlength="9" class="form-input" data-mask="cep">
+        </div>
+        <div class="form-group">
+            <label for="<%= prefix %>logradouro">Logradouro</label>
+            <input type="text" id="<%= prefix %>logradouro" name="logradouro"
+                value="<%= d.logradouro || d.endereco || '' %>" placeholder="Rua, Av..." class="form-input">
+        </div>
+    </div>
+
+    <div class="form-row-grid">
+        <div class="form-group">
+            <label for="<%= prefix %>numero">Número</label>
+            <input type="text" id="<%= prefix %>numero" name="numero" value="<%= d.numero || '' %>" placeholder="123"
+                class="form-input">
+        </div>
+        <div class="form-group">
+            <label for="<%= prefix %>bairro">Bairro</label>
+            <input type="text" id="<%= prefix %>bairro" name="bairro" value="<%= d.bairro || '' %>" placeholder="Centro"
+                class="form-input">
+        </div>
+    </div>
+
+    <div class="form-row-grid" style="grid-template-columns: 1fr 100px;">
+        <div class="form-group">
+            <label for="<%= prefix %>cidade">Cidade</label>
+            <input type="text" id="<%= prefix %>cidade" name="cidade" value="<%= d.cidade || '' %>"
+                placeholder="São Paulo" class="form-input">
+        </div>
+        <div class="form-group">
+            <label for="<%= prefix %>estado">UF</label>
+            <input type="text" id="<%= prefix %>estado" name="estado" value="<%= d.estado || '' %>" placeholder="SP"
+                maxlength="2" style="text-transform:uppercase;" class="form-input">
+        </div>
+    </div>
+
+    <script>
+        // Simple inline script to attach CEP logic if not already attached
+        // This expects to run when the partial is included
+        (function () {
+            const prefix = '<%= prefix %>';
+            const cepInput = document.getElementById(prefix + 'cep');
+
+            if (cepInput && !cepInput.dataset.listenerAttached) {
+                cepInput.dataset.listenerAttached = 'true';
+
+                // Search
+                cepInput.addEventListener('blur', async (e) => {
+                    const cep = e.target.value.replace(/\D/g, '');
+                    if (cep.length === 8) {
+                        cepInput.style.opacity = '0.5';
+                        try {
+                            const res = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+                            const data = await res.json();
+                            if (!data.erro) {
+                                document.getElementById(prefix + 'logradouro').value = data.logradouro || '';
+                                document.getElementById(prefix + 'bairro').value = data.bairro || '';
+                                document.getElementById(prefix + 'cidade').value = data.localidade || '';
+                                document.getElementById(prefix + 'estado').value = data.uf || '';
+                                document.getElementById(prefix + 'numero').focus();
+                            }
+                        } catch (error) {
+                            console.error('Erro ao buscar CEP:', error);
+                        } finally {
+                            cepInput.style.opacity = '1';
+                        }
+                    }
+                });
+            }
+        })();
+    </script>

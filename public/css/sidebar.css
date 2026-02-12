@@ -1,0 +1,297 @@
+/* Sidebar Global Container */
+:root {
+    --sidebar-width: 220px;
+    --sidebar-width-collapsed: 72px;
+    --sidebar-bg: #ffffff;
+    --sidebar-text: #4a5568;
+    --sidebar-text-hover: #9d00ff;
+    /* Roxo da identidade */
+    --sidebar-active-bg: #f3e5ff;
+    --sidebar-border: #e2e8f0;
+    --header-height: 60px;
+}
+
+body.sidebar-open {
+    /* Estado padrão no Desktop */
+}
+
+/* Container Principal */
+.app-container {
+    display: flex;
+    min-height: 100vh;
+    background-color: #f5f5f5;
+}
+
+/* Sidebar Styling */
+.sidebar {
+    width: var(--sidebar-width);
+    background-color: var(--sidebar-bg);
+    border-right: 1px solid var(--sidebar-border);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    z-index: 1000;
+    transition: width 0.3s ease;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.02);
+}
+
+/* Header da Sidebar (Logo) */
+.sidebar-header {
+    height: var(--header-height);
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+    border-bottom: 1px solid var(--sidebar-border);
+    justify-content: space-between;
+}
+
+.brand-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.brand-text {
+    font-weight: 700;
+    font-size: 16px;
+    color: #2d3748;
+}
+
+/* Botão de Toggle (Colapso) */
+.toggle-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #a0aec0;
+    padding: 5px;
+    border-radius: 4px;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.toggle-btn:hover {
+    color: var(--sidebar-text-hover);
+    background-color: #f7fafc;
+}
+
+/* Conteúdo de Navegação */
+.sidebar-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px 8px;
+    /* Reduced vertical padding */
+}
+
+/* Grupos de Menu */
+.menu-group {
+    margin-bottom: 12px;
+    /* Reduced from 24px */
+}
+
+.menu-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #a0aec0;
+    font-weight: 600;
+    margin-bottom: 6px;
+    /* Reduced */
+    padding-left: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    display: none;
+    /* Mantendo escondido conforme solicitado anteriormente */
+}
+
+/* Itens de Menu */
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 12px;
+    /* Reduced padding */
+    color: var(--sidebar-text);
+    text-decoration: none;
+    border-radius: 8px;
+    transition: all 0.2s;
+    margin-bottom: 2px;
+    /* Reduced from 4px */
+    font-weight: 500;
+    font-size: 14px;
+    white-space: nowrap;
+}
+
+.nav-item:hover {
+    background-color: #f8f9fa;
+    color: var(--sidebar-text-hover);
+}
+
+.nav-item.active {
+    background-color: var(--sidebar-active-bg);
+    color: var(--sidebar-text-hover);
+    font-weight: 600;
+}
+
+.nav-icon {
+    font-size: 20px;
+    min-width: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Área Principal (Main Content) */
+.main-content {
+    flex: 1;
+    margin-left: var(--sidebar-width);
+    transition: margin-left 0.3s ease;
+    width: calc(100% - var(--sidebar-width));
+    overflow-x: hidden;
+}
+
+/* Header/Toggle Mobile (Visível apenas em Mobile) */
+.mobile-header {
+    display: none;
+    /* Desktop default */
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
+    /* Match header height */
+    padding: 0 20px;
+    background: #fff;
+    border-bottom: 1px solid #e2e8f0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 900;
+}
+
+.mobile-menu-btn {
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #2d3748;
+    cursor: pointer;
+    padding: 5px;
+}
+
+/* =========================================
+   ESTADO COLAPSADO (Collapsed)
+   ========================================= */
+body.sidebar-collapsed .sidebar {
+    width: var(--sidebar-width-collapsed);
+}
+
+body.sidebar-collapsed .main-content {
+    margin-left: var(--sidebar-width-collapsed);
+    width: calc(100% - var(--sidebar-width-collapsed));
+}
+
+body.sidebar-collapsed .brand-text,
+body.sidebar-collapsed .menu-label,
+body.sidebar-collapsed .nav-text {
+    opacity: 0;
+    pointer-events: none;
+    display: none;
+    /* Remove do fluxo */
+}
+
+body.sidebar-collapsed .menu-label {
+    /* Exibir um separador visual em vez do texto no modo colapsado?
+       Por simplicidade, vamos apenas esconder por enquanto. */
+    display: block;
+    border-top: 1px solid #edf2f7;
+    margin: 16px 8px;
+    height: 1px;
+    text-indent: -9999px;
+    /* Esconde texto */
+    padding: 0;
+}
+
+body.sidebar-collapsed .nav-item {
+    justify-content: center;
+    padding: 12px 0;
+}
+
+body.sidebar-collapsed .sidebar-header {
+    padding: 0;
+    justify-content: center;
+}
+
+body.sidebar-collapsed .brand-wrapper {
+    display: none;
+}
+
+body.sidebar-collapsed .toggle-btn {
+    transform: rotate(180deg);
+}
+
+/* Tooltips básicos para modo colapsado (opcional, via title já resolve nativo) */
+
+/* =========================================
+   RESPONSIVIDADE (Mobile)
+   ========================================= */
+@media (max-width: 768px) {
+    .sidebar {
+        transform: translateX(-100%);
+        /* Escondido por padrão */
+        width: var(--sidebar-width);
+        /* Sempre largura cheia quando aberto */
+    }
+
+    .main-content {
+        margin-left: 0 !important;
+        width: 100% !important;
+        padding-top: 60px;
+        /* Espaço para o mobile header */
+    }
+
+    /* Mostrar Mobile Header */
+    .mobile-header {
+        display: flex;
+    }
+
+    /* Esconder o Header da Sidebar (já que o Mobile Header faz o papel de topo) */
+    /* Ou manter para ter o botão de fechar dentro? Na maioria dos apps mobile, o menu cobre. */
+    /* Vamos manter o padrão: Sidebar abre OVER o conteúdo */
+
+    body.mobile-menu-open .sidebar {
+        transform: translateX(0);
+        box-shadow: 0 0 50px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Overlay para fechar ao clicar fora */
+    .mobile-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 999;
+    }
+
+    body.mobile-menu-open .mobile-overlay {
+        display: block;
+        animation: fadeIn 0.2s;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}

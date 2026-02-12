@@ -1,0 +1,232 @@
+/* Toolbar Unificada - Premium Minimalist */
+.toolbar-semana {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    /* Mais espaço lateral */
+    height: 60px;
+    /* Ajustado para equilíbrio */
+    /* Altura maior para elegância */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+    /* Sombra suave para separar */
+    width: 100%;
+    margin: 0 auto;
+    flex-shrink: 0;
+    z-index: 90;
+    position: relative;
+    border-bottom: 1px solid #f0f0f0;
+    flex-wrap: nowrap;
+    /* TUDO EM UMA LINHA OBRIGATÓRIO */
+    overflow-x: auto;
+    /* Scroll se tela muito pequena */
+}
+
+/* Grupos */
+.toolbar-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.group-left {
+    flex: 1;
+}
+
+.group-center {
+    flex: 2;
+    justify-content: center;
+}
+
+.group-right {
+    flex: 1;
+    justify-content: flex-end;
+}
+
+/* --- DESTAQUE CENTRAL (DATA) --- */
+.select-semana-highlight {
+    font-size: 14px;
+    /* Ajuste Final: Tamanho Padrão */
+    font-weight: 600;
+    /* Menos bold */
+    color: #2c3e50;
+    padding: 6px 20px 6px 10px;
+    border: 1px solid transparent;
+    /* Borda invisível para manter altura */
+    border-radius: 6px;
+    background-color: transparent;
+    cursor: pointer;
+    min-width: 180px;
+    /* Mais compacto */
+    text-align: center;
+    outline: none;
+    transition: all 0.2s;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%239d00ff%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0px center;
+    background-size: 10px auto;
+}
+
+.select-semana-highlight:hover {
+    background-color: #f8f9fa;
+    color: #9d00ff;
+    border-color: #e9ecef;
+}
+
+.date-display-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+/* Botões de Seta Redondos - Clean */
+.btn-circle {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: none;
+    background: #f8f9fa;
+    color: #7f8c8d;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-circle:hover {
+    background: #9d00ff;
+    color: white;
+    transform: scale(1.1);
+}
+
+
+/* --- FILTROS (DISCRETOS) --- */
+.filtro-btn {
+    border: none;
+    background: transparent;
+    font-size: 13px;
+    color: #95a5a6;
+    padding: 6px 14px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.filtro-btn:hover {
+    color: #333;
+    background-color: #f5f5f5;
+}
+
+.filtro-btn.active {
+    background-color: #f3e5ff;
+    color: #9d00ff;
+}
+
+/* --- AÇÕES (Compactas e Modernas) --- */
+/* PEDIDO: Botões ocupando menos espaço e mais bonitos */
+.btn-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+    height: 36px;
+    /* Altura compacta */
+}
+
+/* Botão Atualizar - Estilo Outline Green */
+.btn-sync {
+    background-color: transparent !important;
+    color: #27ae60 !important;
+    border: 1px solid #27ae60 !important;
+    box-shadow: none !important;
+}
+
+.btn-sync:hover {
+    background-color: #27ae60 !important;
+    color: white !important;
+}
+
+/* Botão Nova - Sólido Roxo */
+#btn-nova-semana {
+    background-color: #9d00ff;
+    color: white;
+    box-shadow: 0 4px 10px rgba(157, 0, 255, 0.2);
+}
+
+#btn-nova-semana:hover {
+    background-color: #8e44ad;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 15px rgba(157, 0, 255, 0.3);
+}
+
+/* Botão Fechar - Discreto */
+.btn-secondary-action {
+    background-color: transparent;
+    color: #95a5a6;
+    font-weight: 500;
+}
+
+.btn-secondary-action:hover {
+    color: #c0392b;
+    background-color: #fff5f5;
+}
+
+/* --- SEARCH BAR --- */
+.search-wrapper {
+    position: relative;
+    margin-left: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.search-icon {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 12px;
+    color: #aaa;
+    pointer-events: none;
+}
+
+.search-input {
+    padding: 6px 10px 6px 30px;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    font-size: 13px;
+    color: #333;
+    outline: none;
+    transition: all 0.2s;
+    width: 200px;
+    background-color: #f9f9f9;
+}
+
+.search-input:focus {
+    border-color: #9d00ff;
+    box-shadow: 0 0 0 2px rgba(157, 0, 255, 0.1);
+    width: 240px;
+    background-color: #fff;
+}
+
+/* Contador de Veículos */
+.contador-badge {
+    background-color: #9d00ff;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+    box-shadow: 0 2px 4px rgba(157, 0, 255, 0.2);
+}

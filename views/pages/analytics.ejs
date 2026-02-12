@@ -1,0 +1,77 @@
+<link rel="stylesheet" href="/css/dashboard.css?v=1">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<div class="dashboard-container">
+    <header class="dashboard-header">
+        <h1>Painel de Performance</h1>
+        <div class="dashboard-controls">
+            <select id="select-periodo" class="select-periodo">
+                <option value="4">Últimas 4 Semanas</option>
+                <option value="8" selected>Últimas 8 Semanas</option>
+                <option value="12">Últimas 12 Semanas</option>
+            </select>
+        </div>
+    </header>
+
+    <!-- Mini Cards KPIs -->
+    <div class="mini-cards-grid">
+        <div class="mini-card">
+            <h4>Frota Total</h4>
+            <div class="mini-value" id="kpi-veiculos">-</div>
+            <small>Veículos Ativos</small>
+        </div>
+        <div class="mini-card">
+            <h4>Ocupação</h4>
+            <div class="mini-value" id="kpi-ocupacao" style="color:#27ae60">-</div>
+            <small>Média do Período</small>
+        </div>
+        <div class="mini-card">
+            <h4>Manutenção</h4>
+            <div class="mini-value" id="kpi-manutencao" style="color:#f39c12">-</div>
+            <small>Impacto na Frota</small>
+        </div>
+        <div class="mini-card">
+            <h4>Ticket Médio</h4>
+            <div class="mini-value" id="kpi-ticket">-</div>
+            <small>Semanal (RevPU)</small>
+        </div>
+        <div class="mini-card">
+            <h4>RevPAF</h4>
+            <div class="mini-value" id="kpi-revpaf">-</div>
+            <small>Por Veículo Total</small>
+        </div>
+        <div class="mini-card">
+            <h4>Churn Rate</h4>
+            <div class="mini-value" id="kpi-churn">-</div>
+            <small>Devoluções</small>
+        </div>
+        <div class="mini-card">
+            <h4>Inadimplência Real</h4>
+            <div class="mini-value" id="kpi-inadimplencia" style="color:#e74c3c">-</div>
+            <small id="kpi-inadimplencia-pct">-</small>
+        </div>
+        <div class="mini-card">
+            <h4>Produção Global</h4>
+            <div class="mini-value" id="kpi-receita" style="color:#27ae60">-</div>
+            <small>Total Recebido</small>
+        </div>
+    </div>
+
+    <!-- Gráficos -->
+    <div class="charts-grid">
+        <div class="chart-card">
+            <h3>Eficiência de Frota (%)</h3>
+            <div class="chart-container">
+                <canvas id="chartOcupacao"></canvas>
+            </div>
+        </div>
+        <div class="chart-card">
+            <h3>Performance Financeira (Faturamento)</h3>
+            <div class="chart-container">
+                <canvas id="chartFinanceiro"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/js/dashboard.js?v=2"></script>

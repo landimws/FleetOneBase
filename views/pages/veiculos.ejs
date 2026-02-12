@@ -1,0 +1,283 @@
+<link rel="stylesheet" href="/css/pages/veiculos.css">
+
+<div class="page-container">
+    <!-- Barra de Ações -->
+    <div class="page-actions">
+        <div class="search-container">
+            <input type="text" id="busca-veiculo" placeholder="Buscar por placa ou modelo..." class="search-input">
+        </div>
+
+        <!-- Filtro de Condutor -->
+        <select id="filtro-condutor" class="search-input" style="max-width: 200px; cursor: pointer;">
+            <option value="todos">Todos os Veículos</option>
+            <option value="indicado">Com Condutor Indicado</option>
+            <option value="nao-indicado">Condutor Não Indicado</option>
+            <option value="sem-condutor">Sem Condutor (Disponível)</option>
+        </select>
+
+        <button id="btn-novo-veiculo" class="btn-action">+ Novo Veículo</button>
+    </div>
+
+    <!-- Lista de Veículos -->
+    <div class="table-container">
+        <table id="lista-veiculos" class="data-table">
+            <thead>
+                <th>PLACA</th>
+                <th>MODELO</th>
+                <th>ANO</th>
+                <th>COMBUSTÍVEL</th>
+                <th>CONDUTOR</th>
+                <th style="text-align: center;">INDICADO</th>
+                <th>IPVA</th>
+                <th>LICENCIAMENTO</th>
+                <th>VISTORIA</th>
+                <th>AÇÕES</th>
+            </thead>
+            <tbody>
+                <!-- Será preenchido via JavaScript -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal de Formulário -->
+<div id="modal-form-veiculo" class="modal" style="display: none;">
+    <div class="modal-content" style="max-width: 800px;">
+        <div class="modal-header">
+            <h2 id="modal-title">Novo Veículo</h2>
+            <button id="close-modal" class="modal-close">&times;</button>
+        </div>
+
+        <div class="modal-body" style="padding: 25px;">
+            <form id="form-veiculo">
+
+                <!-- Seção: Dados Principais -->
+                <div class="form-section-title" style="margin-top: 0;">Identificação</div>
+                <div class="form-grid-3">
+                    <div class="form-group">
+                        <label for="input-placa">Placa *</label>
+                        <input type="text" id="input-placa" placeholder="ABC-1234" required
+                            style="font-weight: bold; letter-spacing: 1px;">
+                    </div>
+                    <div class="form-group">
+                        <label for="input-modelo">Modelo *</label>
+                        <select id="input-modelo" required>
+                            <option value="">Selecione...</option>
+                            <!-- Modelos carregados dinamicamente via API -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="input-ano">Ano</label>
+                        <input type="number" id="input-ano" placeholder="Ex: 2024" min="2000" max="2100">
+                    </div>
+                </div>
+
+                <div class="form-grid-2">
+                    <div class="form-group">
+                        <label for="input-combustivel">Combustível *</label>
+                        <select id="input-combustivel" required>
+                            <option value="">Selecione...</option>
+                            <!-- Tipos carregados dinamicamente via API -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="input-preco-base">Preço Base (R$) *</label>
+                        <input type="number" id="input-preco-base" step="0.01" min="0" placeholder="0.00" required>
+                    </div>
+                </div>
+
+                <div class="form-grid-2">
+                    <div class="form-group">
+                        <label for="input-renavam">Renavam</label>
+                        <input type="text" id="input-renavam" placeholder="Apenas números">
+                    </div>
+                    <div class="form-group">
+                        <label for="input-chassi">Chassi</label>
+                        <input type="text" id="input-chassi" placeholder="ABC..." style="text-transform: uppercase;">
+                    </div>
+                </div>
+
+                <!-- Seção: Regularização -->
+                <div class="form-section-title">Regularização & Documentos</div>
+
+                <div style="background: #f8f9fa; border-radius: 8px; padding: 15px; border: 1px solid #eee;">
+
+                    <!-- IPVA -->
+                    <div class="form-grid-3" style="margin-bottom: 15px;">
+                        <div class="form-group">
+                            <label>IPVA (Vencimento)</label>
+                            <input type="text" id="input-ipva-venc" placeholder="DD/MM/AAAA" maxlength="10">
+                        </div>
+                        <div class="form-group">
+                            <label>Valor (R$)</label>
+                            <input type="text" id="input-ipva-valor" class="input-money" placeholder="0,00">
+                        </div>
+                        <div class="form-group" style="display: flex; align-items: flex-end;">
+                            <label class="toggle-wrapper" style="width: 100%;">
+                                <input type="checkbox" id="input-ipva-pago"> Pago
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Licenciamento -->
+                    <div class="form-grid-3" style="margin-bottom: 15px;">
+                        <div class="form-group">
+                            <label>Licenciamento (Venc.)</label>
+                            <input type="text" id="input-licenciamento-venc" placeholder="DD/MM/AAAA" maxlength="10">
+                        </div>
+                        <div class="form-group">
+                            <label>Valor (R$)</label>
+                            <input type="text" id="input-licenciamento-valor" class="input-money" placeholder="0,00">
+                        </div>
+                        <div class="form-group" style="display: flex; align-items: flex-end;">
+                            <label class="toggle-wrapper" style="width: 100%;">
+                                <input type="checkbox" id="input-licenciamento-pago"> Pago
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Vistoria -->
+                    <div class="form-grid-3">
+                        <div class="form-group">
+                            <label>Vistoria (Venc.)</label>
+                            <input type="text" id="input-vistoria-venc" placeholder="DD/MM/AAAA" maxlength="10">
+                        </div>
+                        <div class="form-group">
+                            <label>Valor (R$)</label>
+                            <input type="text" id="input-vistoria-valor" class="input-money" placeholder="0,00">
+                        </div>
+                        <div class="form-group" style="display: flex; align-items: flex-end;">
+                            <label class="toggle-wrapper" style="width: 100%;">
+                                <input type="checkbox" id="input-vistoria-pago"> Pago
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer Form -->
+                <div class="form-group" style="margin-top: 20px; display: flex; gap: 15px; flex-wrap: wrap;">
+
+                    <!-- Condutor Indicado (Só aparece se tiver cliente) -->
+                    <div id="wrapper-condutor-indicado" style="display: none;">
+                        <label class="toggle-wrapper" style="background: white; border-color: #dfe6e9;">
+                            <input type="checkbox" id="input-condutor-indicado">
+                            <span style="font-weight: 600; color: #d35400;">Condutor Indicado</span>
+                        </label>
+                    </div>
+
+                    <label class="toggle-wrapper" style="background: white; border-color: #dfe6e9;">
+                        <input type="checkbox" id="input-ativo" checked>
+                        <span style="font-weight: 600;">Veículo Ativo no Sistema</span>
+                    </label>
+                </div>
+            </form>
+        </div>
+
+        <div class="modal-footer" style="background: #f8f9fa; border-top: 1px solid #eee; padding: 15px 25px;">
+            <button id="btn-cancelar" class="btn-modal btn-secondary">Cancelar</button>
+            <button id="btn-salvar" class="btn-modal btn-success" style="min-width: 120px;">Salvar
+                Alterações</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Detalhes (Leitura) -->
+<div id="modal-detalhes-veiculo" class="modal" style="display: none;">
+    <div class="modal-content" style="max-width: 600px;">
+        <div class="modal-header">
+            <h2>Detalhes do Veículo</h2>
+            <button id="close-modal-detalhes" class="modal-close">&times;</button>
+        </div>
+
+        <div class="modal-body" style="padding: 25px; background: #fdfdfd;">
+            <!-- Topo: Placa e Status -->
+            <div
+                style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 15px;">
+                <div>
+                    <h1 id="det-placa" style="margin: 0; font-size: 28px; color: #2c3e50;">---</h1>
+                    <span id="det-modelo" style="font-size: 16px; color: #7f8c8d; font-weight: 500;">---</span>
+                </div>
+                <div style="text-align: right;">
+                    <div id="det-ativo-badge" style="margin-bottom: 5px;"></div>
+
+                    <!-- Novo: Cliente Atual -->
+                    <div id="det-cliente-box"
+                        style="display: none; background: #e8f6f3; padding: 4px 10px; border-radius: 12px; border: 1px solid #d1f2eb;">
+                        <span
+                            style="font-size: 10px; color: #16a085; text-transform: uppercase; font-weight: 700;">Último
+                            Cliente</span>
+                        <div id="det-cliente" style="font-size: 13px; font-weight: 600; color: #0e6655;">---
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Grid de Informações -->
+            <div class="form-grid-2" style="margin-bottom: 30px;">
+                <div class="details-card">
+                    <div class="details-label">Combustível</div>
+                    <div id="det-combustivel" class="details-value">---</div>
+                </div>
+                <div class="details-card">
+                    <div class="details-label">Ano</div>
+                    <div id="det-ano__view" class="details-value">---</div>
+                </div>
+                <div class="details-card">
+                    <div class="details-label">Preço Base Diária</div>
+                    <div id="det-preco" class="details-value" style="color: #27ae60;">R$ 0,00</div>
+                </div>
+                <div class="details-card">
+                    <div class="details-label">Renavam</div>
+                    <div id="det-renavam" class="details-value">---</div>
+                </div>
+                <div class="details-card">
+                    <div class="details-label">Chassi</div>
+                    <div id="det-chassi" class="details-value">---</div>
+                </div>
+            </div>
+
+            <!-- Regularização -->
+            <div class="form-section-title">Situação Legal</div>
+
+            <div style="background: #fff; padding: 5px;">
+                <!-- IPVA -->
+                <div class="compliance-item">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div style="font-weight: 600; color: #34495e; width: 100px;">IPVA</div>
+                        <div id="det-ipva-dados" style="color: #636e72; font-size: 14px;">---</div>
+                    </div>
+                    <div id="det-ipva-status"></div>
+                </div>
+
+                <!-- Licenciamento -->
+                <div class="compliance-item">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div style="font-weight: 600; color: #34495e; width: 100px;">Licenciamento</div>
+                        <div id="det-lic-dados" style="color: #636e72; font-size: 14px;">---</div>
+                    </div>
+                    <div id="det-lic-status"></div>
+                </div>
+
+                <!-- Vistoria -->
+                <div class="compliance-item">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div style="font-weight: 600; color: #34495e; width: 100px;">Selo Vistoria</div>
+                        <div id="det-vistoria-dados" style="color: #636e72; font-size: 14px;">---</div>
+                    </div>
+                    <div id="det-vistoria-status"></div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="modal-footer"
+            style="background: #f8f9fa; border-top: 1px solid #eee; padding: 15px 25px; justify-content: space-between;">
+            <button id="btn-det-fechar" class="btn-modal btn-secondary">Fechar</button>
+            <button id="btn-det-editar" class="btn-modal btn-primary">Editar Veículo</button>
+        </div>
+    </div>
+</div>
+
+<script src="/js/DataRefreshBus.js"></script>
+<script src="/js/Constants.js?v=20"></script>
+<script src="/js/veiculos-page.js?v=<%= Date.now() %>"></script>

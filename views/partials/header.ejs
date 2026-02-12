@@ -1,0 +1,198 @@
+<header class="app-header">
+    <div class="header-left">
+        <!-- Breadcrumbs or Title could go here -->
+        <h2 class="page-title">
+            <%= title || 'Locadora' %>
+        </h2>
+    </div>
+
+    <div class="header-right">
+        <div class="user-dropdown">
+            <button class="user-btn" onclick="toggleUserMenu()">
+                <div class="avatar-circle">
+                    <%= user && user.nome ? user.nome.charAt(0).toUpperCase() : 'U' %>
+                </div>
+                <span class="user-name">
+                    <%= user ? user.nome : 'Usuário' %>
+                </span>
+                <i class="ph ph-caret-down"></i>
+            </button>
+            <div id="user-menu" class="dropdown-menu">
+                <div class="dropdown-header">
+                    <strong>
+                        <%= user ? user.nome : 'Visitante' %>
+                    </strong>
+                    <span class="role-badge">
+                        <%= user ? (user.role==='admin' ? 'Administrador' : 'Operador' ) : '' %>
+                    </span>
+                </div>
+                <ul class="dropdown-list">
+                    <li>
+                        <a href="#" onclick="openProfileModal()">
+                            <i class="ph ph-user"></i> Meu Perfil
+                        </a>
+                    </li>
+                    <li class="divider"></li>
+                    <li>
+                        <a href="/logout" class="logout-link">
+                            <i class="ph ph-sign-out"></i> Sair
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</header>
+
+<style>
+    .app-header {
+        height: 60px;
+        background: white;
+        border-bottom: 1px solid #e2e8f0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 24px;
+        position: sticky;
+        top: 0;
+        z-index: 800;
+    }
+
+    .page-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #1a202c;
+        margin: 0;
+    }
+
+    .header-right {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .user-dropdown {
+        position: relative;
+    }
+
+    .user-btn {
+        background: none;
+        border: none;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        cursor: pointer;
+        padding: 4px 8px;
+        border-radius: 8px;
+        transition: background-color 0.2s;
+    }
+
+    .user-btn:hover {
+        background-color: #f7fafc;
+    }
+
+    .avatar-circle {
+        width: 32px;
+        height: 32px;
+        background-color: #7c3aed;
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 14px;
+    }
+
+    .user-name {
+        font-weight: 500;
+        color: #4a5568;
+        font-size: 14px;
+    }
+
+    .dropdown-menu {
+        display: none;
+        position: absolute;
+        top: 100%;
+        right: 0;
+        width: 200px;
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        padding: 8px 0;
+        margin-top: 8px;
+        z-index: 900;
+    }
+
+    .dropdown-menu.show {
+        display: block;
+    }
+
+    .dropdown-header {
+        padding: 8px 16px;
+        border-bottom: 1px solid #e2e8f0;
+        margin-bottom: 8px;
+    }
+
+    .dropdown-header strong {
+        display: block;
+        color: #2d3748;
+        font-size: 14px;
+    }
+
+    .role-badge {
+        font-size: 11px;
+        color: #718096;
+        text-transform: uppercase;
+    }
+
+    .dropdown-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .dropdown-list li a {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 16px;
+        text-decoration: none;
+        color: #4a5568;
+        font-size: 14px;
+        transition: background 0.2s;
+    }
+
+    .dropdown-list li a:hover {
+        background-color: #f7fafc;
+        color: #7c3aed;
+    }
+
+    .dropdown-list li a.logout-link:hover {
+        background-color: #fff5f5;
+        color: #e53e3e;
+    }
+
+    .divider {
+        height: 1px;
+        background-color: #e2e8f0;
+        margin: 4px 0;
+    }
+</style>
+
+<script>
+    function toggleUserMenu() {
+        const menu = document.getElementById('user-menu');
+        menu.classList.toggle('show');
+    }
+
+    // Fechar ao clicar fora
+    document.addEventListener('click', function (event) {
+        const dropdown = document.querySelector('.user-dropdown');
+        const menu = document.getElementById('user-menu');
+        if (!dropdown.contains(event.target)) {
+            menu.classList.remove('show');
+        }
+    });
+</script>

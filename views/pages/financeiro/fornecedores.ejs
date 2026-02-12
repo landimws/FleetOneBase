@@ -1,0 +1,389 @@
+<%- contentFor('body') %>
+
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="/css/multas.css"> <!-- Reusing structure styles -->
+    <link rel="stylesheet" href="/css/pages/multas_styles.css"> <!-- Reusing component styles -->
+
+    <!-- Abas -->
+    <!-- Abas -->
+    <!-- Abas & Filtros (Unified Header) -->
+    <div class="tabs">
+        <!-- Title Tab -->
+        <button class="tab-btn active" onclick="switchTab('lista')">Listagem de Fornecedores</button>
+
+        <!-- Filters (Inline) -->
+        <div style="display: flex; gap: 15px; align-items: center; margin-left: 20px; flex: 1; flex-wrap: wrap;">
+
+            <!-- Search -->
+            <div class="smart-search">
+                <input type="text" id="smart-search-input" class="form-modern"
+                    placeholder="Buscar por nome, CPF/CNPJ..." style="width: 300px;">
+                <span id="btn-smart-search"><i class="fas fa-search"></i></span>
+            </div>
+
+            <div class="quick-filters">
+                <button class="filter-chip active" onclick="filtrarStatus('todos')">Todos</button>
+                <button class="filter-chip" onclick="filtrarStatus('ativos')"
+                    style="border-color: #27ae60; color: #27ae60;">Ativos</button>
+                <button class="filter-chip" onclick="filtrarStatus('inativos')"
+                    style="border-color: #7f8c8d; color: #7f8c8d;">Inativos</button>
+            </div>
+        </div>
+
+        <!-- Action Button -->
+        <div style="margin-left: auto; padding-right: 0;">
+            <button onclick="abrirModalFornecedor()" class="btn-action btn-primary"
+                style="padding: 8px 16px; font-size: 0.9rem;">+ Novo Fornecedor</button>
+        </div>
+    </div>
+
+    <!-- Conteúdo Aba LISTAGEM -->
+    <div id="tab-lista" class="tab-content active">
+        <div class="content-container" style="padding: 20px;">
+            <div style="font-weight: bold; color: #34495e; font-size: 1.1em;">
+                Registros: <span id="contador-fornecedores" style="color: #2980b9;">0</span>
+            </div>
+
+
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th style="text-align:left;">NOME</th>
+                            <th style="text-align:center;">CPF / CNPJ</th>
+                            <th style="text-align:center;">TELEFONE</th>
+                            <th style="text-align:center;">STATUS</th>
+                            <th style="text-align:center;">AÇÕES</th>
+                        </tr>
+                    </thead>
+                    <tbody id="listaFornecedores">
+                        <!-- Preenchido via JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Cadastro -->
+    <div class="modal fade hidden" id="modalFornecedor" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header" style="background-color: #3498db; color: white;">
+                    <h5 class="modal-title" id="modalTitulo">Novo Fornecedor</h5>
+                    <button type="button" class="close text-white" onclick="fecharModalFornecedor()">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="formFornecedor">
+                    <div class="modal-body">
+                        <input type="hidden" id="fornecedorId">
+
+                        <div class="form-group">
+                            <label for="nome" style="font-weight: 600; color: #555;">Nome *</label>
+                            <input type="text" class="form-control" id="nome" required
+                                style="border-radius: 4px; border: 1px solid #ddd;">
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="cnpj_cpf" style="font-weight: 600; color: #555;">CNPJ / CPF</label>
+                                    <input type="text" class="form-control" id="cnpj_cpf"
+                                        style="border-radius: 4px; border: 1px solid #ddd;">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="telefone" style="font-weight: 600; color: #555;">Telefone</label>
+                                    <input type="text" class="form-control" id="telefone"
+                                        style="border-radius: 4px; border: 1px solid #ddd;">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="custom-control custom-switch mt-3">
+                            <input type="checkbox" class="custom-control-input" id="ativo" checked>
+                            <label class="custom-control-label" for="ativo">Cadastro Ativo</label>
+                        </div>
+                    </div>
+                    <div class="modal-footer" style="background-color: #f8f9fa;">
+                        <button type="button" class="btn btn-secondary"
+                            onclick="fecharModalFornecedor()">Cancelar</button>
+                        <button type="submit" class="btn btn-primary"
+                            style="background-color: #3498db; border-color: #3498db;">Salvar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { Mask } from '/js/utils/mask.js';
+
+        let todosFornecedores = [];
+        let filtroAtual = 'todos';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Apply Masks
+            const cnpjInput = document.getElementById('cnpj_cpf');
+            const telInput = document.getElementById('telefone');
+
+            if (cnpjInput) {
+                cnpjInput.addEventListener('input', (e) => {
+                    e.target.value = Mask.cpfCnpj(e.target.value);
+                });
+            }
+
+            if (telInput) {
+                telInput.addEventListener('input', (e) => {
+                    e.target.value = Mask.phone(e.target.value);
+                });
+            }
+
+            window.Mask = Mask;
+            carregarFornecedores();
+
+            // Search Filter
+            document.getElementById('smart-search-input').addEventListener('keyup', (e) => {
+                const termo = e.target.value.toLowerCase();
+                filtrarLista(termo);
+            });
+
+            document.getElementById('formFornecedor').addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const id = document.getElementById('fornecedorId').value;
+                const data = {
+                    nome: document.getElementById('nome').value,
+                    cnpj_cpf: document.getElementById('cnpj_cpf').value,
+                    telefone: document.getElementById('telefone').value,
+                    ativo: document.getElementById('ativo').checked
+                };
+
+                try {
+                    const url = id ? `/api/financeiro/fornecedores/${id}` : '/api/financeiro/fornecedores';
+                    const method = id ? 'PUT' : 'POST';
+
+                    const res = await fetch(url, {
+                        method,
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    });
+
+                    if (!res.ok) {
+                        const err = await res.json();
+                        throw new Error(err.error || 'Erro ao salvar');
+                    }
+
+                    fecharModalFornecedor();
+                    carregarFornecedores();
+
+                } catch (err) {
+                    alert(err.message);
+                    console.error(err);
+                }
+            });
+        });
+
+        async function carregarFornecedores() {
+            try {
+                const res = await fetch('/api/financeiro/fornecedores');
+                todosFornecedores = await res.json();
+                // Re-apply current chip filter logic
+                let listaFiltrada = todosFornecedores;
+                if (filtroAtual === 'ativos') listaFiltrada = todosFornecedores.filter(f => f.ativo);
+                if (filtroAtual === 'inativos') listaFiltrada = todosFornecedores.filter(f => !f.ativo);
+
+                renderizarTabela(listaFiltrada);
+            } catch (err) {
+                console.error('Erro ao carregar fornecedores:', err);
+            }
+        }
+
+        function renderizarTabela(lista) {
+            const tbody = document.getElementById('listaFornecedores');
+            document.getElementById('contador-fornecedores').innerText = lista.length;
+
+            if (lista.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding: 20px; color: #7f8c8d;">Nenhum fornecedor encontrado</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = lista.map(f => `
+        <tr style="border-bottom: 1px solid #eee; cursor: pointer;" onclick="visualizarFornecedor(${f.id})">
+            <td>${f.nome}</td>
+            <td class="text-center">${Mask.cpfCnpj(f.cnpj_cpf) || '-'}</td>
+            <td class="text-center">${Mask.phone(f.telefone) || '-'}</td>
+            <td class="text-center">
+                <span class="badge badge-${f.ativo ? 'success' : 'secondary'}">
+                    ${f.ativo ? 'ATIVO' : 'INATIVO'}
+                </span>
+            </td>
+            <td class="text-center">
+                <button class="btn-sm-ghost text-primary" onclick="event.stopPropagation(); editarFornecedor(${f.id}, '${f.nome}', '${f.cnpj_cpf || ''}', '${f.telefone || ''}', ${f.ativo})" title="Editar">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button class="btn-sm-ghost text-danger" onclick="event.stopPropagation(); excluirFornecedor(${f.id})" title="Excluir">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </td>
+        </tr>
+    `).join('');
+        }
+
+        function filtrarLista(termo) {
+            if (!termo) {
+                // Apply status filter
+                if (filtroAtual === 'todos') renderizarTabela(todosFornecedores);
+                if (filtroAtual === 'ativos') renderizarTabela(todosFornecedores.filter(f => f.ativo));
+                if (filtroAtual === 'inativos') renderizarTabela(todosFornecedores.filter(f => !f.ativo));
+                return;
+            }
+            const filtrados = todosFornecedores.filter(f =>
+                f.nome.toLowerCase().includes(termo) ||
+                (f.cnpj_cpf && f.cnpj_cpf.includes(termo))
+            );
+            renderizarTabela(filtrados);
+        }
+
+        window.filtrarStatus = function (tipo) {
+            filtroAtual = tipo;
+            // UI Update (chips)
+            document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+            event.target.classList.add('active');
+
+            if (tipo === 'todos') {
+                renderizarTabela(todosFornecedores);
+            } else if (tipo === 'ativos') {
+                renderizarTabela(todosFornecedores.filter(f => f.ativo));
+            } else if (tipo === 'inativos') {
+                renderizarTabela(todosFornecedores.filter(f => !f.ativo));
+            }
+        }
+
+        window.abrirModalFornecedor = function () {
+            document.getElementById('formFornecedor').reset();
+            document.getElementById('fornecedorId').value = '';
+            document.getElementById('modalTitulo').innerText = 'Novo Fornecedor';
+            document.getElementById('modalFornecedor').classList.remove('hidden');
+        }
+
+        window.fecharModalFornecedor = function () {
+            document.getElementById('modalFornecedor').classList.add('hidden');
+        }
+
+        window.editarFornecedor = function (id, nome, cnpj, tel, ativo) {
+            document.getElementById('fornecedorId').value = id;
+            document.getElementById('nome').value = nome;
+            document.getElementById('cnpj_cpf').value = Mask.cpfCnpj(cnpj);
+            document.getElementById('telefone').value = Mask.phone(tel);
+            document.getElementById('ativo').checked = ativo;
+            document.getElementById('modalTitulo').innerText = 'Editar Fornecedor';
+            document.getElementById('modalFornecedor').classList.remove('hidden');
+        }
+
+        window.excluirFornecedor = async function (id) {
+            if (!confirm('Tem certeza que deseja excluir este fornecedor?')) return;
+            try {
+                const res = await fetch(`/api/financeiro/fornecedores/${id}`, { method: 'DELETE' });
+                if (!res.ok) throw new Error('Erro ao excluir');
+                carregarFornecedores();
+            } catch (err) {
+                alert(err.message);
+            }
+        }
+    </script>
+
+    <!-- Modal Detalhes Fornecedor -->
+    <div class="modal fade hidden" id="modalDetalhesFornecedor" tabindex="-1" role="dialog"
+        style="background:rgba(0,0,0,0.5); overflow-y:auto !important; display:none; align-items:center; justify-content:center;">
+        <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 900px; width: 95%;">
+            <div class="modal-content">
+                <div class="modal-header" style="background-color: #7f8c8d; color: white;">
+                    <h5 class="modal-title">Detalhes do Fornecedor</h5>
+                    <button type="button" class="close text-white" onclick="fecharModalDetalhes()">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div id="conteudoDetalhesFornecedor"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="fecharModalDetalhes()">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Updated 'visualizarFornecedor' with Premium Design
+        async function visualizarFornecedor(id) {
+            try {
+                const response = await fetch(`/api/financeiro/fornecedores/${id}`); // Changed to /api/financeiro/fornecedores/${id}
+                if (!response.ok) throw new Error('Erro ao buscar dados');
+
+                const f = await response.json();
+
+                const html = `
+                <div class="financial-card">
+                    <div class="financial-title">
+                        <i class="fas fa-id-card"></i> Informações Cadastrais
+                    </div>
+                    <div class="financial-grid">
+                        <div class="financial-item">
+                            <div class="financial-label">Razão Social / Nome</div>
+                            <div class="financial-status" style="color:#2c3e50;">${f.nome}</div>
+                        </div>
+                        <div class="financial-item">
+                            <div class="financial-label">CPF / CNPJ</div>
+                            <div class="financial-status">${window.Mask ? window.Mask.cpfCnpj(f.cnpj_cpf) : (f.cnpj_cpf || '-')}</div>
+                        </div>
+                        <div class="financial-item">
+                            <div class="financial-label">Telefone</div>
+                            <div class="financial-status">${window.Mask ? window.Mask.phone(f.telefone) : (f.telefone || '-')}</div>
+                        </div>
+                         <div class="financial-item">
+                            <div class="financial-label">Status</div>
+                            <span class="badge badge-${f.ativo ? 'success' : 'danger'}">
+                                ${f.ativo ? 'Ativo' : 'Inativo'}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="financial-card">
+                    <div class="financial-title">
+                        <i class="fas fa-chart-pie"></i> Resumo Financeiro
+                    </div>
+                    <div class="financial-grid">
+                        <div class="financial-item">
+                            <div class="financial-label">Total Gasto (Histórico)</div>
+                             <div class="financial-status" style="color:#27ae60;">${parseFloat(f.total_gasto || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
+                        </div>
+                        <div class="financial-item">
+                            <div class="financial-label">Última Compra</div>
+                             <div class="financial-status">${f.ultima_compra ? new Date(f.ultima_compra).toLocaleDateString('pt-BR', { timeZone: 'UTC' }) : '-'}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+                document.getElementById('conteudoDetalhesFornecedor').innerHTML = html;
+                document.getElementById('modalDetalhesFornecedor').style.display = 'flex';
+                document.getElementById('modalDetalhesFornecedor').classList.add('show');
+            } catch (error) {
+                console.error(error);
+                alert('Erro ao carregar detalhes do fornecedor.');
+            }
+        }
+
+        function fecharModalDetalhes() {
+            document.getElementById('modalDetalhesFornecedor').classList.add('hidden');
+            document.getElementById('modalDetalhesFornecedor').classList.remove('show'); // Added to hide the modal properly
+            document.getElementById('modalDetalhesFornecedor').style.display = 'none'; // Added to hide the modal properly
+        }
+
+        function switchTab(tab) {
+            console.log('Switch tab ' + tab);
+        }
+    </script>

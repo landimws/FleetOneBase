@@ -1,0 +1,433 @@
+<%- contentFor('body') %>
+
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="/css/multas.css">
+    <link rel="stylesheet" href="/css/pages/multas_styles.css">
+
+    <!-- Abas -->
+    <!-- Abas -->
+    <!-- Abas & Filtros (Unified Header) -->
+    <div class="tabs">
+        <!-- Title Tab -->
+        <button class="tab-btn active" onclick="switchTab('lista')">Contas a Pagar</button>
+
+        <!-- Filters (Inline) -->
+        <div style="display: flex; gap: 15px; align-items: center; margin-left: 20px; flex: 1; flex-wrap: wrap;">
+
+            <!-- Date Filter -->
+            <div
+                style="display:flex; align-items:center; gap:5px; background: #fff; border: 1px solid #e2e8f0; border-radius: 6px; padding: 2px 8px;">
+                <input type="date" id="filtroInicio" class="form-modern"
+                    style="border:none; height:30px; padding:0; width:auto;">
+                <span style="color:#cbd5e1; font-size: 0.8rem;">-</span>
+                <input type="date" id="filtroFim" class="form-modern"
+                    style="border:none; height:30px; padding:0; width:auto;">
+                <button onclick="carregarContas()" title="Filtrar"
+                    style="background: none; border: none; cursor: pointer; color: #64748b;">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+
+            <!-- Chips -->
+            <div class="quick-filters">
+                <button class="filter-chip active" onclick="filtrarStatus('todos')">Todas</button>
+                <button class="filter-chip" onclick="filtrarStatus('PENDENTE')"
+                    style="border-color: #f39c12; color: #f39c12;">Pendentes</button>
+                <button class="filter-chip" onclick="filtrarStatus('PAGO')"
+                    style="border-color: #27ae60; color: #27ae60;">Pagas</button>
+                <button class="filter-chip" onclick="filtrarStatus('ATRASADO')"
+                    style="border-color: #c0392b; color: #c0392b;">Atrasadas</button>
+            </div>
+
+            <!-- Search -->
+            <div class="smart-search" style="margin-left: auto;">
+                <input type="text" id="smart-search-input" class="form-modern" placeholder="Buscar fornecedor..."
+                    style="width: 250px;">
+                <span id="btn-smart-search"><i class="fas fa-search"></i></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Conteúdo LISTAGEM -->
+    <div id="tab-lista" class="tab-content active">
+        <!-- Table -->
+        <div class="table-container" style="padding: 0 20px;">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th class="text-center">VENCIMENTO</th>
+                        <th class="text-left">FORNECEDOR</th>
+                        <th class="text-center">PARCELA</th>
+                        <th class="text-center">FORMA</th>
+                        <th class="text-right">VALOR</th>
+                        <th class="text-center">STATUS</th>
+                        <th class="text-center">AÇÕES</th>
+                    </tr>
+                </thead>
+                <tbody id="tabelaContas">
+                    <!-- JS -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal Pagamento -->
+    <div class="modal fade hidden" id="modalPagamento" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title">Registrar Pagamento</h5>
+                    <button type="button" class="close text-white" onclick="fecharModalPagamento()">
+                        <span>&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="pagamentoId">
+                    <p>Confirmar pagamento da parcela <strong id="pagamentoParcela"></strong> para <strong
+                            id="pagamentoFornecedor"></strong>?</p>
+
+                    <div class="financial-card"
+                        style="padding: 15px; margin-bottom: 20px; background: #f8fafc; border: 1px solid #e2e8f0;">
+                        <div style="font-size: 0.85rem; color: #64748b; margin-bottom: 5px;">Valor Original</div>
+                        <div style="font-size: 1.1rem; font-weight: bold; color: #334155;" id="pagamentoValorDisplay">R$
+                            0,00</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Valor Pago (R$)</label>
+                        <input type="text" class="form-control" id="valor_pago" placeholder="R$ 0,00">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Data Pagamento</label>
+                        <input type="date" class="form-control" id="data_pagamento"
+                            value="<%= new Date().toISOString().split('T')[0] %>">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Forma</label>
+                        <select class="form-control" id="forma_pagamento">
+                            <option value="BOLETO">Boleto</option>
+                            <option value="PIX">PIX</option>
+                            <option value="CARTAO">Cartão</option>
+                            <option value="DINHEIRO">Dinheiro</option>
+                            <option value="CHEQUE">Cheque</option>
+                        </select>
+                    </div>
+
+                    <div class="custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input" id="confirmado" checked>
+                        <label class="custom-control-label" for="confirmado">Pagamento Confirmado
+                            (Conciliado)</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="fecharModalPagamento()">Cancelar</button>
+                    <button type="button" class="btn btn-success" onclick="confirmarPagamento()">Confirmar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { Mask } from '/js/utils/mask.js';
+
+        let todasContas = [];
+        let statusAtual = 'todos';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const valorPagoInput = document.getElementById('valor_pago');
+            if (valorPagoInput) {
+                valorPagoInput.addEventListener('input', (e) => e.target.value = Mask.currency(e.target.value));
+            }
+
+            // Default: Show ALL (No Date Filter)
+            document.getElementById('filtroInicio').value = '';
+            document.getElementById('filtroFim').value = '';
+
+            carregarContas();
+
+            window.Mask = Mask; // Expose for non-module scripts
+
+            document.getElementById('smart-search-input').addEventListener('keyup', (e) => {
+                const termo = e.target.value.toLowerCase();
+                filtrarLocal(termo);
+            });
+        });
+
+        // Expose functions to window because module scope is isolated
+        window.estornarPagamento = async function (id) {
+            if (!confirm('Deseja realmente estornar este pagamento? O status voltará para "Em Aberto".')) return;
+
+            try {
+                const res = await fetch(`/api/financeiro/contas-pagar/${id}/estornar`, { method: 'POST' });
+                if (!res.ok) throw new Error('Erro ao estornar');
+                alert('Pagamento estornado!');
+                carregarContas();
+            } catch (err) {
+                console.error(err);
+                alert('Erro ao estornar pagamento.');
+            }
+        }
+
+        async function carregarContas() {
+            const start = document.getElementById('filtroInicio').value;
+            const end = document.getElementById('filtroFim').value;
+            const status = statusAtual === 'todos' ? '' : statusAtual;
+
+            try {
+                const res = await fetch(`/api/financeiro/contas-pagar?start=${start}&end=${end}&status=${status}`);
+                todasContas = await res.json();
+                renderizarTabela(todasContas);
+            } catch (err) {
+                console.error(err);
+                alert('Erro ao carregar contas');
+            }
+        }
+
+        function renderizarTabela(lista) {
+            const tbody = document.getElementById('tabelaContas');
+            if (lista.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center" style="padding: 20px; color: #7f8c8d;">Nenhuma conta encontrada.</td></tr>';
+                return;
+            }
+
+            const hoje = new Date().toISOString().split('T')[0];
+
+            tbody.innerHTML = lista.map(c => {
+                let statusBadge = 'secondary';
+                let statusText = 'Em Aberto';
+                let atrasado = false;
+                if (c.status === 'PAGO') {
+                    statusBadge = 'success';
+                    statusText = 'Pago';
+                } else if (c.vencimento < hoje) {
+                    statusBadge = 'danger';
+                    statusText = 'Atrasado';
+                    atrasado = true;
+                } else {
+                    statusBadge = 'warning';
+                    statusText = 'Pendente';
+                }
+
+                let statusColor = 'white';
+                if (statusBadge === 'warning' || statusBadge === 'secondary') statusColor = '#2c3e50';
+
+                return `
+            <tr style="border-bottom: 1px solid #f1f5f9; cursor: pointer;" onclick="visualizarConta(${c.id})">
+                <td class="text-center" style="color:${atrasado ? '#e74c3c' : 'inherit'}; font-weight:${atrasado ? '600' : 'normal'};">
+                    ${new Date(c.vencimento).toLocaleDateString('pt-BR', { timeZone: 'UTC' })}
+                </td>
+                <td>${c.Compra?.Fornecedor?.nome || '-'}</td>
+                <td class="text-center">${c.numero_parcela}/${c.total_parcelas}</td>
+                <td class="text-center">${c.forma_pagamento || '-'}</td>
+                <td class="text-right" style="font-weight: 600;">
+                    ${parseFloat(c.valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                </td>
+                <td class="text-center">
+                    <span class="badge badge-${statusBadge}">${statusText.toUpperCase()}</span>
+                </td>
+                <td class="text-center">
+                    ${c.status !== 'PAGO' ? `
+                    <button class="btn-sm-ghost text-success" onclick="event.stopPropagation(); openingPagamento(${c.id}, '${c.Compra?.Fornecedor?.nome}', '${c.numero_parcela}/${c.total_parcelas}', ${c.valor})" title="Registrar Pagamento">
+                        <i class="fas fa-check"></i>
+                    </button>
+                    ` : `
+                    <button class="btn-sm-ghost text-secondary" onclick="event.stopPropagation(); estornarPagamento(${c.id})" title="Estornar Pagamento">
+                        <i class="fas fa-undo"></i>
+                    </button>
+                    `}
+                </td>
+            </tr>
+            `;
+            }).join('');
+        }
+
+        window.filtrarStatus = function (tipo) {
+            statusAtual = tipo;
+            document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+            event.target.classList.add('active');
+            carregarContas();
+        }
+
+        // ... (other internal functions kept internal if not called from HTML) ... Actually HTML calls them via onclick.
+        // We must expose ALL functions called by HTML attributes.
+
+        window.filtrarLocal = function (termo) {
+            if (!termo) return renderizarTabela(todasContas);
+            const filtrados = todasContas.filter(c =>
+                (c.Compra && c.Compra.Fornecedor && c.Compra.Fornecedor.nome.toLowerCase().includes(termo))
+            );
+            renderizarTabela(filtrados);
+        }
+
+        window.openingPagamento = function (id, fornecedor, parcela, valor) {
+            document.getElementById('pagamentoId').value = id;
+            document.getElementById('pagamentoFornecedor').innerText = fornecedor;
+            document.getElementById('pagamentoParcela').innerText = parcela;
+
+            // Display Original
+            document.getElementById('pagamentoValorDisplay').innerText = valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+            // Set Input (Default to original)
+            // Use standard formatting logic
+            const valorFormatado = valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            document.getElementById('valor_pago').value = 'R$ ' + valorFormatado;
+
+            document.getElementById('modalPagamento').classList.remove('hidden');
+        }
+
+        window.fecharModalPagamento = function () {
+            document.getElementById('modalPagamento').classList.add('hidden');
+        }
+
+        window.confirmarPagamento = async function () {
+            const id = document.getElementById('pagamentoId').value;
+            const valorPagoInput = document.getElementById('valor_pago').value;
+
+            const data = {
+                data_pagamento: document.getElementById('data_pagamento').value,
+                forma_pagamento: document.getElementById('forma_pagamento').value,
+                valor_pago: Mask.unmaskCurrency(valorPagoInput),
+                confirmado: document.getElementById('confirmado').checked
+            };
+
+            try {
+                const res = await fetch(`/api/financeiro/contas-pagar/${id}/pagar`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                if (!res.ok) throw new Error('Erro ao pagar');
+
+                fecharModalPagamento();
+                carregarContas();
+            } catch (err) {
+                alert('Erro ao processar pagamento');
+                console.error(err);
+            }
+        }
+
+
+        window.visualizarConta = async function (id) {
+            try {
+                const response = await fetch(`/api/financeiro/contas-pagar/${id}`);
+                if (!response.ok) throw new Error('Erro ao buscar dados');
+
+                const c = await response.json();
+
+                const html = `
+                <div class="financial-card">
+                    <div class="financial-title">
+                        <i class="fas fa-money-bill-wave"></i> Detalhes da Conta
+                    </div>
+                    <div class="financial-grid">
+                         <div class="financial-item">
+                            <div class="financial-label">Fornecedor</div>
+                            <div class="financial-status" style="color:#2c3e50;">
+                                ${c.Compra?.Fornecedor?.nome || '-'} 
+                                <small style="display:block; color:#64748b; font-size:0.75rem;">
+                                    ${window.Mask && c.Compra?.Fornecedor?.cnpj_cpf ? window.Mask.cpfCnpj(c.Compra.Fornecedor.cnpj_cpf) : ''}
+                                </small>
+                            </div>
+                        </div>
+                        <div class="financial-item">
+                            <div class="financial-label">Vencimento</div>
+                            <div class="financial-status">${new Date(c.vencimento).toLocaleDateString('pt-BR', { timeZone: 'UTC' })}</div>
+                        </div>
+                        <div class="financial-item">
+                            <div class="financial-label">Parcela</div>
+                            <div class="financial-status">${c.numero_parcela} / ${c.total_parcelas}</div>
+                        </div>
+                        <div class="financial-item">
+                            <div class="financial-label">Valor</div>
+                            <div class="financial-status" style="color:#c0392b;">${parseFloat(c.valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
+                        </div>
+                    </div>
+                </div>
+                
+                 <div class="financial-card">
+                    <div class="financial-title">
+                        <i class="fas fa-info-circle"></i> Origem
+                    </div>
+                    <div class="financial-grid">
+                         <div class="financial-item">
+                            <div class="financial-label">Nota Fiscal</div>
+                            <div class="financial-status">${c.Compra?.numero_nota || 'N/A'}</div>
+                        </div>
+                         <div class="financial-item">
+                            <div class="financial-label">Data Compra</div>
+                            <div class="financial-status">${c.Compra ? new Date(c.Compra.data_emissao).toLocaleDateString('pt-BR', { timeZone: 'UTC' }) : '-'}</div>
+                        </div>
+                    </div>
+                </div>
+                `;
+
+                const modalBody = document.getElementById('modalDetalhesConta').querySelector('.modal-body');
+                if (modalBody) modalBody.innerHTML = html;
+
+                const modal = document.getElementById('modalDetalhesConta');
+                modal.classList.remove('hidden');
+                modal.style.display = 'flex';
+                modal.classList.add('show'); // Bootstrap/Global style support
+
+            } catch (error) {
+                console.error(error);
+                alert('Erro ao carregar detalhes da conta.');
+            }
+        }
+
+        window.fecharModalDetalhesConta = function () {
+            const modal = document.getElementById('modalDetalhesConta');
+            modal.classList.add('hidden');
+            modal.style.display = 'none';
+            modal.classList.remove('show');
+        }
+    </script>
+
+    <!-- Modal Detalhes Conta -->
+    <div class="modal fade hidden" id="modalDetalhesConta" tabindex="-1" role="dialog"
+        style="background:rgba(0,0,0,0.5); display:none; align-items:center; justify-content:center;">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header" style="background-color: #6c757d; color: white;">
+                    <h5 class="modal-title">Detalhes da Conta a Pagar</h5>
+                    <button type="button" class="close text-white" onclick="fecharModalDetalhesConta()">
+                        <span>&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <h4 class="text-center" id="detalheContaValor" style="color:#2c3e50; font-weight:bold;"></h4>
+                    <p class="text-center" style="color:#7f8c8d; margin-bottom:20px;">Valor da Parcela</p>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <small class="text-muted font-weight-bold">FORNECEDOR</small>
+                            <div id="detalheContaFornecedor"></div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <small class="text-muted font-weight-bold">PARCELA</small>
+                            <div id="detalheContaParcela"></div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <small class="text-muted font-weight-bold">VENCIMENTO</small>
+                            <div id="detalheContaVencimento"></div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <small class="text-muted font-weight-bold">FORMA PAGAMENTO</small>
+                            <div id="detalheContaForma"></div>
+                        </div>
+                        <div class="col-md-12 mb-3">
+                            <small class="text-muted font-weight-bold">STATUS</small>
+                            <div id="detalheContaStatus" style="font-weight:bold;"></div>
+                        </div>
+                    </div>
+                    <div id="detalheContaCompraInfo"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="fecharModalDetalhesConta()">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>

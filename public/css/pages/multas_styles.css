@@ -1,0 +1,108 @@
+.kpi-deck {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.kpi-group-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #eef2f7;
+    transition: transform 0.2s;
+}
+
+.kpi-group-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+}
+
+.kpi-group-header {
+    font-size: 0.85em;
+    text-transform: uppercase;
+    color: #95a5a6;
+    margin-bottom: 15px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid #f8f9fa;
+    padding-bottom: 10px;
+}
+
+.kpi-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.kpi-row:last-child {
+    margin-bottom: 0;
+}
+
+.kpi-row-label {
+    font-size: 0.95em;
+    color: #555;
+}
+
+.kpi-row-value {
+    font-weight: 600;
+    font-size: 1.1em;
+    color: #2c3e50;
+}
+
+.kpi-main-value {
+    font-size: 2em;
+    font-weight: 800;
+    color: #2c3e50;
+    margin: 5px 0 15px 0;
+}
+
+.kpi-sub-info {
+    font-size: 0.85em;
+    color: #7f8c8d;
+    margin-top: -5px;
+    margin-bottom: 15px;
+}
+
+.text-success {
+    color: #27ae60 !important;
+}
+
+.text-danger {
+    color: #c0392b !important;
+}
+
+.text-primary {
+    color: #2980b9 !important;
+}
+
+.text-purple {
+    color: #8e44ad !important;
+}
+
+/* Filter Chips */
+.filter-chip {
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 15px;
+    padding: 4px 12px;
+    font-size: 0.85em;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: #7f8c8d;
+}
+
+.filter-chip:hover {
+    background: #f8f9fa;
+    border-color: #bbb;
+}
+
+.filter-chip.active {
+    background: #34495e;
+    color: white !important;
+    border-color: #34495e !important;
+}

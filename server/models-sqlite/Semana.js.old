@@ -1,0 +1,25 @@
+
+import { DataTypes } from 'sequelize';
+import sequelize from '../config/database-sqlite.js';
+
+const Semana = sequelize.define('Semana', {
+    id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true
+    },
+    data_inicio: {
+        type: DataTypes.DATEONLY,
+        allowNull: false
+    },
+    data_fim: {
+        type: DataTypes.DATEONLY,
+        allowNull: false
+    },
+    status: {
+        type: DataTypes.STRING,
+        defaultValue: 'aberta' // 'aberta', 'fechada'
+    }
+});
+
+export default Semana;

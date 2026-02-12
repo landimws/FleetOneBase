@@ -1,0 +1,124 @@
+@media print {
+    @page {
+        margin: 10mm;
+        size: landscape;
+    }
+
+    /* Reset Global Crítico para Paginação */
+    html,
+    body {
+        background: white;
+        font-family: 'Open Sans', sans-serif;
+        color: black;
+        margin: 0 !important;
+        padding: 0 !important;
+        height: auto !important;
+        min-height: 100% !important;
+        overflow: visible !important;
+        display: block !important;
+    }
+
+    /* Esconder Elementos de Navegação e UI */
+    nav,
+    .sidebar,
+    .menu-lateral,
+    .top-bar,
+    .header-container,
+    .tabs,
+    .list-header,
+    .dashboard-controls,
+    .btn-primary,
+    .btn-secondary,
+    .smart-search,
+    .modal-overlay,
+    #drawer-relatorios,
+    #print-report-container {
+        display: none !important;
+    }
+
+    /* Garantir que o conteúdo principal flua */
+    .main-content,
+    .content-container,
+    #tab-lista,
+    .tab-content.active {
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        position: static !important;
+        display: block !important;
+        visibility: visible !important;
+        height: auto !important;
+        overflow: visible !important;
+    }
+
+    /* Tabela e Container */
+    .table-container {
+        overflow: visible !important;
+        height: auto !important;
+        display: block !important;
+        border: none !important;
+        box-shadow: none !important;
+        margin: 0 !important;
+    }
+
+    table.data-table {
+        width: 100% !important;
+        border-collapse: collapse !important;
+        font-size: 9pt !important;
+        table-layout: auto !important;
+    }
+
+    /* Cabeçalho da Tabela */
+    table.data-table th {
+        background-color: #f0f0f0 !important;
+        color: #333 !important;
+        border: 1px solid #ccc !important;
+        font-weight: bold;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    table.data-table td {
+        border: 1px solid #eee !important;
+        padding: 4px 8px !important;
+        vertical-align: middle;
+    }
+
+    /* Evitar quebra de linha no meio da info */
+    tr {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+    }
+
+    /* Esconder Coluna de Ações */
+    table.data-table th:last-child,
+    table.data-table td:last-child {
+        display: none !important;
+    }
+
+    /* Cores de Status forçadas */
+    .badge {
+        border: 1px solid #999;
+        color: #000 !important;
+        background: transparent !important;
+        font-weight: bold;
+    }
+
+    /* Exibir Rodapé de Totais (Oculto na tela) */
+    .print-only-row {
+        display: table-footer-group !important;
+    }
+
+    /* Cabeçalho do Relatório */
+    .list-header::after {
+        content: "Relatório de Multas";
+        display: block;
+        font-size: 18pt;
+        font-weight: bold;
+        margin-bottom: 10px;
+        text-align: center;
+        width: 100%;
+        visibility: visible;
+        position: static;
+    }
+}

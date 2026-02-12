@@ -1,0 +1,365 @@
+<%- contentFor('body') %>
+
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="/css/pages/compras.css">
+
+    <!-- Abas & Filtros (Unified Header) -->
+    <div class="tabs"
+        style="margin-top: 20px; align-items: center; border-bottom: 2px solid #e2e8f0; padding-bottom: 0; margin-bottom: 20px; flex-wrap: wrap;">
+
+        <!-- Title Tab -->
+        <button class="tab-btn active" style="font-size: 1rem;">Compras & Despesas</button>
+
+        <!-- Filters (Inline) -->
+        <div style="display: flex; gap: 10px; align-items: center; margin-left: 20px; flex: 1; flex-wrap: wrap;">
+
+            <!-- Date Filter -->
+            <div
+                style="display:flex; align-items:center; gap:5px; background: #fff; border: 1px solid #e2e8f0; border-radius: 6px; padding: 2px 8px;">
+                <input type="date" id="filtroInicio"
+                    style="border:none; color:#64748b; font-size:0.85rem; outline:none; background:transparent;">
+                <span style="color:#cbd5e1; font-size: 0.8rem;">-</span>
+                <input type="date" id="filtroFim"
+                    style="border:none; color:#64748b; font-size:0.85rem; outline:none; background:transparent;">
+            </div>
+
+            <!-- Supplier Filter -->
+            <select id="filtroFornecedor" class="form-modern"
+                style="width: 200px; height: 32px; padding: 0 8px; font-size: 0.85rem;">
+                <option value="">Todos Fornecedores</option>
+            </select>
+
+            <button class="btn-action btn-sm-ghost btn-filtrar"
+                style="background: #f1f5f9; color: #64748b; height: 32px;">
+                <i class="fas fa-search"></i>
+            </button>
+        </div>
+
+        <!-- Action Button -->
+        <div style="margin-left: auto; padding-right: 20px;">
+            <button class="btn-action btn-primary btn-nova-compra" style="padding: 8px 16px; font-size: 0.9rem;">
+                + Nova Compra
+            </button>
+        </div>
+    </div>
+
+    <!-- Conteúdo LISTA -->
+    <div id="tab-lista" class="tab-content active">
+        <!-- Old Filters removed -->
+
+        <div class="table-container" style="padding: 0 20px;">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th class="text-center">Data</th>
+                        <th>Fornecedor</th>
+                        <th class="text-center">Nota</th>
+                        <th class="text-right">Total</th>
+                        <th class="text-center">Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="tabelaCompras"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- MODAL PRINCIPAL: NOVA COMPRA -->
+    <div class="modal hidden modal-clean" id="modalCompra"
+        style="position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index: 1050; display: none;">
+        <div class="modal-dialog" style="max-width: 800px; width: 95%; margin: 30px auto; height: 90%;">
+            <div class="modal-content" style="height: 100%; display: flex; flex-direction: column;">
+
+                <div class="modal-header">
+                    <div>
+                        <h5 class="modal-title" id="modalCompraLabel">Nova Compra</h5>
+                        <div style="font-size: 0.85rem; color: #64748b; margin-top: 4px;">Registre a entrada de produtos
+                            ou serviços.</div>
+                    </div>
+                    <!-- Inline close for backup, JS handles proper close -->
+                    <button type="button" class="btn-sm-ghost" onclick="fecharModalCompra()"
+                        style="color:#94a3b8; font-size:1.5rem; line-height:1;">&times;</button>
+                </div>
+
+                <div class="modal-body-scroll" style="flex: 1;">
+                    <form id="formCompra">
+                        <input type="hidden" id="compra_id">
+
+                        <!-- 1. HEADER -->
+                        <div class="form-section" style="margin-top: 24px;">
+                            <div class="flex-row">
+                                <div class="flex-col w-50 w-sm-100">
+                                    <div class="form-group">
+                                        <label>Fornecedor</label>
+                                        <select class="form-modern" id="fornecedor_id" required></select>
+                                    </div>
+                                </div>
+                                <div class="flex-col w-25 w-sm-50">
+                                    <div class="form-group">
+                                        <label>Nº Nota / Fatura</label>
+                                        <input type="text" class="form-modern" id="numero_nota" required
+                                            placeholder="000000">
+                                    </div>
+                                </div>
+                                <div class="flex-col w-25 w-sm-50">
+                                    <div class="form-group">
+                                        <label>Emissão</label>
+                                        <input type="date" class="form-modern" id="data_emissao" required>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 2. ITEMS -->
+                        <div class="form-section">
+                            <div
+                                style="display:flex; justify-content:space-between; align-items: flex-end; margin-bottom: 8px;">
+                                <span class="section-title" style="margin:0;">Itens da Nota</span>
+                                <button type="button" class="btn-sm-ghost btn-add-item">
+                                    + Adicionar Item
+                                </button>
+                            </div>
+
+                            <div style="min-height: 100px;">
+                                <table class="table-modern">
+                                    <thead>
+                                        <tr>
+                                            <th width="50%">Item</th>
+                                            <th width="15%" class="text-center">Qtd</th>
+                                            <th width="15%" class="text-right">Unit.</th>
+                                            <th width="15%" class="text-right">Total</th>
+                                            <th width="5%"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="listaItens"></tbody>
+                                </table>
+
+                                <!-- Empty State -->
+                                <div id="semItensMsg"
+                                    style="text-align:center; padding: 40px 20px; color:#94a3b8; border-bottom: 1px dashed #e2e8f0;">
+                                    <div style="font-size: 2rem; margin-bottom: 10px; opacity: 0.3;">📦</div>
+                                    <p style="margin:0;">Nenhum item lançado.</p>
+                                    <button type="button" class="btn-action btn-primary btn-add-item-empty"
+                                        style="margin-top:15px;">
+                                        Adicionar Primeiro Item
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Subtotal & Discount -->
+                            <div
+                                style="display: flex; justify-content: space-between; align-items: flex-start; margin-top: 15px;">
+                                <div>
+                                    <span class="discount-toggle">
+                                        <span style="font-size:1.1em;">%</span> Adicionar Desconto / Cupom
+                                    </span>
+                                    <div class="discount-container" id="discountArea">
+                                        <div class="flex-row">
+                                            <div class="flex-col w-50">
+                                                <div class="form-group">
+                                                    <label>Desc. (R$)</label>
+                                                    <input type="text" class="form-modern" id="desconto_global_valor"
+                                                        placeholder="R$ 0,00">
+                                                </div>
+                                            </div>
+                                            <div class="flex-col w-50">
+                                                <div class="form-group">
+                                                    <label>Desc. (%)</label>
+                                                    <input type="number" class="form-modern" id="desconto_global_perc"
+                                                        step="0.1" value="0">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div style="text-align: right; font-size: 0.9rem; color: #64748b; margin-top: 5px;">
+                                    Subtotal Itens: <span id="totalItens" style="font-weight: 600; color: #334155;">R$
+                                        0,00</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 3. PAYMENT -->
+                        <div class="form-section">
+                            <span class="section-title">Pagamento</span>
+                            <div class="flex-row">
+                                <div class="flex-col w-25">
+                                    <div class="form-group">
+                                        <label>Condição</label>
+                                        <select class="form-modern" id="condicao_pagamento">
+                                            <option value="avista">À Vista</option>
+                                            <option value="prazo">A Prazo</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="flex-col w-25">
+                                    <div class="form-group">
+                                        <label>Forma</label>
+                                        <select class="form-modern" id="forma_pagamento_padrao">
+                                            <option value="BOLETO">Boleto</option>
+                                            <option value="PIX">PIX</option>
+                                            <option value="CARTAO">Cartão</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="flex-col w-25">
+                                    <div class="form-group">
+                                        <label>1º Vencimento</label>
+                                        <input type="date" class="form-modern" id="primeiro_vencimento">
+                                    </div>
+                                </div>
+                                <div class="flex-col w-25" id="divQtdParcelas" style="display:none;">
+                                    <div class="form-group">
+                                        <label>Parcelas</label>
+                                        <input type="number" class="form-modern" id="qtd_parcelas" value="1" min="1"
+                                            max="12">
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="listaParcelas" style="margin-top: 15px;"></div>
+                        </div>
+
+                        <!-- 4. TOTAL -->
+                        <div class="total-anchor">
+                            <span class="total-label">TOTAL LÍQUIDO A PAGAR</span>
+                            <span class="total-value" id="valor_liquido_display">R$ 0,00</span>
+                            <input type="hidden" id="valor_liquido">
+                        </div>
+
+                        <!-- 5. OBSERVAÇÕES -->
+                        <div class="form-section" style="margin-top: 20px;">
+                            <textarea class="form-modern" id="observacoes" rows="2"
+                                placeholder="Observações opcionais..."
+                                style="background: #f8fafc; border: none; padding: 12px; font-size: 0.85rem; color: #64748b; resize: none;"></textarea>
+                        </div>
+
+                    </form>
+                </div>
+
+                <div class="modal-footer"
+                    style="padding: 24px 32px; border-top: 1px solid #f1f5f9; display: flex; justify-content: flex-end; gap: 12px;">
+                    <!-- Inline close for backup -->
+                    <button type="button" class="btn-action btn-secondary"
+                        onclick="fecharModalCompra()">Cancelar</button>
+                    <button type="button" class="btn-action btn-success"
+                        onclick="document.getElementById('formCompra').requestSubmit()">
+                        <i class="fas fa-check"></i> Confirmar Lançamento
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL ITEM -->
+    <div class="modal hidden" id="modalItemCompra"
+        style="position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index: 1060; display: none;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body" style="padding: 24px;">
+                    <h5 id="modalItemCompraTitulo" style="margin: 0 0 20px 0; font-weight: 700; color: #0f172a;">
+                        Adicionar Item</h5>
+                    <form id="formItem">
+                        <div class="form-group">
+                            <label>Descrição do Item</label>
+                            <input type="text" class="form-modern" id="item_desc" required autofocus>
+                        </div>
+
+                        <div class="flex-row" style="margin-top: 15px;">
+                            <div class="flex-col w-50">
+                                <div class="form-group">
+                                    <label>Quantidade</label>
+                                    <input type="number" class="form-modern" id="item_qtd" value="1" min="0.1"
+                                        step="0.1" required>
+                                </div>
+                            </div>
+                            <div class="flex-col w-50">
+                                <div class="form-group">
+                                    <label>Valor Unit. (R$)</label>
+                                    <input type="text" class="form-modern" id="item_unit" placeholder="R$ 0,00"
+                                        required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex-row" style="margin-top: 15px;">
+                            <div class="flex-col w-50">
+                                <div class="form-group">
+                                    <label>Tipo</label>
+                                    <select class="form-modern" id="item_tipo">
+                                        <option value="PECA">Peça</option>
+                                        <option value="SERVICO">Serviço</option>
+                                        <option value="AVULSO">Avulso</option>
+                                        <option value="TAXA">Taxa/Outros</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="flex-col w-50">
+                                <div class="form-group">
+                                    <label>Desconto (R$)</label>
+                                    <input type="text" class="form-modern" id="item_desc_val" placeholder="R$ 0,00">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex-row"
+                            style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #f1f5f9;">
+                            <div class="flex-col w-50">
+                                <div class="form-group">
+                                    <input type="text" class="form-modern" id="item_placa" list="listaVeiculos"
+                                        placeholder="Placa (Busca)"
+                                        style="font-size: 0.8rem; height: 36px; text-transform: uppercase;">
+                                    <datalist id="listaVeiculos"></datalist>
+                                </div>
+                            </div>
+                            <div class="flex-col w-50">
+                                <div class="form-group">
+                                    <input type="text" class="form-modern" id="item_os" placeholder="Nº OS (Opcional)"
+                                        style="font-size: 0.8rem; height: 36px;">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div
+                            style="margin-top: 25px; display: flex; align-items: center; justify-content: space-between;">
+                            <div style="font-size: 0.9rem; color: #64748b;">Total do Item:</div>
+                            <div style="font-size: 1.25rem; font-weight: 800; color: #10b981;" id="item_total_display">
+                                R$ 0,00</div>
+                        </div>
+
+                        <div style="margin-top: 20px; display: flex; gap: 10px;">
+                            <!-- Inline close for backup -->
+                            <button type="button" class="btn-action btn-secondary w-50"
+                                onclick="fecharModalItem()">Cancelar</button>
+                            <button type="button" class="btn-action btn-success w-50"
+                                id="btnSalvarItem">Adicionar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Detalhes Compra -->
+    <div class="modal fade hidden" id="modalDetalhesCompra" tabindex="-1" role="dialog"
+        style="position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index: 1060; display: none; align-items: center; justify-content: center;">
+        <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 600px; width: 95%;">
+            <div class="modal-content">
+                <div class="modal-header" style="background-color: #6c757d; color: white;">
+                    <h5 class="modal-title">Detalhes da Compra</h5>
+                    <button type="button" class="close text-white" onclick="fecharModalDetalhesCompra()">
+                        <span>&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" id="conteudoDetalhesCompra" style="max-height: 70vh; overflow-y: auto;">
+                    <!-- Preenchido via JS -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary"
+                        onclick="fecharModalDetalhesCompra()">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load Modules -->
+    <script type="module" src="/js/pages/compras/compras.page.js"></script>

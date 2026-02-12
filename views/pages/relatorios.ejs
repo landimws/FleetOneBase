@@ -1,0 +1,82 @@
+<link rel="stylesheet" href="/css/relatorios.css?v=2">
+
+<div class="page-header" style="margin-top: 20px; padding: 0 20px;">
+    <h1>Relatórios & Histórico</h1>
+</div>
+
+
+<div class="relatorios-container">
+
+    <!-- Navegação e Filtro em linha -->
+    <div class="controls-row"
+        style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+        <div class="tabs-nav" style="display:flex; gap:10px;">
+            <button id="tab-clientes" class="tab-btn active">👥 Clientes</button>
+            <button id="tab-veiculos" class="tab-btn">🚗 Veículos</button>
+        </div>
+        <div class="filter-bar" style="width: 300px;">
+            <input type="text" id="input-filtro-lista" class="search-input-medium" placeholder="Filtrar lista..."
+                style="width:100%">
+        </div>
+    </div>
+
+    <!-- Lista (Tabela) -->
+    <div id="lista-container" class="table-container-clean">
+        <table class="data-table" style="width:100%">
+            <thead>
+                <th style="text-align:left; width: 23%;">Nome / Placa</th>
+                <th style="text-align:right; width: 8%;">Aluguel</th>
+                <th style="text-align:right; width: 7%;">Premium</th>
+                <th style="text-align:right; width: 7%;">Proteção</th>
+                <th style="text-align:right; width: 7%;">Acordo</th>
+                <th style="text-align:right; width: 7%;">Boleto</th>
+                <th style="text-align:right; width: 7%;">Desconto</th>
+                <th style="text-align:right; width: 8%; background:#f4f6f7;">Previsto</th>
+                <th style="text-align:right; width: 8%;">PAGO</th>
+                <th style="text-align:right; width: 8%;">Saldo</th>
+                </tr>
+            </thead>
+            <tbody id="tbody-lista">
+                <!-- JS injeta aqui -->
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<!-- MODAL DETALHES (Timeline) -->
+<div id="modal-detalhes" class="modal-overlay" style="display: none;">
+    <div class="modal-content-large">
+        <div class="modal-header">
+            <h2 id="modal-titulo">Histórico de ...</h2>
+            <button id="btn-fechar-modal" class="btn-close">&times;</button>
+        </div>
+
+        <div class="modal-body">
+            <!-- Resumo -->
+            <div id="resumo-container" class="resumo-card">
+                <div class="resumo-item">
+                    <span>Previsto</span>
+                    <strong id="res-total-previsto">R$ 0,00</strong>
+                </div>
+                <div class="resumo-item">
+                    <span>Recebido</span>
+                    <strong id="res-total-pago" style="color: #27ae60;">R$ 0,00</strong>
+                </div>
+                <div class="resumo-item">
+                    <span>Saldo</span>
+                    <strong id="res-total-saldo">R$ 0,00</strong>
+                </div>
+                <div class="resumo-item">
+                    <span>Semanas</span>
+                    <strong id="res-td-semanas" style="color: white;">0</strong>
+                </div>
+            </div>
+
+            <!-- Timeline -->
+            <div id="timeline-container" class="timeline-container" style="margin-top:20px;"></div>
+        </div>
+    </div>
+</div>
+
+<script src="/js/relatorios.js?v=2"></script>

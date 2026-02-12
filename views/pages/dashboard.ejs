@@ -1,0 +1,198 @@
+<!-- CONTAINER WIDE (99.5%) -->
+<div class="page-container-wide">
+
+    <!-- Toolbar Unificada Horizontal -->
+    <div class="toolbar-semana">
+        <!-- Grupo 1: Filtros (Discretos na esquerda) -->
+        <div class="toolbar-group group-left">
+            <button class="filtro-btn active" data-filtro="todos">Todos</button>
+            <button class="filtro-btn" data-filtro="alugado">Alugados</button>
+            <button class="filtro-btn" data-filtro="disponivel">Disponíveis</button>
+            <button class="filtro-btn" data-filtro="manutencao">Manutenção</button>
+            <button class="filtro-btn" data-filtro="validar">Validar</button>
+            <button class="filtro-btn" data-filtro="receber">Receber</button>
+            <button class="filtro-btn" data-filtro="recebidos">Recebidos</button>
+            <div class="search-wrapper">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="input-busca-grid" class="search-input"
+                    placeholder="Buscar (Modelo, Cliente, Tipo)...">
+                <span id="contador-veiculos" class="contador-badge">0 veículos</span>
+            </div>
+        </div>
+
+        <!-- Grupo 2: Navegação (Central e Destacado) -->
+        <div class="toolbar-group group-center">
+            <button id="btn-anterior" class="btn-nav btn-circle">⟨</button>
+            <div class="date-display-wrapper">
+                <select id="select-semana" class="select-semana-highlight">
+                    <option value="">📅 Carregando...</option>
+                </select>
+            </div>
+            <button id="btn-proxima" class="btn-nav btn-circle">⟩</button>
+        </div>
+
+        <!-- Grupo 3: Ações (Direita) -->
+        <div class="toolbar-group group-right">
+
+            <button id="btn-imprimir-grid" class="btn-action btn-secondary-action"
+                style="margin-right: 8px;">Imprimir</button>
+            <button id="btn-nova-semana" class="btn-action">Nova</button>
+            <button id="btn-fechar-semana" class="btn-action btn-secondary-action">Fechar</button>
+        </div>
+    </div>
+
+    <!-- Grid Semanal -->
+    <div class="grid-container">
+        <table id="grid-semana" class="grid-semana">
+            <thead>
+                <tr>
+                    <!-- 1. STATUS (Ícones: Alugado/Disponível/Manutenção + AS + BO/CO) -->
+                    <th style="width: 70px; text-align: center;">STATUS</th>
+                    <!-- 2. PLACA (Clicável para abrir modal) -->
+                    <th style="width: 90px;" data-sort="placa">PLACA</th>
+                    <!-- 3. CLIENTE -->
+                    <th style="width: 200px;" data-sort="cliente">CLIENTE</th>
+                    <!-- 4. TABELADO -->
+                    <th style="width: 90px;" data-sort="tabelado">TABELADO</th>
+                    <!-- 5. DIAS -->
+                    <th style="width: 50px;" data-sort="dias">DIAS</th>
+                    <!-- 6. SEMANA -->
+                    <th style="width: 90px;" data-sort="semana">SEMANA</th>
+                    <!-- 8. P. PREMIUM -->
+                    <th style="width: 85px;" data-sort="p_premium">P. PREM.</th>
+                    <!-- 9. PROTEÇÃO -->
+                    <th style="width: 85px;" data-sort="protecao">PROTEÇÃO</th>
+                    <!-- 10. ACORDO -->
+                    <th style="width: 85px;" data-sort="acordo">ACORDO</th>
+                    <!-- 11. P. BOLETOS -->
+                    <th style="width: 85px;" data-sort="ta_boleto">P. BOLETOS</th>
+                    <!-- 12. DESCONTO -->
+                    <th style="width: 85px;" data-sort="desconto">DESCONTO</th>
+                    <!-- 13. PREVISTO -->
+                    <th style="width: 90px;" data-sort="previsto">PREVISTO</th>
+                    <!-- 14. RECEBIDO -->
+                    <th style="width: 90px;" data-sort="recebido">RECEBIDO</th>
+                    <!-- 15. SALDO -->
+                    <th style="width: 90px;" data-sort="saldo">SALDO</th>
+                </tr>
+            </thead>
+            <tbody id="grid-body">
+                <!-- Linhas serão inseridas via JavaScript -->
+            </tbody>
+            <tfoot
+                style="position: sticky; bottom: 0; z-index: 100; background: #fff; box-shadow: 0 -4px 10px rgba(0,0,0,0.05); border-top: 1px solid #f8f9fa; font-family: 'Segoe UI', sans-serif;">
+                <!-- ULTRA COMPACT LAYOUT -->
+
+                <!-- Linha Atual (22px) -->
+                <tr style="height: 22px; font-weight: 700; font-size: 11px; color: #2c3e50;">
+                    <td colspan="3"
+                        style="text-align: right; padding-right: 8px; border: none !important; color: #95a5a6; font-size: 10px;">
+                        TOTAL</td>
+                    <td id="foot-atual-tabelado" class="text-right" style="border: none !important; padding: 0 4px;">R$
+                        0</td>
+                    <td style="border: none !important;"></td>
+                    <td id="foot-atual-semana" class="text-right" style="border: none !important; padding: 0 4px;">R$ 0
+                    </td>
+                    <td id="foot-atual-p_premium" class="text-right" style="border: none !important; padding: 0 4px;">R$
+                        0</td>
+                    <td id="foot-atual-protecao" class="text-right" style="border: none !important; padding: 0 4px;">R$
+                        0</td>
+                    <td id="foot-atual-acordo" class="text-right" style="border: none !important; padding: 0 4px;">R$ 0
+                    </td>
+                    <td id="foot-atual-ta_boleto" class="text-right" style="border: none !important; padding: 0 4px;">R$
+                        0</td>
+                    <td id="foot-atual-desconto" class="text-right" style="border: none !important; padding: 0 4px;">R$
+                        0</td>
+                    <td id="foot-atual-previsto" class="text-right"
+                        style="border: none !important; padding: 0 4px; background: rgba(46, 204, 113, 0.08); border-radius: 2px;">
+                        R$ 0</td>
+                    <td id="foot-atual-recebido" class="text-right"
+                        style="border: none !important; padding: 0 4px; color: #27ae60;">R$ 0</td>
+                    <td id="foot-atual-saldo" class="text-right" style="border: none !important; padding: 0 4px;">R$ 0
+                    </td>
+                </tr>
+
+                <!-- Linha Anterior (15px) -->
+                <tr style="height: 15px; font-size: 10px; color: #bdc3c7;">
+                    <td colspan="3" style="text-align: right; padding-right: 8px; border: none !important;">Ant.
+                    </td>
+                    <td id="foot-ant-tabelado" class="text-right" style="border: none !important; padding: 0 4px;">R$ 0
+                    </td>
+                    <td style="border: none !important;"></td>
+                    <td id="foot-ant-semana" class="text-right" style="border: none !important; padding: 0 4px;">R$ 0
+                    </td>
+                    <td id="foot-ant-p_premium" class="text-right" style="border: none !important; padding: 0 4px;">R$ 0
+                    </td>
+                    <td id="foot-ant-protecao" class="text-right" style="border: none !important; padding: 0 4px;">R$ 0
+                    </td>
+                    <td id="foot-ant-acordo" class="text-right" style="border: none !important; padding: 0 4px;">R$ 0
+                    </td>
+                    <td id="foot-ant-ta_boleto" class="text-right" style="border: none !important; padding: 0 4px;">R$ 0
+                    </td>
+                    <td id="foot-ant-desconto" class="text-right" style="border: none !important; padding: 0 4px;">R$ 0
+                    </td>
+                    <td id="foot-ant-previsto" class="text-right" style="border: none !important; padding: 0 4px;">R$ 0
+                    </td>
+                    <td id="foot-ant-recebido" class="text-right" style="border: none !important; padding: 0 4px;">R$ 0
+                    </td>
+                    <td id="foot-ant-saldo" class="text-right" style="border: none !important; padding: 0 4px;">
+                        R$ 0</td>
+                </tr>
+
+                <!-- Linha Variação (15px) -->
+                <tr style="height: 15px; font-size: 9px; color: #95a5a6;">
+                    <td colspan="3"
+                        style="text-align: right; padding-right: 8px; border: none !important; font-style: italic;">
+                        Delta</td>
+                    <td id="foot-diff-tabelado" class="text-right" style="border: none !important; padding: 0 4px;">-
+                    </td>
+                    <td style="border: none !important;"></td>
+                    <td id="foot-diff-semana" class="text-right" style="border: none !important; padding: 0 4px;">-</td>
+                    <td id="foot-diff-p_premium" class="text-right" style="border: none !important; padding: 0 4px;">-
+                    </td>
+                    <td id="foot-diff-protecao" class="text-right" style="border: none !important; padding: 0 4px;">-
+                    </td>
+                    <td id="foot-diff-acordo" class="text-right" style="border: none !important; padding: 0 4px;">-</td>
+                    <td id="foot-diff-ta_boleto" class="text-right" style="border: none !important; padding: 0 4px;">-
+                    </td>
+                    <td id="foot-diff-desconto" class="text-right" style="border: none !important; padding: 0 4px;">-
+                    </td>
+                    <td id="foot-diff-previsto" class="text-right" style="border: none !important; padding: 0 4px;">-
+                    </td>
+                    <td id="foot-diff-recebido" class="text-right" style="border: none !important; padding: 0 4px;">-
+                    </td>
+                    <td id="foot-diff-saldo" class="text-right" style="border: none !important; padding: 0 4px;">-</td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+
+</div> <!-- Fecha page-container-wide -->
+
+<!-- Datalists para Autocomplete -->
+<datalist id="placas-list"></datalist>
+<datalist id="clientes-list"></datalist>
+
+
+<script src="/js/DataRefreshBus.js"></script>
+<script src="/js/Constants.js?v=20"></script>
+<script src="/js/Formatters.js?v=20"></script>
+<script src="/js/modal-edicao.js?v=20"></script>
+<script src="/js/grid.js?v=20"></script>
+<script>
+    // Carregar opções para datalist
+    async function carregarOpcoes() {
+        try {
+            const [r1, r2] = await Promise.all([
+                fetch('/api/veiculos?ativo=true'),
+                fetch('/api/clientes?ativo=true')
+            ]);
+            const veiculos = await r1.json();
+            const clientes = await r2.json();
+
+            document.getElementById('placas-list').innerHTML = veiculos.map(v => `<option value="${v.placa}">${v.modelo} - ${v.combustivel}</option>`).join('');
+            document.getElementById('clientes-list').innerHTML = clientes.map(c => `<option value="${c.nome}">`).join('');
+        } catch (e) { console.error('Erro loading options', e); }
+    }
+    carregarOpcoes();
+</script>

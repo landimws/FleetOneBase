@@ -1,0 +1,281 @@
+<link rel="stylesheet" href="/css/dashboard.css"> <!-- Reusing dashboard styles -->
+<link rel="stylesheet" href="/css/multas.css"> <!-- Specific styles -->
+<link rel="stylesheet" href="/css/multas_dashboard_cc.css"> <!-- Command Center styles -->
+<link rel="stylesheet" href="/css/multas_print.css" media="print"> <!-- NEW: Print Styles -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<link rel="stylesheet" href="/css/pages/multas_styles.css">
+
+<!-- Abas -->
+<div class="tabs" style="margin-top: 20px;">
+    <button class="tab-btn active" onclick="switchTab('lista')">Listagem & Lançamento</button>
+    <button class="tab-btn" onclick="switchTab('dashboard')">Análises (Dashboard)</button>
+
+    <!-- Barra de Busca Inteligente e Botão Nova Multa -->
+    <div
+        style="margin-left: auto; padding-right: 20px; align-self: center; display: flex; gap: 15px; align-items: center;">
+        <div class="smart-search" style="position: relative;">
+            <input type="text" id="smart-search-input" placeholder="Buscar placa, modelo ou cliente..."
+                style="padding: 8px 35px 8px 15px; border-radius: 20px; border: 1px solid #ddd; width: 300px; outline: none; font-size: 0.9em; transition: all 0.2s;">
+            <span id="btn-smart-search"
+                style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: #95a5a6; cursor: pointer;">🔍</span>
+        </div>
+        <button id="btn-nova-multa" class="btn-primary" style="font-size: 0.9em;">+ Nova Multa</button>
+    </div>
+</div>
+
+<!-- Conteúdo Aba LISTAGEM -->
+<div id="tab-lista" class="tab-content active">
+
+    <div class="content-container" style="padding: 20px;">
+        <div class="list-header"
+            style="background: #fff; padding: 10px 0; margin-bottom: 15px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+
+            <!-- Lado Esquerdo: Total -->
+            <div style="font-weight: bold; color: #34495e; font-size: 1.1em;">
+                Multas: <span id="contador-multas" style="color: #2980b9;">0</span>
+            </div>
+
+            <!-- Lado Direito: Filtros Agrupados -->
+            <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
+
+                <!-- Filtros de Data Compactos -->
+                <div
+                    style="display: flex; align-items: center; gap: 5px; background: #f8f9fa; padding: 4px 10px; border-radius: 6px; border: 1px solid #e0e0e0;">
+                    <select id="list-tipo-data"
+                        style="padding: 4px; border: none; background: transparent; font-size: 0.9em; font-weight: 500; color: #555; cursor: pointer;">
+                        <option value="infracao">Infração</option>
+                        <option value="vencimento">Vencimento</option>
+                    </select>
+                    <span style="color: #bbb;">|</span>
+                    <input type="date" id="list-data-inicio"
+                        style="padding: 4px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.85em; width: 110px;">
+                    <span style="font-size: 0.8em; color: #7f8c8d;">até</span>
+                    <input type="date" id="list-data-fim"
+                        style="padding: 4px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.85em; width: 110px;">
+
+                    <button id="btn-filtrar-lista" title="Aplicar Filtro"
+                        style="background: none; border: none; cursor: pointer; font-size: 1.1em;">🔎</button>
+                    <button id="btn-limpar-filtros" title="Limpar Datas"
+                        style="background: none; border: none; cursor: pointer; font-size: 1em; color: #999;">✕</button>
+
+                    <div style="width: 1px; height: 15px; background: #e0e0e0; margin: 0 5px;"></div>
+
+                    <button id="btn-print-list" title="Imprimir Listagem" onclick="window.print()"
+                        style="background: none; border: none; cursor: pointer; font-size: 1.2em;">🖨️</button>
+                </div>
+
+                <!-- Separador Visual -->
+                <div style="width: 1px; height: 25px; background: #e0e0e0;"></div>
+
+                <!-- Quick Filters -->
+                <div class="quick-filters" style="display: flex; gap: 5px;">
+                    <button class="filter-chip active" data-filter="todos">Todos</button>
+                    <button class="filter-chip" data-filter="pagas"
+                        style="border-color: #27ae60; color: #27ae60;">Pagas</button>
+                    <button class="filter-chip" data-filter="vencidos"
+                        style="border-color: #c0392b; color: #c0392b;">Vencidos</button>
+                    <button class="filter-chip" data-filter="aberto"
+                        style="border-color: #3498db; color: #3498db;">Aberto</button>
+                    <button class="filter-chip" data-filter="falta_indicar">Indicar</button>
+                    <button class="filter-chip" data-filter="falta_reconhecer">Reconhecer</button>
+                    <button class="filter-chip" data-filter="falta_lancar">Lançar</button>
+                </div>
+            </div>
+        </div>
+        <div class="table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th style="text-align:center;">AUTO</th>
+                        <th style="text-align:center;">RENAINF</th>
+                        <th style="text-align:center; cursor: pointer;" onclick="changeSort('veiculo_id')">PLACA
+                            <span id="sort-icon-veiculo_id"></span>
+                        </th>
+                        <th style="text-align:center; cursor: pointer;" onclick="changeSort('data_infracao')">
+                            DATA <span id="sort-icon-data_infracao">▼</span></th>
+                        <th style="text-align:center; cursor: pointer;" onclick="changeSort('data_vencimento')">
+                            VENCIMENTO <span id="sort-icon-data_vencimento"></span></th>
+                        <th style="text-align:center;">VALOR</th>
+                        <th style="text-align:center;">V.PAGAR</th>
+                        <th style="cursor: pointer;" onclick="changeSort('responsavel')">RESPONSAVEL <span
+                                id="sort-icon-responsavel"></span></th>
+                        <th style="text-align:center;">INDI</th>
+                        <th style="text-align:center;">RECO</th>
+                        <th style="text-align:center;">LANÇ</th>
+                        <th style="text-align:center;">STATUS</th>
+                        <th style="text-align:center;">AÇÕES</th>
+                    </tr>
+                </thead>
+                <tbody id="lista-multas">
+                    <!-- Preenchido via JS -->
+                </tbody>
+                <tfoot class="print-only-row" style="display: none; font-weight: bold; background: #eee;">
+                    <tr>
+                        <td colspan="4" style="text-align: right; padding-right: 10px;">TOTAIS:</td>
+                        <td style="text-align: center;" id="total-valor-original">R$ 0,00</td>
+                        <td style="text-align: center;" id="total-valor-pagar">R$ 0,00</td>
+                        <td colspan="6"></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Conteúdo Aba DASHBOARD -->
+<div id="tab-dashboard" class="tab-content">
+
+    <!-- Global Dashboard Filters -->
+    <div class="dashboard-controls"
+        style="margin-bottom: 20px; display: flex; gap: 10px; justify-content: flex-end; align-items: center;">
+        <label>Periodo de Análise:</label>
+        <input type="date" id="filtro-inicio">
+        <span>até</span>
+        <input type="date" id="filtro-fim">
+        <button id="btn-filtrar-analytics" class="btn-secondary">Atualizar Dados</button>
+    </div>
+
+    <!-- COMMAND CENTER GRID -->
+    <div class="command-center-grid">
+
+        <!-- ROW 1: EXECUTIVE DECK -->
+        <!-- ROW 1: EXECUTIVE DECK (GROUPED) -->
+        <div class="kpi-deck">
+            <!-- CARD 1: CUSTOS / OBRIGAÇÕES -->
+            <div class="kpi-group-card">
+                <div class="kpi-group-header">Obrigações com Órgão (Despesa)</div>
+
+                <div class="kpi-row-label">Total a Pagar</div>
+                <div class="kpi-main-value text-danger" id="kpi-total-a-pagar">R$ 0,00</div>
+
+                <div class="kpi-row">
+                    <span class="kpi-row-label">Já Pago</span>
+                    <span class="kpi-row-value text-success" id="kpi-pago">R$ 0,00</span>
+                </div>
+                <div class="kpi-row">
+                    <span class="kpi-row-label">Pendente</span>
+                    <span class="kpi-row-value text-danger" id="kpi-a-pagar">R$ 0,00</span>
+                </div>
+            </div>
+
+            <!-- CARD 2: RESULTADO / CARTEIRA -->
+            <div class="kpi-group-card" style="border-top: 4px solid #8e44ad;">
+                <div class="kpi-group-header" style="color: #8e44ad;">Resultado Financeiro (Locadora)</div>
+
+                <div class="kpi-row-label">Lucro Operacional</div>
+                <div class="kpi-main-value text-purple" id="kpi-lucro">R$ 0,00</div>
+                <div class="kpi-sub-info">Recebido Clientes - Pago Órgão</div>
+
+                <div class="kpi-row">
+                    <span class="kpi-row-label">Recebido</span>
+                    <span class="kpi-row-value text-primary" id="kpi-recebido">R$ 0,00</span>
+                </div>
+                <div class="kpi-row">
+                    <span class="kpi-row-label">A Receber</span>
+                    <span class="kpi-row-value text-warning" id="kpi-a-receber" style="color: #f39c12;">R$
+                        0,00</span>
+                </div>
+            </div>
+
+            <!-- CARD 3: EFICIÊNCIA & RISCO -->
+            <div class="kpi-group-card">
+                <div class="kpi-group-header">Eficiência & Indicadores</div>
+
+                <div class="kpi-row">
+                    <span class="kpi-row-label">Total Bruto (Original)</span>
+                    <span class="kpi-row-value" id="kpi-total-original">R$ 0,00</span>
+                </div>
+                <div class="kpi-row">
+                    <span class="kpi-row-label">Economia (Descontos)</span>
+                    <span class="kpi-row-value text-success" id="kpi-saldo">R$ 0,00</span>
+                </div>
+
+                <div style="margin-top: 15px; padding-top: 15px; border-top: 1px dashed #eee;">
+                    <div class="kpi-row">
+                        <span class="kpi-row-label">Risco NIC (Indic. Crítica)</span>
+                        <span class="kpi-row-value text-danger" id="kpi-risco-nic" style="font-size: 1.4em;">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ROW 2: FINANCIAL CORE -->
+        <div class="chart-section" style="grid-column: span 2;">
+            <h3>Fluxo Financeiro (6 Meses) & Margem</h3>
+            <div class="chart-container" style="height: 300px;">
+                <canvas id="chart-fluxo"></canvas>
+            </div>
+        </div>
+        <div class="chart-section">
+            <h3>Status dos Processos</h3>
+            <div class="chart-container" style="height: 300px;">
+                <canvas id="chart-status"></canvas>
+            </div>
+        </div>
+
+        <!-- ROW 3: OPERATIONAL FORENSICS -->
+        <div class="chart-section">
+            <h3>Top 5 Veículos Ofensores</h3>
+            <div class="chart-container" style="height: 250px;">
+                <canvas id="chart-top-veiculos"></canvas>
+            </div>
+        </div>
+        <div class="chart-section">
+            <h3>Top Órgãos Autuadores</h3>
+            <div class="chart-container" style="height: 250px;">
+                <canvas id="chart-top-orgaos"></canvas>
+            </div>
+        </div>
+        <div class="chart-section">
+            <h3>Responsabilidade (Custo)</h3>
+            <div class="chart-container" style="height: 250px;">
+                <canvas id="chart-responsabilidade"></canvas>
+            </div>
+        </div>
+
+        <!-- ROW 4: WAR ROOM -->
+        <div class="war-room-section" style="grid-column: span 3;">
+            <div class="section-header"
+                style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                <h3 style="color: #e74c3c;">🚨 WAR ROOM: Vencimentos Próximos (30 Dias)</h3>
+            </div>
+            <table class="data-table dense">
+                <thead>
+                    <tr>
+                        <th>Vencimento</th>
+                        <th>Auto</th>
+                        <th>Veículo</th>
+                        <th>Valor</th>
+                        <th>Tipo de Risco</th>
+                        <th>Ação</th>
+                    </tr>
+                </thead>
+                <tbody id="lista-war-room">
+                    <!-- JS Populates -->
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+
+<!-- Modal Nova/Editar Multa -->
+<!-- Modais -->
+<%- include('../partials/multas/modal_edicao') %>
+    <%- include('../partials/multas/modal_detalhes') %>
+        <%- include('../partials/multas/drawer_relatorios') %>
+            <%- include('../partials/multas/modal_lancamento') %>
+
+                <!-- Container de Impressão (Invisível na Tela, Visível no Print) -->
+                <div id="print-report-container" style="display: none;"></div>
+
+                <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                <!-- Core Modules -->
+                <script src="/js/DataRefreshBus.js"></script>
+                <script src="/js/Formatters.js?v=20"></script>
+                <script src="/js/Constants.js?v=20"></script>
+                <script src="/js/services/MultasAPI.js"></script>
+                <script src="/js/modules/DashboardModule.js"></script>
+
+                <!-- Main Controller -->
+                <script src="/js/multas.js?v=5"></script>

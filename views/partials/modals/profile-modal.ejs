@@ -1,0 +1,299 @@
+<!-- Modal de Perfil Glassmorphism -->
+<div id="profile-modal" class="glass-overlay" style="display: none;">
+    <div class="glass-card">
+
+        <!-- View Mode -->
+        <div id="profile-view" class="glass-content fade-up">
+            <div class="glass-header">
+                <div class="glass-avatar">
+                    <%= user && user.nome ? user.nome.charAt(0).toUpperCase() : 'U' %>
+                </div>
+                <div class="glass-user-info">
+                    <h3>
+                        <%= user ? user.nome : 'Usuário' %>
+                    </h3>
+                    <p>@<%= user ? user.username : '' %>
+                    </p>
+                    <span class="glass-badge">
+                        <%= user ? (user.role==='admin' ? 'Administrador' : 'Operador' ) : '' %>
+                    </span>
+                </div>
+            </div>
+
+            <div class="glass-actions">
+                <button class="btn-glass-secondary" onclick="closeProfileModal()">Fechar</button>
+                <button class="btn-glass-primary" onclick="toggleProfileEdit(true)">Editar</button>
+            </div>
+        </div>
+
+        <!-- Edit Mode -->
+        <div id="profile-edit" class="glass-content fade-up" style="display: none;">
+            <div class="glass-edit-header">
+                <h3>Editar Perfil</h3>
+            </div>
+
+            <form onsubmit="updateProfile(event)" class="glass-form">
+                <div class="glass-input-group">
+                    <label>Nome</label>
+                    <input type="text" name="nome" value="<%= user ? user.nome : '' %>" required class="glass-input">
+                </div>
+
+                <div class="glass-input-group">
+                    <label>Usuário</label>
+                    <input type="text" name="username" value="<%= user ? user.username : '' %>" class="glass-input">
+                </div>
+
+                <div class="glass-input-group">
+                    <label>Nova Senha</label>
+                    <input type="password" name="password" placeholder="Opcional" class="glass-input">
+                </div>
+
+                <div class="glass-actions">
+                    <button type="button" class="btn-glass-secondary" onclick="toggleProfileEdit(false)">Voltar</button>
+                    <button type="submit" class="btn-glass-save">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function openProfileModal() {
+        toggleProfileEdit(false);
+        document.getElementById('profile-modal').style.display = 'flex';
+    }
+
+    function closeProfileModal() {
+        document.getElementById('profile-modal').style.display = 'none';
+    }
+
+    function toggleProfileEdit(editMode) {
+        document.getElementById('profile-view').style.display = editMode ? 'none' : 'block';
+        document.getElementById('profile-edit').style.display = editMode ? 'block' : 'none';
+    }
+
+    async function updateProfile(e) {
+        e.preventDefault();
+        const btn = e.target.querySelector('button[type="submit"]');
+        const originalText = btn.innerText;
+        btn.innerText = '...';
+        btn.disabled = true;
+
+        const formData = new FormData(e.target);
+        const data = Object.fromEntries(formData.entries());
+
+        try {
+            const response = await fetch('/api/profile', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+
+            if (response.ok) {
+                window.location.reload();
+            } else {
+                const result = await response.json();
+                alert('Erro: ' + result.error);
+                btn.innerText = originalText;
+                btn.disabled = false;
+            }
+        } catch (error) {
+            console.error(error);
+            alert('Erro ao atualizar.');
+            btn.innerText = originalText;
+            btn.disabled = false;
+        }
+    }
+</script>
+
+<style>
+    /* Ensure FULL SCREEN Overlay properly centered */
+    .glass-overlay {
+        position: fixed !important;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(15, 23, 42, 0.6);
+        /* Modern dark overlay */
+        backdrop-filter: blur(8px);
+        /* Strong blur for focus */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 99999;
+        /* Max z-index */
+    }
+
+    /* Beautiful Glass Card */
+    .glass-card {
+        background: rgba(255, 255, 255, 0.95);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 24px;
+        width: 320px;
+        /* Fixed width */
+        padding: 24px;
+        box-shadow:
+            0 20px 25px -5px rgba(0, 0, 0, 0.1),
+            0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        animation: springUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    /* Content Styling */
+    .glass-header {
+        text-align: center;
+        margin-bottom: 24px;
+    }
+
+    .glass-avatar {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 32px;
+        font-weight: 700;
+        margin: 0 auto 16px;
+        box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.3);
+    }
+
+    .glass-user-info h3 {
+        margin: 0;
+        font-size: 20px;
+        font-weight: 700;
+        color: #1e293b;
+    }
+
+    .glass-user-info p {
+        margin: 4px 0 8px;
+        font-size: 14px;
+        color: #64748b;
+    }
+
+    .glass-badge {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        background: #f1f5f9;
+        color: #475569;
+    }
+
+    /* Buttons */
+    .glass-actions {
+        display: flex;
+        gap: 12px;
+    }
+
+    .btn-glass-primary {
+        flex: 1;
+        padding: 10px;
+        border: none;
+        border-radius: 12px;
+        background: #0f172a;
+        color: white;
+        font-weight: 600;
+        font-size: 14px;
+        cursor: pointer;
+        transition: transform 0.1s;
+    }
+
+    .btn-glass-primary:hover {
+        background: #1e293b;
+    }
+
+    .btn-glass-primary:active {
+        transform: scale(0.98);
+    }
+
+    .btn-glass-secondary {
+        flex: 1;
+        padding: 10px;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        background: white;
+        color: #64748b;
+        font-weight: 600;
+        font-size: 14px;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    .btn-glass-secondary:hover {
+        background: #f8fafc;
+        color: #334155;
+    }
+
+    .btn-glass-save {
+        flex: 1;
+        padding: 10px;
+        border: none;
+        border-radius: 12px;
+        background: #10b981;
+        color: white;
+        font-weight: 600;
+        font-size: 14px;
+        cursor: pointer;
+    }
+
+    /* Inputs */
+    .glass-input-group {
+        margin-bottom: 16px;
+    }
+
+    .glass-input-group label {
+        display: block;
+        font-size: 12px;
+        font-weight: 600;
+        color: #64748b;
+        margin-bottom: 6px;
+    }
+
+    .glass-input {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        background: #f8fafc;
+        font-size: 14px;
+        color: #334155;
+        box-sizing: border-box;
+        transition: all 0.2s;
+    }
+
+    .glass-input:focus {
+        background: white;
+        border-color: #6366f1;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+
+    .glass-edit-header {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .glass-edit-header h3 {
+        font-size: 18px;
+        margin: 0;
+        color: #1e293b;
+    }
+
+    @keyframes springUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px) scale(0.9);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+</style>

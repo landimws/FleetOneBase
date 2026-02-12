@@ -1,0 +1,124 @@
+<!-- CMD: Modal Detalhes (Read-Only) -->
+<div id="modal-detalhes" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+        <!-- Header -->
+        <div class="modal-header">
+            <div>
+                <h2 id="detalhe-titulo">Detalhes da Multa</h2>
+                <span class="badge" id="detalhe-status" style="margin-top:5px; display:inline-block;"></span>
+            </div>
+            <button type="button" class="btn-icon-delete"
+                onclick="document.getElementById('modal-detalhes').style.display='none'"
+                style="color: #95a5a6; font-size: 1.2em;">✕</button>
+        </div>
+
+        <!-- Body -->
+        <div class="modal-body">
+            <!-- Section: General Info -->
+            <div class="details-section">
+                <div class="details-grid">
+                    <div class="detail-item">
+                        <span class="detail-label">Auto</span>
+                        <span class="detail-value" id="d-auto"></span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Renainf</span>
+                        <span class="detail-value" id="d-renainf"></span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Placa</span>
+                        <span class="detail-value" id="d-placa"></span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Órgão</span>
+                        <span class="detail-value" id="d-orgao"></span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Valor Original</span>
+                        <span class="detail-value" id="d-valor"></span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Data Infração</span>
+                        <span class="detail-value" id="d-infracao"></span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Vencimento</span>
+                        <span class="detail-value" id="d-vencimento"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div style="height: 1px; background: #f0f0f0; margin: 20px 0;"></div>
+
+            <!-- Section: Responsibles & Workflow -->
+            <div class="details-grid" style="grid-template-columns: 1fr 1fr 1fr; margin-bottom: 24px;">
+                <div class="detail-item">
+                    <span class="detail-label">Responsável</span>
+                    <span class="detail-value" id="d-responsavel"></span>
+                </div>
+                <div class="detail-item" id="container-condutor">
+                    <span class="detail-label">Condutor</span>
+                    <span class="detail-value" id="d-condutor"></span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Status Workflow</span>
+                    <div style="margin-top: 5px; font-size: 0.9em;">
+                        <div id="div-indicado">Indicado: <span id="d-indicado"></span></div>
+                        <div id="div-reconheceu">Reconheceu: <span id="d-reconheceu"></span></div>
+                        <div id="div-taxa">Taxa Admin: <span id="d-taxa"></span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Financial Card -->
+            <div class="financial-card">
+                <div class="financial-title">
+                    💰 Resumo Financeiro
+                </div>
+
+                <div class="financial-grid">
+                    <!-- Pago ao Orgao? -->
+                    <div class="financial-item">
+                        <div class="financial-label">Pago ao Órgão</div>
+                        <div class="financial-status" id="d-pago-status">-</div>
+                        <div id="d-pago-detalhes" style="font-size:0.85em; color:#666; margin-top:4px; display:none;">
+                            <span id="d-pago-data"></span> • <span id="d-pago-valor"></span>
+                        </div>
+                    </div>
+
+                    <!-- Cobrado Carteira? -->
+                    <div class="financial-item" id="container-cobrado-cliente">
+                        <div class="financial-label">Cobrado do Cliente</div>
+                        <div class="financial-status" id="d-cobrado-status">-</div>
+                        <div id="d-cobrado-detalhes"
+                            style="font-size:0.85em; color:#666; margin-top:4px; display:none;">
+                            <span id="d-cobrado-data"></span> • <span id="d-cobrado-valor"></span>
+                        </div>
+                        <div id="d-cobrado-actions" style="margin-top:5px; display:none;"></div>
+                    </div>
+                </div>
+
+                <div
+                    style="margin-top: 15px; display: flex; gap: 20px; border-top: 1px solid #edf2f7; padding-top: 15px;">
+                    <div class="detail-item">
+                        <span class="detail-label">Valor c/ Desconto</span>
+                        <span class="detail-value" id="d-valor-desconto" style="color: #27ae60; font-weight: 700;">R$
+                            0,00</span>
+                    </div>
+                    <div class="detail-item" id="container-valor-cobrar">
+                        <span class="detail-label">Valor a Cobrar</span>
+                        <span class="detail-value" id="d-valor-cobrar" style="color: #2980b9; font-weight: 700;">R$
+                            0,00</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="modal-footer">
+            <button type="button" class="btn-secondary"
+                onclick="document.getElementById('modal-detalhes').style.display='none'">Fechar</button>
+            <button type="button" class="btn-primary" id="btn-editar-visual">✏️ Editar Multa</button>
+        </div>
+    </div>
+</div>

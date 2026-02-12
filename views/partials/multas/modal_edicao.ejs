@@ -1,0 +1,235 @@
+<div id="modal-multa" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="modal-titulo">Nova Multa</h2>
+            <button type="button" class="btn-icon-delete" onclick="closeModal()"
+                style="color: #95a5a6; font-size: 1.2em;">✕</button>
+        </div>
+        <div class="modal-body">
+            <form id="form-multa">
+                <!-- Conteúdo em Grid -->
+                <div class="details-grid" style="grid-template-columns: 1fr 1fr; gap: 30px;">
+
+                    <!-- Coluna 1: Dados Principais -->
+                    <div style="display: flex; flex-direction: column; gap: 20px;">
+                        <!-- Seção Veículo -->
+                        <div class="modal-section">
+                            <div class="modal-section-title">🚗 Identificação</div>
+                            <div class="modal-grid">
+                                <div class="form-group">
+                                    <label>Placa Veículo *</label>
+                                    <input type="text" id="placa" list="lista-veiculos" required placeholder="ABC1234"
+                                        autocomplete="off">
+                                    <datalist id="lista-veiculos"></datalist>
+                                </div>
+                                <!-- Removed Duplicate Numero Auto -->
+                            </div>
+                        </div>
+
+                        <!-- Seção Infração -->
+                        <div class="modal-section">
+                            <div class="modal-section-title">📅 Dados da Infração</div>
+                            <div class="modal-grid">
+                                <div class="form-group">
+                                    <label>Nº Auto Infração</label>
+                                    <input type="text" id="numero_auto" required style="text-transform: uppercase;">
+                                </div>
+                                <div class="form-group">
+                                    <label>Renainf</label>
+                                    <input type="text" id="renainf" style="text-transform: uppercase;">
+                                </div>
+                                <div class="form-group">
+                                    <label>Data Infração *</label>
+                                    <input type="date" id="data_infracao" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Valor Original *</label>
+                                    <input type="number" id="valor_original" step="0.01" required placeholder="R$ 0,00">
+                                </div>
+                                <div class="form-group">
+                                    <label>Vencimento *</label>
+                                    <input type="date" id="data_vencimento" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Órgão Autuador *</label>
+                                    <select id="orgao_autuador" required>
+                                        <option value="" disabled selected>Selecione...</option>
+                                        <option value="AMC">AMC</option>
+                                        <option value="Aquiraz">Aquiraz</option>
+                                        <option value="Caucaia">Caucaia</option>
+                                        <option value="Eusébio">Eusébio</option>
+                                        <option value="Detran-CE">Detran-CE</option>
+                                        <option value="DNIT">DNIT</option>
+                                        <option value="DER-CE">DER-CE</option>
+                                        <option value="Itaitinga">Itaitinga</option>
+                                        <option value="Maracanau">Maracanau</option>
+                                        <option value="Pindoretama">Pindoretama</option>
+                                        <option value="Pacatuba">Pacatuba</option>
+                                        <option value="Pacajus">Pacajus</option>
+                                        <option value="Horizonte">Horizonte</option>
+                                        <option value="Paracuru">Paracuru</option>
+                                        <option value="Sao Goncalo do Amarante">São Gonçalo do Amarante</option>
+                                        <option value="PRF">PRF</option>
+                                        <option value="Outros">Outros</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Seção Baixa Financeira (Movida para cá) -->
+                        <div id="section-baixa-financeira" class="modal-section"
+                            style="border-left: 4px solid #ecc94b; background: #fffdf7;">
+                            <div class="modal-section-title" style="color: #b7791f; margin-bottom: 12px;">⚡
+                                Baixa Financeira</div>
+
+                            <!-- Layout em Colunas para Alinhamento Vertical -->
+                            <div style="display: flex; gap: 15px;">
+
+                                <!-- Coluna 1: Pagamento Órgão -->
+                                <div style="flex: 1; display: flex; flex-direction: column; gap: 5px;">
+                                    <label class="checkbox-card"
+                                        style="background: white; border-color: #ecc94b; padding: 5px 10px; font-size: 0.85em; width: 100%; box-sizing: border-box;">
+                                        <input type="checkbox" id="check-pago-orgao">
+                                        <span>Pago Órgão</span>
+                                    </label>
+
+                                    <div id="container-pago-orgao"
+                                        style="display: none; background: white; padding: 8px; border-radius: 6px; border: 1px solid #fef3c7; flex-direction: column; gap: 5px;">
+                                        <div class="form-group" style="margin-bottom: 5px;">
+                                            <label style="font-size: 0.8em; color: #666;">Data Pagto</label>
+                                            <input type="date" id="data_pagamento_orgao"
+                                                style="padding: 4px; font-size: 0.9em; width: 100%;">
+                                        </div>
+                                        <div class="form-group">
+                                            <label style="font-size: 0.8em; color: #666;">Valor Pago</label>
+                                            <input type="number" id="valor_pago_orgao" step="0.01"
+                                                style="padding: 4px; font-size: 0.9em; width: 100%;">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Coluna 2: Carteira -->
+                                <div style="flex: 1; display: flex; flex-direction: column; gap: 5px;">
+                                    <label class="checkbox-card" id="wrapper-check-carteira"
+                                        style="background: white; border-color: #3498db; padding: 5px 10px; font-size: 0.85em; opacity: 0.7; cursor: not-allowed; width: 100%; box-sizing: border-box;"
+                                        title="Para lançar, salve e use o botão 'Lançar' na tela de Detalhes">
+                                        <input type="checkbox" id="check-lancado-carteira" disabled>
+                                        <span>Lançado Cart. (Auto)</span>
+                                    </label>
+
+                                    <div id="container-lancado-carteira"
+                                        style="display: none; background: white; padding: 8px; border-radius: 6px; border: 1px solid #dbeafe; flex-direction: column; gap: 5px;">
+                                        <div class="form-group" style="margin-bottom: 5px;">
+                                            <label style="font-size: 0.8em; color: #666;">Data Lanç.</label>
+                                            <input type="date" id="data_lancamento_carteira"
+                                                style="padding: 4px; font-size: 0.9em; width: 100%;">
+                                        </div>
+                                        <div class="form-group">
+                                            <label style="font-size: 0.8em; color: #666;">Valor Lanç.</label>
+                                            <input type="number" id="valor_lancado_carteira" step="0.01"
+                                                style="padding: 4px; font-size: 0.9em; width: 100%;">
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Coluna 2: Responsável, Ajustes e Notas -->
+                    <div style="display: flex; flex-direction: column; gap: 20px;">
+                        <!-- Seção Responsabilidade -->
+                        <div class="modal-section">
+                            <div class="modal-section-title">👤 Responsável & Indicação</div>
+                            <div class="form-group" style="margin-bottom: 12px;">
+                                <label>Tipo Responsável</label>
+                                <select id="tipo_responsavel">
+                                    <option value="cliente">Cliente</option>
+                                    <option value="locadora">Locadora (Empresa)</option>
+                                </select>
+                            </div>
+                            <div class="form-group" id="group-cliente">
+                                <label>Nome do Condutor</label>
+                                <input type="text" id="cliente_nome" list="lista-clientes" autocomplete="off"
+                                    placeholder="Busque o cliente...">
+                                <datalist id="lista-clientes"></datalist>
+                            </div>
+
+                            <div style="margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap;">
+                                <label class="checkbox-card" id="container-indicado">
+                                    <input type="checkbox" id="foi_indicado">
+                                    <span>Indicado</span>
+                                </label>
+                                <label class="checkbox-card" id="container-reconheceu" style="display:none;">
+                                    <input type="checkbox" id="reconheceu">
+                                    <span>Reconheceu</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Seção Financeira -->
+                        <div class="modal-section" style="background: #fafafa; border-style: dashed;">
+                            <div class="modal-section-title">💰 Ajustes & Preview</div>
+                            <div class="modal-grid">
+                                <div id="group-desconto" class="form-group">
+                                    <label>Desconto (%)</label>
+                                    <select id="desconto_aplicado" style="cursor: pointer;">
+                                        <option value="0">0% (Integral)</option>
+                                        <option value="20">20% (Prazo)</option>
+                                        <option value="40">40% (Antecipado)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" id="group-taxas">
+                                    <label>Taxas</label>
+                                    <label class="checkbox-card">
+                                        <input type="checkbox" id="cobrar_taxa">
+                                        <span>Admin (15%)</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <!-- NEW: Advertência Option -->
+                            <div style="margin-top: 10px;">
+                                <label class="checkbox-card" style="border: 1px solid #f39c12; background: #fffaf0;">
+                                    <input type="checkbox" id="convertido_advertencia">
+                                    <span style="color: #d35400; font-weight: 600;">Converter em
+                                        Advertência</span>
+                                </label>
+                            </div>
+
+                            <div class="preview-container" style="margin-top: 20px;">
+                                <div id="group-pagar-preview" class="preview-box success">
+                                    <span class="preview-label">A Pagar (Órgão)</span>
+                                    <input type="text" id="calc_valor_desconto" readonly
+                                        style="background:transparent; border:none; color:#166534; font-size:1.1rem; font-weight:800; padding:0; width:100%; pointer-events:none;">
+                                </div>
+                                <div class="preview-box info" id="group-cobrar-preview">
+                                    <span class="preview-label">A Cobrar (Cliente)</span>
+                                    <input type="text" id="calc_valor_cobrar" readonly
+                                        style="background:transparent; border:none; color:#1e40af; font-size:1.1rem; font-weight:800; padding:0; width:100%; pointer-events:none;">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Seção Observações (NOVA) -->
+                        <div class="modal-section" style="flex: 1; display: flex; flex-direction: column;">
+                            <div class="modal-section-title">📝 Observações Internas</div>
+                            <div class="form-group" style="flex: 1; display: flex; flex-direction: column;">
+                                <textarea id="observacoes" placeholder="Notas sobre a indicação, recurso ou acordo..."
+                                    style="width: 100%; flex: 1; min-height: 100px; padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-family: inherit; resize: none;"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="modal-footer" style="padding: 20px 25px; border-top: 1px solid #eee; background: #f8f9fa;">
+            <button type="button" class="btn-secondary" onclick="closeModal()"
+                style="padding: 10px 20px; font-weight: 600;">Cancelar</button>
+            <button type="submit" form="form-multa" class="btn-primary"
+                style="background: linear-gradient(135deg, #9d00ff 0%, #7a00cc 100%); padding: 10px 40px; font-weight: 800; box-shadow: 0 4px 12px rgba(157, 0, 255, 0.3); border: none;">
+                SALVAR ALTERAÇÕES
+            </button>
+        </div>
+    </div>
+</div>

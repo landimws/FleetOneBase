@@ -1,0 +1,515 @@
+<link rel="stylesheet" href="/css/carteira.css?v=5">
+
+<!-- CONTAINER WIDE -->
+<div class="page-container-wide">
+
+    <div class="carteira-layout">
+        <!-- Coluna 1: Lista de Clientes -->
+        <div class="carteira-sidebar">
+            <div class="sidebar-header">
+                <input type="text" id="buscaCliente" class="search-cliente-input"
+                    placeholder="Buscar cliente por nome...">
+            </div>
+            <!-- Lista de Clientes -->
+            <div id="listaClientes" class="cliente-list">
+                <!-- Preenchido via JS -->
+            </div>
+        </div>
+
+        <!-- Coluna 2: Área de Conteúdo (Direita) -->
+        <div class="carteira-content-area">
+
+            <!-- PLACEHOLDER (Estado Inicial) -->
+            <div id="placeholderView" class="carteira-placeholder">
+                <div style="text-align: center;">
+                    <i class="ph ph-user-list" style="font-size: 48px; color: #ccc; margin-bottom: 10px;"></i>
+                    <br>
+                    Selecione um cliente na lista ao lado<br>para visualizar e gerenciar a carteira.
+                </div>
+            </div>
+
+            <!-- DETALHES DA CARTEIRA (Oculto inicialmente) -->
+            <div id="detalhesView" class="hidden" style="height: 100%; display: flex; flex-direction: column;">
+
+                <div class="content-header">
+                    <div style="flex: 0 0 auto;">
+                        <h2 style="margin: 0; font-size: 18px; color: #2c3e50;" id="carteiraNomeCliente">Nome do
+                            Cliente</h2>
+                        <span style="font-size: 12px; color: #7f8c8d;">Controle de Débitos e Créditos</span>
+                    </div>
+
+                    <!-- Resumo Integrado no Header -->
+                    <div class="header-resumo">
+                        <div class="h-item">
+                            <span class="label">Débitos:</span>
+                            <span class="value debt" id="txTotalDebitos">R$ 0,00</span>
+                        </div>
+                        <div class="h-item">
+                            <span class="label">Créditos:</span>
+                            <span class="value credit" id="txTotalCreditos">R$ 0,00</span>
+                        </div>
+                        <div class="h-item">
+                            <span class="label">Descontos:</span>
+                            <span class="value" id="txTotalDescontos" style="color: #e67e22;">R$ 0,00</span>
+                        </div>
+                        <div class="h-item divider">
+                            <span class="label">Saldo:</span>
+                            <span class="value balance" id="txSaldoDevedor">R$ 0,00</span>
+                        </div>
+                    </div>
+
+                    <!-- Veículos (Empurra para direita) -->
+                    <div id="resumoVeiculosPanel"
+                        style="display: flex; flex-wrap: wrap; gap: 5px; margin-left: auto; align-items: center;">
+                    </div>
+
+                    <button onclick="imprimirRelatorio()" class="btn-new"
+                        style="background-color: #34495e; margin-left: 15px;">
+                        <i class="ph ph-printer"></i> Imprimir
+                    </button>
+
+                    <button id="btnEncerrarContrato" onclick="abrirModalEncerramento()" class="btn-new"
+                        style="background-color: #c0392b; margin-left: 10px; color: white;">
+                        <i class="ph ph-file-text"></i> Encerrar Contrato
+                    </button>
+
+                    <button id="btnReabrirContrato" onclick="reabrirContrato()" class="btn-new" style="display: none;
+                        background-color: #3498db; margin-left: 10px; color: white;">
+                        <i class="ph ph-lock-open"></i> Reabrir Contrato
+                    </button>
+                </div>
+
+                <!-- Badge de Contrato Encerrado -->
+                <div id="badgeEncerrado"
+                    style="display: none; background: #e74c3c; color: white; padding: 12px 20px; border-radius: 8px; text-align: center; font-weight: bold; margin: 15px 0; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+                    ⚠️ CONTRATO ENCERRADO
+                </div>
+
+                <!-- Scrollable Content -->
+                <div style="flex: 1; display: flex; flex-direction: column; overflow: hidden; padding-right: 5px;">
+
+                    <!-- Painel de Resumo -->
+                    <!-- (Painel de Resumo removido - movido para o header) -->
+
+
+                    <!-- Área de Lançamentos (Split) -->
+                    <div class="split-view">
+
+                        <!-- ESQUERDA: DÉBITOS -->
+                        <div class="painel-lancamento">
+                            <div class="painel-title header-debitos">
+                                <span>DÉBITOS (A Pagar)</span>
+                                <button onclick="abrirModalLancamento('debito')" class="btn-new danger">+ Novo
+                                    Débito</button>
+                            </div>
+                            <div class="painel-content">
+                                <div id="listaDebitos"></div>
+                            </div>
+                        </div>
+
+                        <!-- DIREITA: CRÉDITOS -->
+                        <div class="painel-lancamento">
+                            <div class="painel-title header-creditos">
+                                <span>CRÉDITOS (Pagos)</span>
+                                <button onclick="abrirModalLancamento('credito')" class="btn-new success">+ Novo
+                                    Crédito</button>
+                            </div>
+                            <div class="painel-content">
+                                <div id="listaCreditos"></div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div> <!-- Fim Scrollable content -->
+
+            </div> <!-- Fim de DetalhesView -->
+
+        </div> <!-- Fim Coluna 2 -->
+
+    </div>
+</div>
+
+<!-- MODAL DE LANÇAMENTO -->
+<div id="modalLancamento" class="modal-overlay hidden">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="tituloModal">Novo Lançamento</h2>
+            <button onclick="fecharModalLancamento()" class="btn-close-modal">×</button>
+        </div>
+        <div class="modal-body">
+
+            <!-- Form Débito -->
+            <form id="formDebito" class="hidden" onsubmit="salvarDebito(event)">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Data</label>
+                        <input type="date" name="data" required class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Veículo</label>
+                        <input type="text" name="veiculo_placa" list="dlVeiculos" required class="form-input"
+                            placeholder="Digite placa ou modelo...">
+                        <datalist id="dlVeiculos"></datalist>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Tipo</label>
+                        <select name="tipo" required class="form-select">
+                            <option value="Locação">Locação</option>
+                            <option value="Multa">Multa</option>
+                            <option value="Funilaria">Funilaria/Pintura</option>
+                            <option value="Sinistro">Sinistro</option>
+                            <option value="Peça">Peça</option>
+                            <option value="Taxas">Taxas</option>
+                            <option value="Reembolso">Reembolso</option>
+                            <option value="Devolução Caução">Devolução Caução</option>
+                            <option value="Outros">Outros</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label class="form-label">Descrição</label>
+                    <textarea name="descricao" rows="2" class="form-textarea" required></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Quantidade</label>
+                        <input type="number" name="quantidade" value="1" min="1" class="form-input"
+                            oninput="calcTotalDebito()" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Valor Unitário</label>
+                        <input type="number" name="valor_unitario" step="0.01" class="form-input"
+                            oninput="calcTotalDebito()" required>
+                    </div>
+                    <div class="form-group check-group">
+                        <input type="checkbox" name="cobra_taxa_adm" id="chkTaxa" onchange="calcTotalDebito()">
+                        <label for="chkTaxa">TA</label>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label class="form-label">Observação (Interna)</label>
+                    <textarea name="observacao" rows="2" class="form-textarea"
+                        placeholder="Não aparece na fatura..."></textarea>
+                </div>
+
+                <div class="text-right" style="margin-bottom: 15px; font-weight: bold; color: #e74c3c;"
+                    id="previewTotalDebito">
+                    Total: R$ 0,00
+                </div>
+
+                <button type="submit" class="btn-save danger">Salvar Débito</button>
+            </form>
+
+            <!-- Form Crédito -->
+            <form id="formCredito" class="hidden" onsubmit="salvarCredito(event)">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Data</label>
+                        <input type="date" name="data" required class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Valor Original</label>
+                        <input type="number" name="valor_original" step="0.01" class="form-input"
+                            placeholder="Ex: 200.00" onchange="calcularValorFinal()" required>
+                    </div>
+                </div>
+
+                <div class="form-group check-group" style="margin-bottom: 15px;">
+                    <input type="checkbox" id="chkAplicarDesconto" onchange="toggleDescontoFields()">
+                    <label for="chkAplicarDesconto">Aplicar Desconto?</label>
+                </div>
+
+                <div class="form-row hidden" id="containerDescontos">
+                    <div class="form-group" style="flex: 0.3;">
+                        <label class="form-label">Tipo</label>
+                        <select name="desconto_tipo" class="form-select" onchange="calcularValorFinal()">
+                            <option value="percentual">%</option>
+                            <option value="valor">R$</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="flex: 0.7;">
+                        <label class="form-label" id="labelDesconto">Desconto (%)</label>
+                        <input type="number" name="desconto_percentual" step="0.01" min="0" class="form-input"
+                            placeholder="Ex: 50" value="0" id="inputDesconto" onchange="calcularValorFinal()">
+                    </div>
+                </div>
+
+                <div class="form-group hidden" id="containerValorFinal"
+                    style="background: #e8f5e9; padding: 12px; border-radius: 5px; border: 2px solid #27ae60;">
+                    <label class="form-label" style="color: #27ae60; font-weight: bold;">Valor Final (a
+                        receber)</label>
+                    <input type="number" name="valor" step="0.01" class="form-input" readonly
+                        style="background: white; font-size: 16px; font-weight: bold; color: #27ae60;"
+                        placeholder="R$ 0,00" required>
+                    <small style="color: #666; font-size: 11px;">Este é o valor que será creditado na
+                        conta</small>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Banco / Destino</label>
+                        <input type="text" name="banco" class="form-input" placeholder="Ex: Itaú, Caixa...">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Meio Pagamento</label>
+                        <select name="tipo" class="form-select" required>
+                            <option value="PIX">PIX</option>
+                            <option value="Boleto">Boleto</option>
+                            <option value="Dinheiro">Dinheiro</option>
+                            <option value="Cartão">Cartão</option>
+                            <option value="Desconto">Desconto</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label class="form-label">Descrição</label>
+                    <textarea name="descricao" rows="2" class="form-textarea"
+                        placeholder="Descreva o motivo do crédito..."></textarea>
+                </div>
+
+                <div class="form-group check-group" style="margin-bottom: 15px;">
+                    <input type="checkbox" name="recorrente" id="chkRecorrente" onchange="toggleRecorrencia()">
+                    <label for="chkRecorrente">📅 Lançamento Recorrente</label>
+                </div>
+
+                <div id="recorrenciaFields" class="hidden"
+                    style="background: #f8f9fa; padding: 15px; border-radius: 5px; margin-bottom: 15px;">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Quantidade de Parcelas</label>
+                            <input type="number" name="num_parcelas" min="2" max="100" class="form-input" value="7"
+                                onchange="atualizarPreviewParcelas()">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Periodicidade</label>
+                            <select name="periodicidade" class="form-select" onchange="atualizarPreviewParcelas()">
+                                <option value="semanal">Semanal (7 dias)</option>
+                                <option value="mensal">Mensal (30 dias)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="previewParcelas" style="font-size: 11px; color: #7f8c8d; margin-top: 10px;"></div>
+                </div>
+
+                <div class="form-group check-group">
+                    <input type="checkbox" name="banco_confirmado" id="chkConfirmado">
+                    <label for="chkConfirmado" style="color:#27ae60;">Confirmado no Banco</label>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label class="form-label">Observação (Interna)</label>
+                    <textarea name="observacao" rows="2" class="form-textarea"
+                        placeholder="Não aparece na fatura..."></textarea>
+                </div>
+
+                <button type="submit" class="btn-save success">Salvar Crédito</button>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<!-- MODAL DE DETALHES (Read-Only) -->
+<div id="modalDetalhes" class="modal-overlay hidden">
+    <div class="modal-content" style="max-width: 500px;">
+        <div class="modal-header">
+            <h2 id="tituloDetalhes">Detalhes</h2>
+            <button onclick="fecharModalDetalhes()" class="btn-close-modal">×</button>
+        </div>
+        <div class="modal-body">
+
+            <!-- Conteúdo Dinâmico -->
+            <div id="conteudoDetalhes" style="font-size: 14px; color: #2c3e50;">
+                <!-- Preenchido via JS -->
+            </div>
+
+            <div class="modal-footer"
+                style="margin-top: 20px; display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid #eee; padding-top: 15px;">
+                <button id="btnExcluirDetalhe" class="btn-save danger"
+                    style="background: none; color: #e74c3c; border: 1px solid #e74c3c;">
+                    <i class="ph ph-trash"></i> Excluir
+                </button>
+                <button id="btnEditarDetalhe" class="btn-save" style="background: #3498db;">
+                    <i class="ph ph-pencil-simple"></i> Editar
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Encerramento -->
+<%- include('../partials/modals/negociacao') %>
+    <div id="modalEncerramento" class="modal-overlay" style="display: none;">
+        <div class="modal-content" style="max-width: 800px; padding: 0;">
+            <div class="modal-header"
+                style="background: #2c3e50; color: white; padding: 20px; border-radius: 8px 8px 0 0;">
+                <h3 style="margin: 0; display: flex; align-items: center; gap: 10px;">
+                    <i class="ph ph-file-signature"></i> Encerramento de Contrato
+                </h3>
+                <button onclick="fecharModalEncerramento()"
+                    style="background:none; border:none; color:white; font-size:24px; cursor:pointer;">&times;</button>
+            </div>
+
+            <div class="modal-body" style="padding: 20px; max-height: 70vh; overflow-y: auto;">
+
+                <!-- Passo 1: Dados Pessoais e Contratuais -->
+                <div
+                    style="background: #f8f9fa; padding: 15px; border-radius: 6px; margin-bottom: 20px; border: 1px solid #e9ecef;">
+                    <h4
+                        style="margin-top: 0; color: #2c3e50; border-bottom: 2px solid #ddd; padding-bottom: 10px; margin-bottom: 15px;">
+                        1. Dados do Contrato (Para Documentos)
+                    </h4>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                        <div class="form-group">
+                            <label>Veículo Placa (Encerramento)</label>
+                            <select id="encPlaca" class="form-select"
+                                onchange="atualizarDadosVeiculoSelecionado()"></select>
+                        </div>
+                        <div class="form-group">
+                            <label>Modelo</label>
+                            <input type="text" id="encModelo" class="form-input" readonly style="background: #eee;">
+                        </div>
+                        <div class="form-group">
+                            <label>Ano Fab/Mod</label>
+                            <input type="text" id="encAno" class="form-input" placeholder="Ex: 2023/2024">
+                        </div>
+                        <div class="form-group">
+                            <label>Valor Semanal (R$)</label>
+                            <input type="number" id="encValorSemanal" class="form-input" step="0.01">
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+                        <div class="form-group">
+                            <label>Data Início</label>
+                            <input type="date" id="encDataInicio" class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label>Data Fim</label>
+                            <input type="date" id="encDataFim" class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label>KM Inicial</label>
+                            <input type="number" id="encKmInicio" class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label>KM Final</label>
+                            <input type="number" id="encKmFim" class="form-input">
+                        </div>
+                    </div>
+
+                    <div
+                        style="background: #e8f4f8; padding: 10px; border-radius: 4px; margin-bottom: 15px; border-left: 4px solid #3498db; color: #2980b9;">
+                        <i class="ph ph-info"></i> Os dados pessoais (CPF, RG, Endereço) serão preenchidos
+                        automaticamente no termo com base no cadastro do cliente.
+                    </div>
+
+                    <div style="display: none; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="form-group">
+                            <label>CPF</label>
+                            <input type="text" id="encCpf" class="form-input" placeholder="000.000.000-00">
+                        </div>
+                        <div class="form-group">
+                            <label>RG</label>
+                            <input type="text" id="encRg" class="form-input">
+                        </div>
+                        <div class="form-group" style="grid-column: span 2;">
+                            <label>Endereço Completo</label>
+                            <input type="text" id="encEndereco" class="form-input"
+                                placeholder="Rua, Número, Bairro, Cidade-UF, CEP">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Passo 2: Conferência Financeira -->
+                <div
+                    style="background: #fff3e0; padding: 15px; border-radius: 6px; margin-bottom: 20px; border: 1px solid #ffe0b2;">
+                    <h4
+                        style="margin-top: 0; color: #d35400; border-bottom: 2px solid #f39c12; padding-bottom: 10px; margin-bottom: 15px;">
+                        2. Conferência Financeira (Read-Only)
+                    </h4>
+
+                    <div style="display: flex; justify-content: space-around; text-align: center; margin-bottom: 15px;">
+                        <div>
+                            <small style="display: block; color: #7f8c8d;">TOTAL DÉBITOS</small>
+                            <strong id="encTotalDebitos" style="font-size: 18px; color: #c0392b;">R$ 0,00</strong>
+                        </div>
+                        <div>
+                            <small style="display: block; color: #7f8c8d;">TOTAL PAGO</small>
+                            <strong id="encTotalPagos" style="font-size: 18px; color: #27ae60;">R$ 0,00</strong>
+                        </div>
+                        <div>
+                            <small style="display: block; color: #7f8c8d;">SALDO FINAL</small>
+                            <strong id="encSaldoFinal" style="font-size: 24px;">R$ 0,00</strong>
+                        </div>
+                    </div>
+
+                    <p style="text-align: center; color: #7f8c8d; font-size: 12px; margin: 0;">
+                        <i class="ph ph-info"></i> O saldo acima será utilizado para gerar os termos legais.
+                        Certifique-se de que todos os lançamentos foram feitos.
+                    </p>
+                </div>
+
+                <!-- Opções de Acordo (Só aparece se tiver dívida) -->
+                <div id="boxAcordoDivida"
+                    style="display: none; background: #ffebee; padding: 15px; border-radius: 6px; margin-bottom: 20px; border: 1px solid #ef9a9a;">
+                    <h4 style="margin-top: 0; color: #c0392b; margin-bottom: 10px;">
+                        <i class="ph ph-handshake"></i> Detalhes do Acordo (Confissão de Dívida)
+                    </h4>
+                    <div class="form-group">
+                        <label>Texto do Acordo (Cláusula 3ª)</label>
+                        <textarea id="encTextoAcordo" class="form-input" rows="3"
+                            placeholder="Ex: Fica acordado 6 parcelas iguais de R$ 200,00 começando a partir do dia..."></textarea>
+                        <small style="color: #666;">O sistema tentará preencher isso automaticamente com base nos
+                            créditos futuros lançados.</small>
+                    </div>
+                </div>
+
+                <!-- Ação de Encerramento -->
+                <div style="margin-top: 20px; border-top: 1px solid #eee; padding-top: 20px; text-align: right;">
+                    <button onclick="confirmarEncerramento()" class="btn-new"
+                        style="background-color: #c0392b; color: white; height: 50px; padding: 0 30px; font-size: 16px;">
+                        <i class="ph ph-check-circle" style="margin-right: 8px;"></i>
+                        Confirmar Encerramento
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="/js/DataRefreshBus.js"></script>
+    <script src="/js/Formatters.js"></script>
+    <script src="/js/services/CarteiraAPI.js"></script>
+    <script src="/js/services/EncerramentoAPI.js"></script>
+    <script src="/js/modules/CarteiraStore.js"></script>
+    <script src="/js/modules/NegociacaoWizard.js"></script>
+    <script src="/js/carteira.js?v=7"></script>
+    <script src="/js/templates/print_encerramento.js?v=3"></script>
+    <script src="/js/carteira_encerramento.js?v=3"></script>
+    <script>
+        // Fechar com ESC
+        document.addEventListener('keydown', function (event) {
+            if (event.key === "Escape") {
+                fecharModalLancamento();
+            }
+        });
+
+        // Fechar ao clicar fora
+        document.getElementById('modalLancamento').addEventListener('click', function (e) {
+            if (e.target === this) {
+                fecharModalLancamento();
+            }
+        });
+    </script>

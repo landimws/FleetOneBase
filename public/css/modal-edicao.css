@@ -1,0 +1,566 @@
+/* ========================================
+   MODAL DE EDIÇÃO - CSS PREMIUM
+   ======================================== */
+
+.modal-content-form {
+    background: white;
+    width: 90%;
+    max-width: 950px;
+    max-height: 90vh;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(50px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.modal-body-form {
+    padding: 30px;
+    overflow-y: auto;
+    flex: 1;
+    background: #f8f9fa;
+}
+
+/* Seções do Formulário */
+.form-section {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.form-section h3 {
+    margin: 0 0 15px 0;
+    font-size: 16px;
+    color: #2c3e50;
+    border-bottom: 2px solid #9d00ff;
+    padding-bottom: 8px;
+}
+
+/* Layout de Campos */
+.form-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.form-row:last-child {
+    margin-bottom: 0;
+}
+
+.form-field {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-field.full-width {
+    grid-column: 1 / -1;
+}
+
+.form-field label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #555;
+    margin-bottom: 5px;
+}
+
+.form-field input,
+.form-field select,
+.form-field textarea {
+    padding: 10px 12px;
+    font-size: 14px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    outline: none;
+    transition: all 0.2s;
+    font-family: inherit;
+}
+
+.form-field input:focus,
+.form-field select:focus,
+.form-field textarea:focus {
+    border-color: #9d00ff;
+    box-shadow: 0 0 0 3px rgba(157, 0, 255, 0.1);
+}
+
+/* Campos Read-Only */
+.readonly-field input,
+.readonly-field select {
+    background: #f1f2f6;
+    color: #7f8c8d;
+    cursor: not-allowed;
+}
+
+/* Campos Destacados */
+.highlight-field input {
+    background: #fff3cd;
+    font-weight: bold;
+    color: #2c3e50;
+    border: 2px solid #ffc107;
+}
+
+/* Radio Buttons de Status */
+.status-radio-group {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.status-radio {
+    display: flex;
+    align-items: center;
+    padding: 12px 20px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    user-select: none;
+}
+
+.status-radio:hover {
+    border-color: #9d00ff;
+    background: #f8f9ff;
+}
+
+.status-radio input[type="radio"] {
+    margin-right: 8px;
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+.status-radio input[type="radio"]:checked+.status-label {
+    color: #9d00ff;
+    font-weight: bold;
+}
+
+.status-label {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+/* Seletor de Dias */
+.dias-semana-selector {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #e1e2e6;
+    margin-top: 0;
+}
+
+.dias-semana-selector>label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: 600;
+    color: #555;
+    font-size: 13px;
+}
+
+.dias-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+    margin-bottom: 10px;
+}
+
+.dia-btn {
+    width: 100%;
+    aspect-ratio: 1;
+    min-height: 45px;
+    border: 2px solid #ddd;
+    background: white;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    padding: 4px;
+}
+
+.dia-nome {
+    font-weight: bold;
+    font-size: 10px;
+    color: #7f8c8d;
+    text-transform: uppercase;
+}
+
+.dia-data {
+    font-size: 14px;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.dia-btn:hover:not(:disabled) {
+    border-color: #9d00ff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.dia-btn.active {
+    background: linear-gradient(135deg, #9d00ff 0%, #7a00cc 100%);
+    border-color: #9d00ff;
+    box-shadow: 0 4px 12px rgba(157, 0, 255, 0.4);
+}
+
+.dia-btn.active .dia-nome,
+.dia-btn.active .dia-data {
+    color: white;
+}
+
+/* Dia Ocupado */
+.dia-btn.dia-ocupado {
+    background: #f1f2f6;
+    border-color: #ddd;
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.dia-btn.dia-ocupado .dia-nome,
+.dia-btn.dia-ocupado .dia-data {
+    color: #95a5a6;
+    text-decoration: line-through;
+}
+
+/* Ações Rápidas */
+.dias-actions {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+    justify-content: center;
+}
+
+.btn-atalho {
+    padding: 8px 16px;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #555;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-atalho:hover {
+    background: #f1f2f6;
+    border-color: #9d00ff;
+    color: #9d00ff;
+}
+
+/* Resumo de Dias */
+.dias-resumo {
+    text-align: center;
+    padding: 12px;
+    background: white;
+    border-radius: 6px;
+    font-weight: 600;
+    color: #2c3e50;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.resumo-icon {
+    font-size: 18px;
+}
+
+.resumo-separador {
+    color: #ddd;
+    margin: 0 4px;
+}
+
+/* Checkboxes */
+.checkbox-field {
+    display: flex;
+    align-items: center;
+}
+
+.checkbox-field label {
+    display: flex;
+    align-items: center;
+    margin: 0;
+    cursor: pointer;
+    user-select: none;
+}
+
+.checkbox-field input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    margin-right: 8px;
+    cursor: pointer;
+}
+
+/* Footer do Modal */
+.modal-footer {
+    padding: 20px 30px;
+    background: #f8f9fa;
+    border-top: 1px solid #eee;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.btn-primary {
+    background: #9d00ff;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-primary:hover {
+    background: #8500d9;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(157, 0, 255, 0.3);
+}
+
+.btn-secondary {
+    background: #f1f2f6;
+    color: #2c3e50;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-secondary:hover {
+    background: #e1e2e6;
+}
+
+.btn-danger {
+    background: #e74c3c;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-danger:hover {
+    background: #c0392b;
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .modal-content-form {
+        width: 95%;
+        max-height: 95vh;
+    }
+
+    .modal-body-form {
+        padding: 20px;
+    }
+
+    .dias-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+
+    .dia-btn {
+        min-height: 50px;
+    }
+
+    .dia-nome {
+        font-size: 10px;
+    }
+
+    .dia-data {
+        font-size: 14px;
+    }
+
+    .status-radio-group {
+        flex-direction: column;
+    }
+}
+
+/* ========================================
+   CUSTOM SEARCH DROPDOWN (Novo)
+   ======================================== */
+.custom-search-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.custom-search-input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 13px;
+    outline: none;
+    transition: all 0.2s;
+}
+
+.custom-search-input:focus {
+    border-color: #9d00ff;
+    box-shadow: 0 0 0 3px rgba(157, 0, 255, 0.1);
+}
+
+.custom-dropdown-list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    max-height: 250px;
+    background: white;
+    /* Fallback */
+    background: rgba(40, 44, 52, 0.95);
+    /* Dark Glass */
+    backdrop-filter: blur(10px);
+    border-radius: 8px;
+    margin-top: 5px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    z-index: 10000;
+    overflow-y: auto;
+    display: none;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.custom-dropdown-list.visible {
+    display: block;
+    animation: fadeInDrop 0.2s ease-out;
+}
+
+@keyframes fadeInDrop {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.custom-option {
+    padding: 10px 15px;
+    color: #ecf0f1;
+    cursor: pointer;
+    font-size: 13px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    transition: background 0.2s;
+    display: flex;
+    justify-content: space-between;
+}
+
+.custom-option:last-child {
+    border-bottom: none;
+}
+
+.custom-option:hover,
+.custom-option.selected {
+    background: rgba(157, 0, 255, 0.3);
+    /* Roxo glow */
+    color: white;
+}
+
+.custom-option .sub-text {
+    font-size: 11px;
+    color: #95a5a6;
+}
+
+/* Scrollbar Bonita */
+.custom-dropdown-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.custom-dropdown-list::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+
+/* Botões Minimalistas (Clean) */
+.btn-clean-danger,
+.btn-clean-secondary {
+    background: none;
+    border: none;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    padding: 8px 15px;
+    opacity: 0.7;
+    transition: all 0.2s ease;
+    border-radius: 4px;
+}
+
+.btn-clean-danger {
+    color: #e74c3c;
+}
+
+.btn-clean-secondary {
+    color: #7f8c8d;
+}
+
+/* Hover Effects - Agora acontece algo! */
+.btn-clean-danger:hover {
+    opacity: 1;
+    background: rgba(231, 76, 60, 0.1);
+    transform: translateY(-1px);
+}
+
+.btn-clean-secondary:hover {
+    opacity: 1;
+    background: rgba(157, 0, 255, 0.08);
+    /* Fundo Roxo Bebê muito leve */
+    color: #9d00ff;
+    /* Texto Roxo Vivo */
+    transform: translateY(-1px);
+    font-weight: 700;
+    /* Leve negrito para destacar */
+}
+
+/* Primary Pill */
+.btn-pill {
+    border-radius: 30px;
+    padding: 10px 35px;
+    font-size: 14px;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 15px rgba(157, 0, 255, 0.2);
+}
+
+.btn-pill:hover {
+    box-shadow: 0 6px 20px rgba(157, 0, 255, 0.4);
+    transform: translateY(-2px);
+}

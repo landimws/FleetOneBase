@@ -1,0 +1,510 @@
+/* CSS Específico para Multas, estende main.css e dashboard.css */
+
+.btn-primary {
+    background-color: #2c3e50;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.btn-secondary {
+    background-color: #95a5a6;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.btn-sm {
+    padding: 4px 8px;
+    font-size: 0.8em;
+}
+
+.btn-icon-delete {
+    background: transparent;
+    border: none;
+    font-size: 1.1em;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 50%;
+    transition: background 0.2s, transform 0.1s;
+    line-height: 1;
+    color: #e74c3c;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-icon-delete:hover {
+    background-color: #fdeaea;
+    transform: scale(1.1);
+}
+
+.btn-icon-delete:active {
+    transform: scale(0.95);
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(4px);
+    /* Blur effect for overlay */
+}
+
+/* Premium Modal Design */
+.modal-content {
+    background: white;
+    padding: 0;
+    /* Remove default padding for clean header */
+    border-radius: 12px;
+    /* Smoother corners */
+    width: 1000px;
+    max-width: 90vw;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    display: flex;
+    flex-direction: column;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+}
+
+.modal-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid #f0f0f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #fff;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.modal-header h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    color: #2c3e50;
+    font-weight: 700;
+}
+
+.modal-body {
+    padding: 24px;
+    overflow-y: auto;
+}
+
+/* Details Grid System */
+.details-section {
+    margin-bottom: 24px;
+}
+
+.details-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px 24px;
+}
+
+.detail-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.detail-label {
+    font-size: 0.85rem;
+    color: #7f8c8d;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.detail-value {
+    font-size: 1rem;
+    color: #2c3e50;
+    font-weight: 500;
+}
+
+/* Financial Box Card */
+.financial-card {
+    background: #f8fbff;
+    border: 1px solid #e3f2fd;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 24px;
+}
+
+.financial-title {
+    font-size: 0.95rem;
+    color: #2980b9;
+    font-weight: 700;
+    margin: 0 0 16px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.financial-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.financial-item {
+    background: white;
+    padding: 12px;
+    border-radius: 6px;
+    border: 1px solid #edf2f7;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+.financial-label {
+    font-size: 0.8rem;
+    color: #64748b;
+    margin-bottom: 4px;
+}
+
+.financial-status {
+    font-weight: 700;
+    font-size: 0.95rem;
+}
+
+/* Modal Footer */
+.modal-footer {
+    padding: 16px 24px;
+    background: #f8f9fa;
+    border-top: 1px solid #eee;
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+.form-row {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.form-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    margin-bottom: 5px;
+    font-weight: bold;
+    font-size: 0.9em;
+}
+
+.form-group input,
+.form-group select {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+/* Status Badges */
+.badge {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.8em;
+    font-weight: bold;
+}
+
+.badge-payed {
+    background: #2ecc71;
+    color: white;
+}
+
+.badge-open {
+    background: #e67e22;
+    color: white;
+}
+
+.badge-late {
+    background: #e74c3c;
+    color: white;
+}
+
+.badge-exempt {
+    background: #7f8c8d;
+    /* Slate Grey - Neutral/Resolved */
+    color: white;
+}
+
+/* Scroll na Tabela */
+/* Layout Responsivo de Altura (Fill Screen) */
+body {
+    /* Garante que o body seja flex column (já está no main.css, mas reforçando contexto) */
+    overflow: hidden;
+}
+
+.tab-content.active {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    overflow: hidden;
+    /* Importante para o scroll ser interno */
+    height: calc(100vh - 120px);
+    /* 60px menu + 40px tabs + margins aprox */
+}
+
+/* Container interno da aba */
+.content-container {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    overflow: hidden;
+    height: 100%;
+}
+
+/* Scroll na Tabela - Preencher espaço restante */
+.table-container {
+    flex: 1;
+    /* Ocupa todo espaço disponível */
+    max-height: none;
+    /* Remove limite fixo */
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background: white;
+}
+
+/* Compact Table Layout */
+/* Compact Table Layout (Inherited from main.css) */
+/* Removido para herdar padding: 6px 12px e font-size: 14px do main.css */
+
+.data-table thead th {
+    position: sticky;
+    top: 0;
+    background: #f8f9fa;
+    color: #333;
+    /* Texto escuro para fundo claro */
+    z-index: 1;
+}
+
+/* Tabs Premium */
+.tabs {
+    display: flex;
+    justify-content: flex-start;
+    /* Alinhado à esquerda */
+    align-items: center;
+    /* Centralizar vertical */
+    margin: 20px 0 0 20px;
+    /* Margem esquerda fixa */
+    border-bottom: 1px solid #e0e0e0;
+    gap: 5px;
+    /* Gap menor */
+    background: white;
+    padding: 10px 10px 0 10px;
+    border-radius: 8px 8px 0 0;
+    width: auto;
+    display: inline-flex;
+    min-width: 98%;
+}
+
+.tab-btn {
+    padding: 8px 16px;
+    /* Ainda menor */
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 0.85rem;
+    /* Fonte menor (13.6px) */
+    font-weight: 600;
+    color: #7f8c8d;
+    border-bottom: 3px solid transparent;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    position: relative;
+    top: 1px;
+    /* Para sobrepor a borda */
+}
+
+.tab-btn:hover {
+    color: #9d00ff;
+    /* Roxo Tema */
+    background: linear-gradient(to top, #f9f9f9, transparent);
+}
+
+.tab-btn.active {
+    color: #9d00ff;
+    /* Roxo Tema */
+    border-bottom-color: #9d00ff;
+    font-weight: 700;
+}
+
+.tab-content {
+    display: none;
+    animation: slideUp 0.3s ease-out;
+}
+
+/* .tab-content.active {
+    display: block;
+} */
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Modal Redesign - Command Center Style */
+.modal-section {
+    background: #ffffff;
+    border: 1px solid #edf2f7;
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.modal-section-title {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #4a5568;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.modal-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+}
+
+.form-group label {
+    font-size: 0.8rem;
+    color: #718096;
+    margin-bottom: 4px;
+    font-weight: 600;
+}
+
+.form-group input,
+.form-group select {
+    padding: 10px 12px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    color: #2d3748;
+    transition: all 0.2s ease;
+    background: #fdfdfd;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    border-color: #9d00ff;
+    box-shadow: 0 0 0 3px rgba(157, 0, 255, 0.1);
+    outline: none;
+    background: #fff;
+}
+
+/* Preview Area */
+.preview-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.preview-box {
+    padding: 12px;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.preview-box.success {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+}
+
+.preview-box.info {
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+}
+
+.preview-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.preview-box.success .preview-label {
+    color: #15803d;
+}
+
+.preview-box.info .preview-label {
+    color: #1d4ed8;
+}
+
+.preview-value {
+    font-size: 1.25rem;
+    font-weight: 800;
+}
+
+.preview-box.success .preview-value {
+    color: #166534;
+}
+
+.preview-box.info .preview-value {
+    color: #1e40af;
+}
+
+/* Custom Checkboxes */
+.checkbox-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.checkbox-card:hover {
+    background: #f1f5f9;
+}
+
+.checkbox-card input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+.checkbox-card span {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #475569;
+}

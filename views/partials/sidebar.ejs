@@ -1,0 +1,82 @@
+<aside class="sidebar">
+    <!-- Header: Logo & Toggle -->
+    <div class="sidebar-header">
+        <div class="brand-wrapper">
+            <span>🚗</span>
+            <span class="brand-text">Locações</span>
+        </div>
+        <button id="sidebar-toggle" class="toggle-btn" title="Recolher Menu">
+            <i class="ph ph-caret-left"></i>
+        </button>
+    </div>
+
+    <!-- Navegação -->
+    <div class="sidebar-content">
+        <a href="/" class="nav-item <%= page === 'grid' ? 'active' : '' %>" title="Grid Semanal">
+            <span class="nav-icon"><i class="ph ph-calendar"></i></span>
+            <span class="nav-text">Grid Semanal</span>
+        </a>
+
+        <a href="/carteira" class="nav-item <%= page === 'carteira' ? 'active' : '' %>" title="Carteira">
+            <span class="nav-icon"><i class="ph ph-wallet"></i></span>
+            <span class="nav-text">Carteira</span>
+        </a>
+
+        <a href="/veiculos" class="nav-item <%= page === 'veiculos' ? 'active' : '' %>" title="Veículos">
+            <span class="nav-icon"><i class="ph ph-car"></i></span>
+            <span class="nav-text">Veículos</span>
+        </a>
+
+        <a href="/clientes" class="nav-item <%= page === 'clientes' ? 'active' : '' %>" title="Clientes">
+            <span class="nav-icon"><i class="ph ph-users"></i></span>
+            <span class="nav-text">Clientes</span>
+        </a>
+
+        <a href="/multas" class="nav-item <%= page === 'multas' ? 'active' : '' %>" title="Multas">
+            <span class="nav-icon"><i class="ph ph-warning-circle"></i></span>
+            <span class="nav-text">Multas</span>
+        </a>
+
+        <a href="/financeiro/fornecedores" class="nav-item <%= page === 'financeiro_fornecedores' ? 'active' : '' %>"
+            title="Fornecedores">
+            <span class="nav-icon"><i class="ph ph-handshake"></i></span>
+            <span class="nav-text">Fornecedores</span>
+        </a>
+
+        <a href="/financeiro/compras" class="nav-item <%= page === 'financeiro_compras' ? 'active' : '' %>"
+            title="Compras">
+            <span class="nav-icon"><i class="ph ph-shopping-cart"></i></span>
+            <span class="nav-text">Compras</span>
+        </a>
+
+        <a href="/financeiro/contas" class="nav-item <%= page === 'financeiro_contas' ? 'active' : '' %>"
+            title="Contas a Pagar">
+            <span class="nav-icon"><i class="ph ph-receipt"></i></span>
+            <span class="nav-text">Contas a Pagar</span>
+        </a>
+
+        <a href="/analise" class="nav-item <%= page === 'dashboard' ? 'active' : '' %>" title="Análise">
+            <span class="nav-icon"><i class="ph ph-chart-line-up"></i></span>
+            <span class="nav-text">Análise</span>
+        </a>
+
+        <a href="/relatorios" class="nav-item <%= page === 'relatorios' ? 'active' : '' %>" title="Relatórios">
+            <span class="nav-icon"><i class="ph ph-file-text"></i></span>
+            <span class="nav-text">Relatórios</span>
+        </a>
+
+        <% if (user && user.role==='admin' ) { %>
+            <div style="margin-top: auto; border-top: 1px solid #e2e8f0; margin-top: 20px; padding-top: 10px;">
+                <a href="/configuracoes/empresa"
+                    class="nav-item <%= (page === 'configuracoes_empresa' || page === 'configuracoes_usuarios') ? 'active' : '' %>"
+                    title="Configurações">
+                    <span class="nav-icon"><i class="ph ph-gear"></i></span>
+                    <span class="nav-text">Configurações</span>
+                </a>
+            </div>
+            <% } %>
+    </div>
+</aside>
+
+<!-- Overlay para Mobile -->
+<div id="mobile-overlay" class="mobile-overlay"></div>

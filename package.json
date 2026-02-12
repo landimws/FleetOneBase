@@ -1,0 +1,49 @@
+{
+  "name": "controle-locadora",
+  "version": "1.0.0",
+  "description": "Sistema de gestão de locadora de veículos",
+  "main": "server/index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node --watch server/index.js",
+    "test": "cross-env NODE_ENV=test node --test tests/*.test.js",
+    "test:watch": "cross-env NODE_ENV=test node --test --watch tests/*.test.js",
+    "migrate": "node server/migration-runner.js migrate",
+    "migrate:test": "cross-env NODE_ENV=test node server/migration-runner.js migrate",
+    "migrate:rollback": "node server/migration-runner.js rollback",
+    "migrate:rollback:test": "cross-env NODE_ENV=test node server/migration-runner.js rollback",
+    "migrate:status": "node server/migration-runner.js status",
+    "backup": "node server/migration-runner.js backup",
+    "service:install": "node scripts/install-service.js",
+    "service:uninstall": "node scripts/uninstall-service.js"
+  },
+  "keywords": [
+    "locadora",
+    "gestão",
+    "veículos"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "better-sqlite3": "^12.6.2",
+    "connect-session-sequelize": "^8.0.5",
+    "dotenv": "^16.3.1",
+    "ejs": "^3.1.10",
+    "express": "^4.18.2",
+    "express-ejs-layouts": "^2.5.1",
+    "express-session": "^1.19.0",
+    "express-validator": "^7.0.1",
+    "fs-extra": "^11.3.3",
+    "mongoose": "^8.0.0",
+    "node-windows": "^1.0.0-beta.8",
+    "sequelize": "^6.37.7"
+  },
+  "devDependencies": {
+    "cross-env": "^10.1.0",
+    "selfsigned": "^5.5.0",
+    "sqlite": "^5.1.1",
+    "sqlite3": "^5.1.7"
+  }
+}

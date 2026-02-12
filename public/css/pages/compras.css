@@ -1,0 +1,421 @@
+/* --- CUSTOM GRID SYSTEM --- */
+.flex-row {
+    display: flex;
+    flex-wrap: wrap;
+    margin-right: -10px;
+    margin-left: -10px;
+    align-items: flex-end;
+}
+
+.flex-col {
+    padding-left: 10px;
+    padding-right: 10px;
+    box-sizing: border-box;
+}
+
+.w-100 {
+    width: 100%;
+}
+
+.w-50 {
+    width: 50%;
+}
+
+.w-40 {
+    width: 40%;
+}
+
+.w-33 {
+    width: 33.33%;
+}
+
+.w-25 {
+    width: 25%;
+}
+
+.w-20 {
+    width: 20%;
+}
+
+@media (max-width: 768px) {
+    .w-sm-100 {
+        width: 100% !important;
+    }
+
+    .w-sm-50 {
+        width: 50% !important;
+    }
+}
+
+/* --- REDESIGN STYLES --- */
+.modal-clean .modal-content {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+    background: #fff;
+}
+
+.modal-clean .modal-header {
+    border-bottom: 1px solid #f1f5f9;
+    padding: 24px 32px;
+    background: #fff;
+    border-radius: 12px 12px 0 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.modal-clean .modal-title {
+    font-weight: 700;
+    font-size: 1.35rem;
+    color: #0f172a;
+    margin: 0;
+}
+
+.modal-body-scroll {
+    max-height: 75vh;
+    overflow-y: auto;
+    padding: 0 32px 32px 32px;
+    background: #fff;
+}
+
+.form-section {
+    margin-bottom: 32px;
+}
+
+.section-title {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 700;
+    color: #94a3b8;
+    margin-bottom: 12px;
+    margin-top: 24px;
+    display: block;
+}
+
+.form-modern {
+    display: block;
+    width: 100%;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 9px 12px;
+    font-size: 0.95rem;
+    color: #1e293b;
+    background: #fff;
+    height: 42px;
+}
+
+.form-modern:focus {
+    border-color: var(--color-primary);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(157, 0, 255, 0.1);
+}
+
+.form-group label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #64748b;
+    margin-bottom: 6px;
+    display: block;
+}
+
+.table-modern {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-top: 10px;
+}
+
+.table-modern th {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #94a3b8;
+    text-transform: uppercase;
+    padding: 0 0 8px 0;
+    border-bottom: 2px solid #f1f5f9;
+    text-align: left;
+}
+
+.table-modern td {
+    padding: 12px 0;
+    border-bottom: 1px solid #f8fafc;
+    vertical-align: middle;
+    color: #334155;
+    font-size: 0.95rem;
+}
+
+.total-anchor {
+    text-align: right;
+    margin-top: 10px;
+    padding-top: 20px;
+    border-top: 2px solid #f8fafc;
+}
+
+.total-label {
+    font-size: 0.9rem;
+    color: #64748b;
+    font-weight: 600;
+    margin-right: 15px;
+}
+
+.total-value {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #0f172a;
+}
+
+.discount-toggle {
+    font-size: 0.85rem;
+    color: var(--color-primary);
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 5px;
+}
+
+.discount-container {
+    display: none;
+    margin-top: 15px;
+    padding: 15px;
+    background: #f8fafc;
+    border-radius: 8px;
+}
+
+.discount-container.active {
+    display: block;
+}
+
+.btn-action {
+    border: none;
+    border-radius: 6px;
+    padding: 10px 20px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-primary {
+    background: var(--color-primary);
+    color: white;
+}
+
+.btn-success {
+    background: #10b981;
+    color: white;
+}
+
+.btn-secondary {
+    background: #f1f5f9;
+    color: #64748b;
+}
+
+.btn-sm-ghost {
+    background: transparent;
+    color: var(--color-primary);
+    padding: 5px 10px;
+    font-size: 0.85rem;
+    border: none;
+    cursor: pointer;
+}
+
+#modalItemCompra .modal-dialog {
+    max-width: 420px;
+    width: 95%;
+    margin: 0 auto;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    pointer-events: none;
+}
+
+#modalItemCompra .modal-content {
+    pointer-events: auto;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.text-center {
+    text-align: center;
+}
+
+/* Missing Tab Styles */
+.tabs {
+    display: flex;
+    gap: 20px;
+    border-bottom: 2px solid #e2e8f0;
+    /* Subtle line */
+    padding-bottom: 0;
+    margin-bottom: 20px;
+}
+
+.tab-btn {
+    background: none;
+    border: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: #64748b;
+    padding: 10px 15px;
+    cursor: pointer;
+    position: relative;
+    transition: color 0.2s;
+}
+
+.tab-btn.active {
+    color: var(--color-primary);
+    /* Active Purple */
+}
+
+.tab-btn.active::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    /* Align with bottom border of .tabs */
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: var(--color-primary);
+    border-radius: 3px 3px 0 0;
+}
+
+.tab-btn:hover {
+    color: #475569;
+}
+
+.table-container {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 0 20px;
+    margin: 0 20px;
+    max-height: calc(100vh - 180px);
+    /* Altura dinâmica baseada na tela */
+    overflow-y: auto;
+    /* Scroll vertical */
+}
+
+.data-table {
+    width: 100%;
+}
+
+/* ========================================
+   MELHORIAS VISUAIS
+   ======================================== */
+
+/* Sticky Header */
+.table-container thead {
+    position: sticky;
+    top: 0;
+    background: #fff;
+    z-index: 10;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* Hover em linhas */
+.data-table tbody tr {
+    transition: background-color 0.15s ease;
+}
+
+.data-table tbody tr:hover {
+    background-color: #f8fafc;
+}
+
+/* Botões com micro-animação */
+.btn-action {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-action:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(157, 0, 255, 0.2);
+}
+
+.btn-action:active {
+    transform: translateY(0);
+}
+
+/* Scrollbar customizada */
+.table-container::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.table-container::-webkit-scrollbar-track {
+    background: #f1f3f5;
+    border-radius: 4px;
+}
+
+.table-container::-webkit-scrollbar-thumb {
+    background: var(--color-primary);
+    border-radius: 4px;
+}
+
+.table-container::-webkit-scrollbar-thumb:hover {
+    background: var(--color-primary-dark);
+}
+
+/* ========================================
+   RESPONSIVIDADE MOBILE
+   ======================================== */
+
+@media (max-width: 768px) {
+
+    /* Tabs quebram para coluna */
+    .tabs {
+        flex-direction: column;
+        align-items: stretch !important;
+        gap: 10px;
+    }
+
+    /* Filtros ocupam largura total */
+    .tabs>div {
+        flex-direction: column !important;
+        width: 100% !important;
+        margin-left: 0 !important;
+    }
+
+    /* Campo de busca responsivo */
+    .smart-search input {
+        width: 100% !important;
+    }
+
+    /* Filtros chips centralizam */
+    .quick-filters {
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    /* Modal: 4 colunas → 2 colunas */
+    .flex-row .flex-col.w-25 {
+        width: 50% !important;
+    }
+
+    /* Modal: 3 colunas → 1 coluna */
+    .flex-row .flex-col.w-33 {
+        width: 100% !important;
+    }
+
+    /* Tabela: esconder coluna "Nota" */
+    .data-table th:nth-child(3),
+    .data-table td:nth-child(3) {
+        display: none;
+    }
+
+    /* Reduzir padding geral */
+    .table-container {
+        padding: 0 10px;
+        margin: 0 10px;
+    }
+
+    /* Modal ocupa mais espaço */
+    .modal-dialog {
+        max-width: 95% !important;
+    }
+}

@@ -1,0 +1,191 @@
+
+import { DataTypes } from 'sequelize';
+import sequelize from '../config/database-sqlite.js';
+import Semana from './Semana.js';
+import Veiculo from './Veiculo.js';
+import Cliente from './Cliente.js';
+
+const LinhaSemana = sequelize.define('LinhaSemana', {
+    id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true
+    },
+    // Status do veículo (NOVO)
+    status_veiculo: {
+        type: DataTypes.STRING,
+        defaultValue: 'disponivel',
+        allowNull: false,
+        validate: {
+            isIn: [['alugado', 'disponivel', 'manutencao', 'validar']]
+        }
+    },
+
+    // Flags
+    AS: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+        comment: 'Assinatura (Pagamento Recorrente)'
+    },
+    BO: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+        comment: 'Boleto Gerado'
+    },
+    CO: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+        comment: 'Conciliado'
+    },
+
+    // Identificação
+    placa: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    tipo: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        comment: 'Tipo de locação (só para alugado)'
+    },
+    cliente: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        comment: 'Legacy: Nome do Cliente'
+    },
+    cliente_id: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        references: {
+            model: 'Clientes',
+            key: 'id'
+        }
+    },
+
+    // Dias selecionados (NOVO)
+    dias_selecionados: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+        defaultValue: '[]',
+        comment: 'Array JSON de dias: ["ter", "qua", "qui"]',
+        get() {
+            const rawValue = this.getDataValue('dias_selecionados');
+            return rawValue ? JSON.parse(rawValue) : [];
+        },
+        set(value) {
+            this.setDataValue('dias_selecionados', JSON.stringify(value || []));
+        }
+    },
+    dias: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
+        comment: 'Total de dias (calculado)'
+    },
+
+    // Campos de manutenção (NOVO)
+    local_manutencao: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        comment: 'Local/Oficina (só para manutenção)'
+    },
+    previsao_retorno: {
+        type: DataTypes.DATEONLY,
+        allowNull: true,
+        comment: 'Previsão de retorno (só para manutenção)'
+    },
+    tabelado: {
+        type: DataTypes.FLOAT,
+        defaultValue: 0
+    },
+    valor_semanal: {
+        type: DataTypes.FLOAT,
+        defaultValue: 0,
+        comment: 'Valor semanal digitado pelo usuário (fonte da verdade para cálculos)'
+    },
+    diaria: {
+        type: DataTypes.FLOAT,
+        defaultValue: 0
+    },
+    semana: {
+        type: DataTypes.FLOAT,
+        defaultValue: 0
+    },
+    p_premium: {
+        type: DataTypes.FLOAT,
+        defaultValue: 0
+    },
+    protecao: {
+        type: DataTypes.FLOAT,
+        defaultValue: 0
+    },
+    acordo: {
+        type: DataTypes.FLOAT,
+        defaultValue: 0
+    },
+    ta_boleto: {
+        type: DataTypes.FLOAT,
+        defaultValue: 0
+    },
+    desconto: {
+        type: DataTypes.FLOAT,
+        defaultValue: 0
+    },
+    previsto: {
+        type: DataTypes.FLOAT,
+        defaultValue: 0
+    },
+    recebido: {
+        type: DataTypes.FLOAT,
+        defaultValue: 0
+    },
+    saldo: {
+        type: DataTypes.FLOAT,
+        defaultValue: 0
+    },
+
+    // Data de pagamento (NOVO)
+    data_pagamento: {
+        type: DataTypes.DATEONLY,
+        allowNull: true,
+        comment: 'Data do pagamento (obrigatório se CO = true)'
+    },
+
+    // Observações
+    observacoes: {
+        type: DataTypes.TEXT,
+        allowNull: true
+    }
+}, {
+    indexes: [
+        {
+            fields: ['SemanaId'] // Acelera o JOIN/Include
+        },
+        {
+            fields: ['placa'] // Acelera a Ordenação
+        }
+    ],
+    timestamps: false,
+    tableName: 'LinhaSemanas',
+    freezeTableName: true
+});
+
+// Definir Relacionamento
+Semana.hasMany(LinhaSemana, {
+    as: 'linhas',
+    foreignKey: 'SemanaId'  // Especificar explicitamente
+});
+LinhaSemana.belongsTo(Semana, {
+    foreignKey: 'SemanaId'  // Especificar explicitamente para evitar inferência incorreta
+});
+// Permite trazer dados do Veiculo (como preco_base) via include
+LinhaSemana.belongsTo(Veiculo, {
+    as: 'Veiculo',  // Alias explícito
+    foreignKey: 'placa',
+    targetKey: 'placa'
+});
+LinhaSemana.belongsTo(Cliente, {
+    foreignKey: 'cliente_id',
+    as: 'ClienteRel'
+});
+
+export default LinhaSemana;
