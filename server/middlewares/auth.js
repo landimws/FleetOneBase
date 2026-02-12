@@ -5,14 +5,19 @@ import sequelize from '../config/database-sqlite.js';
 
 const SequelizeStore = connectSessionSequelize(session.Store);
 
+const sessionStore = new SequelizeStore({
+    db: sequelize,
+    checkExpirationInterval: 15 * 60 * 1000,
+    expiration: 24 * 60 * 60 * 1000
+});
+
+// Sincronizar tabela de sessões
+sessionStore.sync();
+
 // Configuração da Sessão
 export const sessionConfig = session({
     secret: process.env.SESSION_SECRET || 'secreta_super_secreta_locadora_123',
-    store: new SequelizeStore({
-        db: sequelize,
-        checkExpirationInterval: 15 * 60 * 1000,
-        expiration: 24 * 60 * 60 * 1000
-    }),
+    store: sessionStore,
     resave: false,
     saveUninitialized: false,
     cookie: {
