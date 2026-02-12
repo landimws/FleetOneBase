@@ -1,0 +1,116 @@
+<% page='empresas' %>
+
+    <div class="row mb-4">
+        <div class="col-12 col-md-8">
+            <a href="/admin/empresas/novo" class="btn btn-admin-primary">
+                <i class="bi bi-plus-circle me-2"></i>Nova Empresa
+            </a>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <i class="bi bi-building me-2"></i>Lista de Empresas
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nome</th>
+                            <th>CNPJ</th>
+                            <th>Usuários</th>
+                            <th>Status</th>
+                            <th>Criado em</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if (empresas && empresas.length> 0) { %>
+                            <% empresas.forEach(function(empresa) { %>
+                                <tr>
+                                    <td>
+                                        <%= empresa.id %>
+                                    </td>
+                                    <td><strong>
+                                            <%= empresa.nome %>
+                                        </strong></td>
+                                    <td>
+                                        <%= empresa.cnpj || '-' %>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-secondary">
+                                            <%= empresa.numUsuarios %> usuário<%= empresa.numUsuarios !==1 ? 's' : '' %>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge <%= empresa.ativo ? 'badge-ativo' : 'badge-inativo' %>">
+                                            <%= empresa.ativo ? 'Ativo' : 'Inativo' %>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <%= new Date(empresa.createdAt).toLocaleDateString('pt-BR') %>
+                                    </td>
+                                    <td>
+                                        <a href="/admin/empresas/novo?id=<%= empresa.id %>"
+                                            class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <button
+                                            class="btn btn-sm btn-outline-<%= empresa.ativo ? 'danger' : 'success' %>"
+                                            onclick="toggleStatus(<%= empresa.id %>, <%= empresa.ativo %>, this)">
+                                            <i class="bi bi-<%= empresa.ativo ? 'x-circle' : 'check-circle' %>"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <% }); %>
+                                    <% } else { %>
+                                        <tr>
+                                            <td colspan="7" class="text-center text-muted py-4">
+                                                Nenhuma empresa cadastrada.
+                                            </td>
+                                        </tr>
+                                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+
+        async function toggleStatus(id, ativoAtual, btnElement) {
+            const acao = ativoAtual ? 'desativar' : 'ativar';
+
+            if (!confirm(`Tem certeza que deseja ${acao} esta empresa?${ativoAtual ? '\n\nATENÇÃO: Todos os usuários desta empresa serão desativados automaticamente!' : ''}`)) {
+                return;
+            }
+
+            // Ativar loading no botão clicado
+            Loading.show(btnElement);
+
+            try {
+                const response = await fetch(`/admin/empresas/${id}/toggle-status`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    Toast.show(data.message, 'success');
+                    // Pequeno delay para usuário ver o toast antes do reload
+                    setTimeout(() => window.location.reload(), 1500);
+                } else {
+                    Toast.show('Erro: ' + data.message, 'error');
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                Toast.show('Erro ao alterar status da empresa.', 'error');
+            } finally {
+                Loading.hide(btnElement);
+            }
+        }
+    </script>

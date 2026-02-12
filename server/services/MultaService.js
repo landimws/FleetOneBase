@@ -1,16 +1,7 @@
-import { Op, Sequelize } from 'sequelize';
-import Multa from '../models-sqlite/Multa.js';
-import Veiculo from '../models-sqlite/Veiculo.js';
-import Cliente from '../models-sqlite/Cliente.js';
-import Debito from '../models-sqlite/Debito.js';
+import { Op } from 'sequelize';
 import { normalizeString } from '../utils/stringUtils.js';
-import { FinancialCalculator } from '../domain/financial/FinancialCalculator.js';
 
 class MultaService {
-
-
-    // Analytics removido para MultaAnalyticsService.js
-
 
     /**
      * Valida regras de negócio complexas.
@@ -41,20 +32,11 @@ class MultaService {
             }
         }
 
-        // Regra: Não alterar desconto se já pago (já estava pago no banco)
-        // Se estamos pagando AGORA (data.data_pagamento_orgao presente), permitimos definir o desconto (validado acima).
-        // Mas se já estava pago ANTES, não deixamos mudar o desconto para garantir integridade histórica.
         const jaEstavaPago = currentRecord && currentRecord.data_pagamento_orgao;
-
-        // Verifica se o usuário está removendo o pagamento (Estorno/Correção)
-        // Se data.data_pagamento_orgao é explicitamente null, ele está estornando.
         const estaEstornando = data.data_pagamento_orgao === null;
 
         if (jaEstavaPago && !estaEstornando) {
-            // Se tentar mudar desconto de algo q ja estava pago E NÃO está estornando
             if (data.desconto_aplicado !== undefined && data.desconto_aplicado !== currentRecord.desconto_aplicado) {
-                // Exceção: Se o usuário estiver "reabrindo" o pagamento (mudando data de pagamento ou valor), talvez devesse permitir?
-                // Mas por segurança, assumimos que registro histórico é imutável nessa via.
                 throw new Error('Não é possível alterar desconto de multa já paga no órgão.');
             }
         }
@@ -62,20 +44,16 @@ class MultaService {
 
     /**
      * Cria uma nova multa.
+     * @param {Object} models
      * @param {Object} data 
      * @returns {Object} Multa criada (JSON)
      */
-    async create(data) {
-        // Business Logic: Validar se já existe auto (embora o Schema já faça, double check é bom)
-        // Aqui confiamos no Schema para validação básica.
+    async create(models, data) {
+        const { Multa, Veiculo, Cliente } = models;
 
         try {
             this._validateRules(data);
 
-            // Populate search_text
-            // Need to fetch vehicle model if not provided?
-            // Strategy: Fetch vehicle model since we only assume placa is valid from validation.
-            // But doing a query here? Yes necessary.
             let modelo = '';
             let nomeCliente = '';
             const veiculo = await Veiculo.findByPk(data.veiculo_id);
@@ -88,7 +66,7 @@ class MultaService {
 
             const fullText = `${data.veiculo_id} ${modelo} ${nomeCliente} ${data.numero_auto || ''} ${data.renainf || ''}`;
             data.search_text = normalizeString(fullText);
-            data.cliente_nome = nomeCliente; // Sync for legacy/search
+            data.cliente_nome = nomeCliente;
 
             if (data.numero_auto) {
                 data.numero_auto = data.numero_auto.toUpperCase();
@@ -103,10 +81,13 @@ class MultaService {
 
     /**
      * Busca uma multa por ID.
+     * @param {Object} models
      * @param {number} id 
      * @returns {Object} Multa (JSON)
      */
-    async getById(id) {
+    async getById(models, id) {
+        const { Multa, Veiculo, Cliente } = models;
+
         const multa = await Multa.findByPk(id, {
             include: [
                 { model: Veiculo, as: 'veiculo' },
@@ -123,10 +104,13 @@ class MultaService {
 
     /**
      * Lista todas as multas com filtros opcionais.
+     * @param {Object} models
      * @param {Object} filters 
      * @returns {Array} Lista de multas
      */
-    async list(filters = {}) {
+    async list(models, filters = {}) {
+        const { Multa, Veiculo, Cliente } = models;
+
         const where = {};
         const include = [
             { model: Veiculo, as: 'veiculo' },
@@ -157,22 +141,22 @@ class MultaService {
             }
         }
 
-        // Filtros Rápidos (Workflow)
+        // Filtros Rápidos
         if (filters.filtro_rapido) {
             const todayStrComp = new Date().toISOString().split('T')[0];
 
             switch (filters.filtro_rapido) {
                 case 'falta_indicar':
                     where.foi_indicado = false;
-                    where.tipo_responsavel = 'cliente'; // Apenas clientes precisam ser indicados
+                    where.tipo_responsavel = 'cliente';
                     break;
                 case 'falta_reconhecer':
                     where.reconheceu = false;
-                    where.foi_indicado = true; // Só pode reconhecer se já foi indicado
+                    where.foi_indicado = true;
                     break;
                 case 'falta_lancar':
                     where.data_lancamento_carteira = null;
-                    where.tipo_responsavel = 'cliente'; // Apenas clientes são cobrados na carteira
+                    where.tipo_responsavel = 'cliente';
                     break;
                 case 'pagas':
                     where.data_pagamento_orgao = { [Op.not]: null };
@@ -188,13 +172,13 @@ class MultaService {
             }
         }
 
-        // Smart Search (Busca Global)
+        // Smart Search
         if (filters.search) {
             const term = normalizeString(filters.search);
             where.search_text = { [Op.like]: `%${term}%` };
         }
 
-        // Filtro por Data (Intervalo ou Parcial)
+        // Filtro por Data
         if (filters.data_inicio || filters.data_fim) {
             const campoData = filters.tipo_data === 'vencimento' ? 'data_vencimento' : 'data_infracao'; // Default infracao
 
@@ -208,7 +192,7 @@ class MultaService {
         }
 
         // Ordenação
-        let order = [['data_infracao', 'DESC']]; // Default
+        let order = [['data_infracao', 'DESC']];
         if (filters.sort_by) {
             const direction = filters.order === 'asc' ? 'ASC' : 'DESC';
             const allowedCols = ['veiculo_id', 'data_infracao', 'data_vencimento', 'valor_original', 'cliente_nome', 'cliente_id'];
@@ -224,8 +208,7 @@ class MultaService {
             where,
             include,
             order,
-            raw: false,
-            logging: console.log
+            raw: false
         });
 
         return multas.map(m => m.toJSON());
@@ -233,25 +216,19 @@ class MultaService {
 
     /**
      * Atualiza uma multa.
+     * @param {Object} models
      * @param {number} id 
      * @param {Object} data 
      * @returns {Object} Multa atualizada
      */
-    async update(id, data) {
+    async update(models, id, data) {
+        const { Multa, Veiculo, Cliente } = models;
+
         const multa = await Multa.findByPk(id);
         if (!multa) {
             throw new Error('Multa não encontrada');
         }
 
-        // Regra de Negócio: Se mudar o desconto, verificar se é permitido (placeholder)
-        // Regra: Se mudar valor_original, recalcular dependentes (automático via virtual getter)
-
-        // Update search_text if relevant fields change
-        // Update search_text ALWAYS to ensure consistency with new strategy (including auto number)
-        // Even if fields didn't change in payload, we might need to update the index if the logic changed.
-        // Or simpler: Just ensure we have the latest values.
-
-        // Fetch current values if not in payload
         const placa = data.veiculo_id || multa.veiculo_id;
         let modelo = '';
         const veiculo = await Veiculo.findByPk(placa);
@@ -261,20 +238,15 @@ class MultaService {
         if (data.cliente_id !== undefined) {
             const cliente = await Cliente.findByPk(data.cliente_id);
             nome = cliente ? cliente.nome : '';
-            data.cliente_nome = nome; // Sync legacy
+            data.cliente_nome = nome;
         } else if (data.cliente_nome !== undefined) {
             nome = data.cliente_nome;
         }
 
         const auto = data.numero_auto !== undefined ? data.numero_auto : (multa.numero_auto || '');
 
-        // Always update search_text
         const fullText = `${placa} ${modelo} ${nome} ${auto}`;
         data.search_text = normalizeString(fullText);
-
-        if (data.numero_auto) {
-            data.numero_auto = data.numero_auto.toUpperCase();
-        }
 
         if (data.numero_auto) {
             data.numero_auto = data.numero_auto.toUpperCase();
@@ -288,9 +260,11 @@ class MultaService {
 
     /**
      * Exclui uma multa.
+     * @param {Object} models
      * @param {number} id 
      */
-    async delete(id) {
+    async delete(models, id) {
+        const { Multa } = models;
         const multa = await Multa.findByPk(id);
         if (!multa) {
             throw new Error('Multa não encontrada');
@@ -300,36 +274,37 @@ class MultaService {
 
     /**
      * Lança a multa na carteira do cliente (Cria Débito).
+     * @param {Object} models
      * @param {number} id ID da Multa
-     * @param {Object} debitData Dados confirmados pelo usuário (valor, data, descricao, etc)
+     * @param {Object} debitData Dados confirmados pelo usuário
      */
-    async lancarNaCarteira(id, debitData) {
+    async lancarNaCarteira(models, id, debitData) {
+        const { Multa, Debito } = models;
+
         const multa = await Multa.findByPk(id);
         if (!multa) throw new Error('Multa não encontrada');
 
-        // Auto-healing: Se estiver com data infalida, permitir relançar
         if (multa.data_lancamento_carteira && multa.data_lancamento_carteira !== 'Invalid date') {
             throw new Error('Esta multa já foi lançada na carteira anteriormente.');
         }
 
-        // Validar Data do Lançamento
         if (!debitData.data || isNaN(new Date(debitData.data).getTime())) {
             throw new Error('Data de lançamento inválida.');
         }
 
-        // Validar Cliente
         if (!debitData.cliente_nome) throw new Error('Cliente obrigatório para lançamento.');
 
         try {
             // 1. Criar Débito
             const novoDebito = await Debito.create({
+                cliente_id: debitData.cliente_id || multa.cliente_id, // Ensure binding
                 cliente_nome: debitData.cliente_nome,
                 veiculo_placa: debitData.veiculo_placa || multa.veiculo_id,
                 data: debitData.data,
                 tipo: 'Multa',
                 descricao: debitData.descricao,
                 quantidade: 1,
-                valor_unitario: debitData.valor_unitario, // Valor base sem taxa
+                valor_unitario: debitData.valor_unitario,
                 cobra_taxa_adm: debitData.cobra_taxa_adm,
                 percentual_taxa: debitData.cobra_taxa_adm ? 15.0 : 0,
                 valor_taxa: debitData.valor_taxa,
@@ -351,10 +326,13 @@ class MultaService {
 
     /**
      * Aplica desconto em uma multa.
+     * @param {Object} models
      * @param {number} id 
      * @param {number} percentual (0, 20, 40)
      */
-    async aplicarDesconto(id, percentual) {
+    async aplicarDesconto(models, id, percentual) {
+        const { Multa } = models;
+
         if (![0, 20, 40].includes(percentual)) {
             throw new Error('Percentual inválido. Use 0, 20 ou 40.');
         }

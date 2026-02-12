@@ -1,8 +1,6 @@
 
-import Encerramento from '../models-sqlite/Encerramento.js';
-import Cliente from '../models-sqlite/Cliente.js';
-
 export const getLast = async (req, res) => {
+    const { Encerramento } = req.models;
     try {
         const cliente_ref = decodeURIComponent(req.params.cliente);
         const isId = !isNaN(cliente_ref);
@@ -25,6 +23,7 @@ export const getLast = async (req, res) => {
 };
 
 export const create = async (req, res) => {
+    const { Encerramento, Cliente } = req.models;
     try {
         const {
             cliente_id,
@@ -57,6 +56,7 @@ export const create = async (req, res) => {
 };
 
 export const reopen = async (req, res) => {
+    const { Encerramento, Cliente } = req.models;
     try {
         const cliente_ref = decodeURIComponent(req.params.cliente);
         const { motivo } = req.body;

@@ -1,10 +1,8 @@
-import Semana from '../models-sqlite/Semana.js';
-import LinhaSemana from '../models-sqlite/LinhaSemana.js';
-import Veiculo from '../models-sqlite/Veiculo.js';
 import * as LinhaService from '../services/linhaSemanaService.js';
 import { Op } from 'sequelize';
 
 export const list = async (req, res) => {
+    const { Semana } = req.models;
     try {
         const semanas = await Semana.findAll({
             attributes: ['id', 'data_inicio', 'data_fim', 'status'],
@@ -27,13 +25,13 @@ export const list = async (req, res) => {
 };
 
 export const getById = async (req, res) => {
+    const { Semana, LinhaSemana } = req.models;
     try {
         const id = req.params.id;
         const semana = await Semana.findByPk(id, {
             include: [{
                 model: LinhaSemana,
                 as: 'linhas'
-                // Removed Veiculo include which was causing SQL join errors in SQLite
             }]
         });
 
@@ -62,6 +60,7 @@ export const getById = async (req, res) => {
 };
 
 export const update = async (req, res) => {
+    const { Semana, LinhaSemana, Veiculo } = req.models;
     try {
         const id = req.params.id;
         const { status, linhas } = req.body;
@@ -124,6 +123,7 @@ export const update = async (req, res) => {
 };
 
 export const create = async (req, res) => {
+    const { Semana, LinhaSemana, Veiculo } = req.models;
     try {
         const { data_inicio_manual } = req.body;
 
@@ -203,6 +203,7 @@ export const create = async (req, res) => {
 };
 
 export const sincronizar = async (req, res) => {
+    const { Semana, LinhaSemana, Veiculo } = req.models;
     try {
         const id = req.params.id;
         const semana = await Semana.findByPk(id, {
@@ -250,6 +251,7 @@ export const sincronizar = async (req, res) => {
 };
 
 export const updateLine = async (req, res) => {
+    const { LinhaSemana } = req.models;
     try {
         const { linhaId } = req.params;
         const processado = LinhaService.normalizarDados(req.body);
@@ -262,6 +264,7 @@ export const updateLine = async (req, res) => {
 };
 
 export const createLine = async (req, res) => {
+    const { LinhaSemana } = req.models;
     try {
         const { semanaId } = req.params;
         const processado = LinhaService.normalizarDados(req.body);
@@ -275,6 +278,7 @@ export const createLine = async (req, res) => {
 };
 
 export const deleteLine = async (req, res) => {
+    const { LinhaSemana } = req.models;
     try {
         const { linhaId } = req.params;
         await LinhaSemana.destroy({ where: { id: linhaId } });

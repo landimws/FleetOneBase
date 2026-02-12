@@ -1,7 +1,6 @@
 
-import Fornecedor from '../models-sqlite/Fornecedor.js';
-
 export const list = async (req, res) => {
+    const { Fornecedor } = req.models;
     try {
         const fornecedores = await Fornecedor.findAll({
             order: [['nome', 'ASC']]
@@ -13,10 +12,8 @@ export const list = async (req, res) => {
     }
 };
 
-import Compra from '../models-sqlite/Compra.js';
-import { Sequelize } from 'sequelize';
-
 export const getById = async (req, res) => {
+    const { Fornecedor, Compra } = req.models;
     try {
         const { id } = req.params;
         const fornecedor = await Fornecedor.findByPk(id, {
@@ -29,7 +26,9 @@ export const getById = async (req, res) => {
         if (!fornecedor) return res.status(404).json({ error: 'Fornecedor não encontrado' });
 
         // Calculate financial summary manually (or via Sequelize aggregate if preferred, but this is simpler for now)
-        const compras = fornecedor.Compras || [];
+        const compras = fornecedor.Compras || []; // Sequelize might capitalize it based on alias, check usage
+        // But since we defined hasMany without alias in tenantContext 'Compra', it's usually 'Compras'
+
         const total_gasto = compras.reduce((sum, c) => sum + Number(c.valor_liquido || 0), 0);
 
         let ultima_compra = null;
@@ -52,6 +51,7 @@ export const getById = async (req, res) => {
 };
 
 export const create = async (req, res) => {
+    const { Fornecedor } = req.models;
     try {
         const { nome, cnpj_cpf, telefone, ativo } = req.body;
 
@@ -81,6 +81,7 @@ export const create = async (req, res) => {
 };
 
 export const update = async (req, res) => {
+    const { Fornecedor } = req.models;
     try {
         const { id } = req.params;
         const { nome, cnpj_cpf, telefone, ativo } = req.body;
@@ -91,7 +92,7 @@ export const update = async (req, res) => {
         }
 
         if (cnpj_cpf && cnpj_cpf !== fornecedor.cnpj_cpf) {
-            const { Op } = await import('sequelize');
+            const { Op } = req.models.sequelize.Sequelize; // Use Sequelize from context
             const existe = await Fornecedor.findOne({
                 where: {
                     cnpj_cpf,
@@ -118,6 +119,7 @@ export const update = async (req, res) => {
 };
 
 export const remove = async (req, res) => {
+    const { Fornecedor } = req.models;
     try {
         const { id } = req.params;
         const fornecedor = await Fornecedor.findByPk(id);
@@ -126,8 +128,6 @@ export const remove = async (req, res) => {
             return res.status(404).json({ error: 'Fornecedor não encontrado' });
         }
 
-        // Check for dependencies (Compras) before delete
-        // Since we have RESTRICT in DB, sequelize might throw error, catch it.
         try {
             await fornecedor.destroy();
             res.json({ message: 'Fornecedor removido com sucesso' });

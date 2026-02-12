@@ -1,9 +1,8 @@
 
 import { Op } from 'sequelize';
-import Semana from '../models-sqlite/Semana.js';
-import LinhaSemana from '../models-sqlite/LinhaSemana.js';
 
 export const search = async (req, res) => {
+    const { LinhaSemana, Semana } = req.models;
     try {
         const { termo } = req.query;
 
@@ -76,6 +75,7 @@ export const search = async (req, res) => {
 };
 
 export const listGeneral = async (req, res) => {
+    const { LinhaSemana } = req.models;
     try {
         const { tipo } = req.query; // 'clientes' ou 'veiculos'
 

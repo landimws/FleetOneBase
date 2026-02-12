@@ -1,11 +1,8 @@
-
-import Veiculo from '../models-sqlite/Veiculo.js';
-import LinhaSemana from '../models-sqlite/LinhaSemana.js';
-import Semana from '../models-sqlite/Semana.js';
 import { Op } from 'sequelize';
 import { validationResult } from 'express-validator';
 
 export const list = async (req, res) => {
+    const { Veiculo, LinhaSemana, Semana } = req.models;
     try {
         const { busca, ativo } = req.query;
         let where = {};
@@ -58,6 +55,7 @@ export const list = async (req, res) => {
 };
 
 export const getByPlaca = async (req, res) => {
+    const { Veiculo } = req.models;
     try {
         const veiculo = await Veiculo.findByPk(req.params.placa.toUpperCase());
         if (!veiculo) return res.status(404).json({ error: 'Veículo não encontrado' });
@@ -68,6 +66,7 @@ export const getByPlaca = async (req, res) => {
 };
 
 export const create = async (req, res) => {
+    const { Veiculo } = req.models;
     try {
         const errors = validationResult(req);
         if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
@@ -115,6 +114,7 @@ export const create = async (req, res) => {
 };
 
 export const update = async (req, res) => {
+    const { Veiculo } = req.models;
     try {
         const placa = req.params.placa.toUpperCase();
         const veiculo = await Veiculo.findByPk(placa);
@@ -152,6 +152,7 @@ export const update = async (req, res) => {
 };
 
 export const remove = async (req, res) => {
+    const { Veiculo, LinhaSemana } = req.models;
     try {
         const placa = req.params.placa.toUpperCase();
 
@@ -174,6 +175,7 @@ export const remove = async (req, res) => {
 };
 
 export const getLastClient = async (req, res) => {
+    const { Semana, LinhaSemana } = req.models;
     try {
         const placa = req.params.placa.toUpperCase();
 

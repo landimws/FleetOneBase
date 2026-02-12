@@ -1,15 +1,15 @@
 
-import Debito from '../models-sqlite/Debito.js';
-import Credito from '../models-sqlite/Credito.js';
-
 class CarteiraService {
 
     /**
      * Busca o resumo financeiro da carteira de um cliente.
-     * @param {string} cliente_nome 
+     * @param {Object} models Models injetados (Debito, Credito)
+     * @param {string} cliente_ref 
      * @returns {Object} Resumo e listas de débitos/créditos
      */
-    async getResumoCarteira(cliente_ref) {
+    async getResumoCarteira(models, cliente_ref) {
+        const { Debito, Credito } = models;
+
         // Pode ser ID (numero) ou Nome (string) para retrocompatibilidade
         const isId = !isNaN(cliente_ref);
         const where = isId ? { cliente_id: cliente_ref } : { cliente_nome: decodeURIComponent(cliente_ref) };
@@ -84,10 +84,13 @@ class CarteiraService {
 
     /**
      * Cria um novo débito.
+     * @param {Object} models
      * @param {Object} data 
      * @returns {Object} Débito criado
      */
-    async createDebito(data) {
+    async createDebito(models, data) {
+        const { Debito } = models;
+
         // Validar e calcular
         const qtd = parseFloat(data.quantidade) || 1;
         const unit = parseFloat(data.valor_unitario) || 0;
@@ -122,10 +125,13 @@ class CarteiraService {
 
     /**
      * Cria um crédito (ou múltiplos parcelados).
+     * @param {Object} models
      * @param {Object} data 
      * @returns {Object} Resultado (único ou lista)
      */
-    async createCredito(data) {
+    async createCredito(models, data) {
+        const { Credito } = models;
+
         // Se recorrente, criar múltiplos créditos
         if (data.recorrente && data.num_parcelas > 1) {
             const parcelas = parseInt(data.num_parcelas);
@@ -185,7 +191,8 @@ class CarteiraService {
         }
     }
 
-    async updateDebito(id, data) {
+    async updateDebito(models, id, data) {
+        const { Debito } = models;
         const debito = await Debito.findByPk(id);
         if (!debito) throw new Error('Débito não encontrado');
 
@@ -218,7 +225,8 @@ class CarteiraService {
         return debito;
     }
 
-    async updateCredito(id, data) {
+    async updateCredito(models, id, data) {
+        const { Credito } = models;
         const credito = await Credito.findByPk(id);
         if (!credito) throw new Error('Crédito não encontrado');
 
@@ -238,11 +246,13 @@ class CarteiraService {
         await credito.update(updateData);
         return credito;
     }
-    async deleteDebito(id) {
+    async deleteDebito(models, id) {
+        const { Debito } = models;
         return await Debito.destroy({ where: { id } });
     }
 
-    async deleteCredito(id) {
+    async deleteCredito(models, id) {
+        const { Credito } = models;
         return await Credito.destroy({ where: { id } });
     }
 }

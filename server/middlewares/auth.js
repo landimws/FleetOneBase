@@ -48,8 +48,32 @@ export const isAuthenticated = (req, res, next) => {
         id: req.session.userId,
         nome: req.session.userName,
         username: req.session.userUsername,
-        role: req.session.userRole
+        role: req.session.userRole,
+        empresaId: req.session.empresaId // [NEW] Disponível na view
     };
+
+    // [SECURITY] Bloqueio Total para FleetOne em Rotas Operacionais
+    const FLEETONE_EMPRESA_ID = 1;
+    if (req.session.empresaId === FLEETONE_EMPRESA_ID) {
+        // Rotas permitidas para SuperAdmin
+        const allowedPaths = [
+            '/admin',
+            '/logout',
+            '/auth/logout',
+            '/api/profile'
+        ];
+
+        // Verifica se o path inicia com algum permitido
+        const isAllowed = allowedPaths.some(p => req.path.startsWith(p));
+
+        // Se tentar acessar dashboard, veiculos, etc -> Redireciona para Admin
+        if (!isAllowed) {
+            // Evitar loop de redirecionamento se já estiver no admin
+            if (req.path === '/admin/empresas') return next();
+
+            return res.redirect('/admin/empresas');
+        }
+    }
 
     next();
 };
@@ -61,3 +85,25 @@ export const isAdmin = (req, res, next) => {
     }
     return res.status(403).send('Acesso negado. Apenas administradores.');
 };
+
+// Middleware de Super Admin (Painel Administrativo)
+// SuperAdmin = Usuários da empresa FleetOne (empresaId === 1)
+export const isSuperAdmin = (req, res, next) => {
+    // Verificar se usuário está autenticado
+    if (!req.session.userId) {
+        return res.redirect('/login');
+    }
+
+    // REGRA: SuperAdmin = empresaId da FleetOne (ID fixo = 1)
+    const FLEETONE_EMPRESA_ID = 1;
+
+    if (req.session.empresaId === FLEETONE_EMPRESA_ID) {
+        return next();
+    }
+
+    return res.status(403).render('errors/403', {
+        message: 'Acesso negado. Apenas administradores FleetOne têm acesso ao Painel Administrativo.',
+        layout: false
+    });
+};
+

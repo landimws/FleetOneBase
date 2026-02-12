@@ -1,13 +1,11 @@
 
-import ContaPagar from '../models-sqlite/ContaPagar.js';
-import Compra from '../models-sqlite/Compra.js';
-import Fornecedor from '../models-sqlite/Fornecedor.js';
-
 export const list = async (req, res) => {
+    const { ContaPagar, Compra, Fornecedor, sequelize } = req.models;
+    const { Op } = sequelize.Sequelize;
+
     try {
         const { status, start, end, fornecedor_id } = req.query;
         const where = {};
-        const { Op } = await import('sequelize');
 
         // Status Filtering Logic
         if (status) {
@@ -16,17 +14,14 @@ export const list = async (req, res) => {
             if (status === 'PAGO') {
                 where.status = 'PAGO';
             } else if (status === 'PENDENTE') {
-                // Em Aberto e NÃO vencido (ou vencendo hoje)
                 where.status = 'EM_ABERTO';
                 where.vencimento = { [Op.gte]: hoje };
             } else if (status === 'ATRASADO') {
-                // Em Aberto e Vencido
-                where.status = { [Op.in]: ['EM_ABERTO', 'ATRASADO'] }; // Include explicit 'ATRASADO' if it exists
+                where.status = { [Op.in]: ['EM_ABERTO', 'ATRASADO'] };
                 where.vencimento = { [Op.lt]: hoje };
             } else if (status === 'TODOS') {
                 // No status filter
             } else {
-                // Fallback for direct DB values (e.g. if someone sends 'EM_ABERTO' manually)
                 where.status = status;
             }
         }
@@ -42,7 +37,6 @@ export const list = async (req, res) => {
         }
 
         if (start || end) {
-            // If we already have a vencimento condition (from PENDENTE/ATRASADO), we need to AND it.
             if (where.vencimento) {
                 where.vencimento = {
                     [Op.and]: [
@@ -63,9 +57,6 @@ export const list = async (req, res) => {
             }]
         }];
 
-        // Filter by supplier requires filtering the included Compra->Fornecedor
-        // If fornecedor_id is present, the inner where handles it. 
-        // But we need 'required: true' if we want to filter the main results.
         if (fornecedor_id) {
             include[0].required = true;
         }
@@ -84,6 +75,7 @@ export const list = async (req, res) => {
 };
 
 export const pay = async (req, res) => {
+    const { ContaPagar } = req.models;
     try {
         const { id } = req.params;
         const { data_pagamento, forma_pagamento, confirmado, valor_pago } = req.body;
@@ -93,14 +85,10 @@ export const pay = async (req, res) => {
             return res.status(404).json({ error: 'Conta não encontrada' });
         }
 
-        if (conta.status === 'PAGO' && !confirmado) {
-            // Preventing accidental double payment logic if needed
-        }
-
         await conta.update({
             data_pagamento: data_pagamento || new Date(),
             forma_pagamento: forma_pagamento || conta.forma_pagamento,
-            valor_pago: valor_pago || conta.valor, // Default to original value if not provided
+            valor_pago: valor_pago || conta.valor,
             status: 'PAGO',
             confirmado: confirmado !== undefined ? confirmado : true
         });
@@ -114,6 +102,7 @@ export const pay = async (req, res) => {
 };
 
 export const reversePayment = async (req, res) => {
+    const { ContaPagar } = req.models;
     try {
         const { id } = req.params;
         const conta = await ContaPagar.findByPk(id);
@@ -135,10 +124,10 @@ export const reversePayment = async (req, res) => {
 };
 
 export const updateStatus = async (req, res) => {
-    // Defines generic status update (e.g. reopen)
+    const { ContaPagar } = req.models;
     try {
         const { id } = req.params;
-        const { status } = req.body; // EM_ABERTO, ATRASADO
+        const { status } = req.body;
 
         const conta = await ContaPagar.findByPk(id);
         if (!conta) return res.status(404).json({ error: 'Conta não encontrada' });
@@ -157,6 +146,7 @@ export const updateStatus = async (req, res) => {
 };
 
 export const getById = async (req, res) => {
+    const { ContaPagar, Compra, Fornecedor } = req.models;
     try {
         const { id } = req.params;
         const conta = await ContaPagar.findByPk(id, {

@@ -1,0 +1,321 @@
+import MasterDatabase from '../../config/MasterDatabase.js';
+import { exec } from 'child_process';
+import { promisify } from 'util';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { Op } from 'sequelize'; // [NEW] Import Op
+
+const execAsync = promisify(exec);
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+/**
+ * Controller Administrativo para gestão de Empresas (Tenants)
+ * Rotas: /admin/empresas/*
+ * Requer: isSuperAdmin middleware
+ */
+class AdminEmpresasController {
+    /**
+     * GET /admin/empresas
+     * Lista todas as empresas do sistema (Exceto a Master ID 1)
+     */
+    async listAll(req, res) {
+        try {
+            const empresas = await MasterDatabase.Empresa.findAll({
+                where: {
+                    id: { [Op.ne]: 1 } // [FIX] Ocultar FleetOne (Sistema)
+                },
+                include: [{
+                    model: MasterDatabase.Usuario,
+                    attributes: ['id'],
+                    as: 'Usuarios' // Nome do relacionamento
+                }],
+                order: [['createdAt', 'DESC']]
+            });
+
+            // Contar usuários por empresa
+            const empresasComContagem = empresas.map(empresa => ({
+                ...empresa.toJSON(),
+                numUsuarios: empresa.Usuarios ? empresa.Usuarios.length : 0
+            }));
+
+            res.render('admin/empresas/index', {
+                title: 'Gerenciar Empresas',
+                empresas: empresasComContagem,
+                layout: 'admin/layouts/admin-layout'
+            });
+        } catch (error) {
+            console.error('Erro ao listar empresas:', error);
+            res.status(500).send('Erro ao carregar empresas.');
+        }
+    }
+
+    /**
+     * GET /admin/empresas/novo
+     * Renderiza formulário de criação
+     */
+    async renderForm(req, res) {
+        const empresaId = req.query.id;
+        let empresa = null;
+
+        if (empresaId) {
+            // [SECURITY] Não permitir editar ID 1
+            if (parseInt(empresaId) === 1) {
+                return res.status(403).send('Acesso negado. Empresa do sistema não pode ser editada.');
+            }
+            empresa = await MasterDatabase.Empresa.findByPk(empresaId);
+        }
+
+        res.render('admin/empresas/form', {
+            title: empresa ? 'Editar Empresa' : 'Nova Empresa',
+            empresa: empresa || {},
+            layout: 'admin/layouts/admin-layout'
+        });
+    }
+
+    /**
+     * POST /admin/empresas
+     * Cria nova empresa + banco isolado
+     */
+    async create(req, res) {
+        try {
+            const { nome, cnpj, email, telefone, responsavel, cep, logradouro,
+                numero, bairro, cidade, estado } = req.body;
+
+            // Validar CNPJ único
+            if (cnpj) {
+                const empresaExistente = await MasterDatabase.Empresa.findOne({
+                    where: { cnpj }
+                });
+
+                if (empresaExistente) {
+                    return res.status(400).json({
+                        success: false,
+                        message: 'CNPJ já cadastrado.'
+                    });
+                }
+            }
+
+            // Criar empresa no Master DB
+            const empresa = await MasterDatabase.Empresa.create({
+                nome,
+                cnpj: cnpj || null,
+                email: email || null,
+                telefone: telefone || null,
+                responsavel: responsavel || null,
+                cep: cep || null,
+                logradouro: logradouro || null,
+                numero: numero || null,
+                bairro: bairro || null,
+                cidade: cidade || null,
+                estado: estado || null,
+                ativo: true
+            });
+
+            // Executar script para criar banco do tenant
+            try {
+                const scriptPath = path.resolve(process.cwd(), 'server/scripts/createTenant.js');
+                const { stdout, stderr } = await execAsync(`node "${scriptPath}" ${empresa.id}`);
+
+                console.log('✅ Banco criado para empresa:', empresa.id);
+                if (stdout) console.log(stdout);
+                if (stderr) console.error(stderr);
+            } catch (scriptError) {
+                console.error('❌ Erro ao criar banco tenant:', scriptError);
+                // Rollback: deletar empresa criada
+                await empresa.destroy();
+
+                return res.status(500).json({
+                    success: false,
+                    message: 'Erro ao criar banco de dados da empresa.'
+                });
+            }
+
+            res.json({
+                success: true,
+                message: 'Empresa criada com sucesso!',
+                empresaId: empresa.id
+            });
+        } catch (error) {
+            console.error('Erro ao criar empresa:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Erro ao criar empresa: ' + error.message
+            });
+        }
+    }
+
+    /**
+     * PUT /admin/empresas/:id
+     * Atualiza dados da empresa
+     */
+    async update(req, res) {
+        try {
+            const { id } = req.params;
+            console.log(`📝 [AdminEmpresasController] Update request para ID: ${id}`);
+            console.log('📦 [AdminEmpresasController] Body recebido:', JSON.stringify(req.body, null, 2));
+
+            // [SECURITY] Não permitir editar ID 1
+            if (parseInt(id) === 1) {
+                return res.status(403).json({
+                    success: false,
+                    message: 'Acesso negado. Empresa do sistema não pode ser editada.'
+                });
+            }
+
+            const { nome, cnpj, email, telefone, responsavel, cep, logradouro,
+                numero, bairro, cidade, estado } = req.body;
+
+            const empresa = await MasterDatabase.Empresa.findByPk(id);
+
+            if (!empresa) {
+                return res.status(404).json({
+                    success: false,
+                    message: 'Empresa não encontrada.'
+                });
+            }
+
+            // Validar CNPJ único (se mudou)
+            if (cnpj && cnpj !== empresa.cnpj) {
+                const empresaExistente = await MasterDatabase.Empresa.findOne({
+                    where: { cnpj }
+                });
+
+                if (empresaExistente) {
+                    return res.status(400).json({
+                        success: false,
+                        message: 'CNPJ já cadastrado.'
+                    });
+                }
+            }
+
+            await empresa.update({
+                nome,
+                cnpj: cnpj || null,
+                email: email || null,
+                telefone: telefone || null,
+                responsavel: responsavel || null,
+                cep: cep || null,
+                logradouro: logradouro || null,
+                numero: numero || null,
+                bairro: bairro || null,
+                cidade: cidade || null,
+                estado: estado || null
+            });
+
+            res.json({
+                success: true,
+                message: 'Empresa atualizada com sucesso!'
+            });
+        } catch (error) {
+            console.error('Erro ao atualizar empresa:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Erro ao atualizar empresa.'
+            });
+        }
+    }
+
+    /**
+     * POST /admin/empresas/:id/toggle-status
+     * Ativa/Desativa empresa + desativa usuários em cascata
+     */
+    async toggleStatus(req, res) {
+        try {
+            const { id } = req.params;
+
+            // [SECURITY] Não permitir desativar ID 1
+            if (parseInt(id) === 1) {
+                return res.status(403).json({
+                    success: false,
+                    message: 'Acesso negado. Empresa do sistema não pode ser desativada.'
+                });
+            }
+
+            const empresa = await MasterDatabase.Empresa.findByPk(id);
+
+            if (!empresa) {
+                return res.status(404).json({
+                    success: false,
+                    message: 'Empresa não encontrada.'
+                });
+            }
+
+            const novoStatus = !empresa.ativo;
+
+            await MasterDatabase.sequelize.transaction(async (t) => {
+                // Atualizar status da empresa
+                await empresa.update({ ativo: novoStatus }, { transaction: t });
+
+                // Cascata: Se desativar empresa, desativa todos os usuários
+                if (!novoStatus) {
+                    const usuariosDesativados = await MasterDatabase.Usuario.update(
+                        { ativo: false },
+                        {
+                            where: { empresaId: id },
+                            transaction: t
+                        }
+                    );
+
+                    console.log(`🔒 Empresa ${id} desativada. ${usuariosDesativados[0]} usuários desativados em cascata.`);
+                }
+            });
+
+            res.json({
+                success: true,
+                message: `Empresa ${novoStatus ? 'ativada' : 'desativada'} com sucesso!`,
+                novoStatus
+            });
+        } catch (error) {
+            console.error('Erro ao alterar status da empresa:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Erro ao alterar status.'
+            });
+        }
+    }
+
+    /**
+     * DELETE /admin/empresas/:id
+     * Remove empresa (soft delete)
+     * TODO: Implementar exclusão de banco físico se necessário
+     */
+    async delete(req, res) {
+        try {
+            const { id } = req.params;
+
+            // [SECURITY] Não permitir deletar ID 1
+            if (parseInt(id) === 1) {
+                return res.status(403).json({
+                    success: false,
+                    message: 'Acesso negado. Empresa do sistema não pode ser deletada.'
+                });
+            }
+
+            const empresa = await MasterDatabase.Empresa.findByPk(id);
+
+            if (!empresa) {
+                return res.status(404).json({
+                    success: false,
+                    message: 'Empresa não encontrada.'
+                });
+            }
+
+            // Por segurança, apenas desativar (não deletar fisicamente)
+            await empresa.update({ ativo: false });
+
+            res.json({
+                success: true,
+                message: 'Empresa desativada com sucesso!'
+            });
+        } catch (error) {
+            console.error('Erro ao deletar empresa:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Erro ao deletar empresa.'
+            });
+        }
+    }
+}
+
+export default new AdminEmpresasController();

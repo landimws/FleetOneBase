@@ -1,7 +1,5 @@
 
-import { Op, Sequelize } from 'sequelize';
-import Multa from '../models-sqlite/Multa.js';
-import Veiculo from '../models-sqlite/Veiculo.js';
+import { Op } from 'sequelize';
 import { normalizeString } from '../utils/stringUtils.js';
 import { FinancialCalculator } from '../domain/financial/FinancialCalculator.js';
 
@@ -9,9 +7,13 @@ class MultaAnalyticsService {
 
     /**
      * Gera dados analíticos das multas.
+     * @param {Object} models Models injetados
      * @param {Object} filters filtros opcionais (data_inicio, data_fim)
      */
-    async getAnalytics(filters = {}) {
+    async getAnalytics(models, filters = {}) {
+        const { Multa, Veiculo, sequelize } = models; // Sequelize needed for raw queries/functions
+        const Sequelize = sequelize.Sequelize; // Access static Sequelize if needed, or use instance methods
+
         const whereBase = {};
         if (filters.search) {
             const term = normalizeString(filters.search);
@@ -26,7 +28,7 @@ class MultaAnalyticsService {
             };
         }
 
-        // --- 1. KPIs FINANCEIROS ESTRATÉGICOS (Baseados no Filtro Geral) ---
+        // --- 1. KPIs FINANCEIROS ESTRATÉGICOS ---
         // Valor Original Total
         const valorOriginalTotal = await Multa.sum('valor_original', { where: whereGeral }) || 0;
 

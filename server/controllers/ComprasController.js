@@ -1,18 +1,13 @@
 
-import sequelize from '../config/database-sqlite.js';
-import Compra from '../models-sqlite/Compra.js';
-import CompraItem from '../models-sqlite/CompraItem.js';
-import ContaPagar from '../models-sqlite/ContaPagar.js';
-import Fornecedor from '../models-sqlite/Fornecedor.js';
-
 export const list = async (req, res) => {
+    const { Compra, Fornecedor, sequelize } = req.models;
+    const { Op } = sequelize.Sequelize;
+
     try {
         const { start, end, fornecedor_id } = req.query;
         const where = {};
 
-        // Simple date filtering (YYYY-MM-DD)
         // Date filtering (YYYY-MM-DD)
-        const { Op } = await import('sequelize');
         const dateCondition = {};
 
         if (start && end) {
@@ -44,6 +39,7 @@ export const list = async (req, res) => {
 };
 
 export const getById = async (req, res) => {
+    const { Compra, Fornecedor, CompraItem, ContaPagar } = req.models;
     try {
         const { id } = req.params;
         const compra = await Compra.findByPk(id, {
@@ -63,6 +59,7 @@ export const getById = async (req, res) => {
 };
 
 export const create = async (req, res) => {
+    const { Compra, CompraItem, ContaPagar, sequelize } = req.models;
     const t = await sequelize.transaction();
     try {
         const {
@@ -192,6 +189,7 @@ export const create = async (req, res) => {
 
 
 export const update = async (req, res) => {
+    const { Compra, CompraItem, ContaPagar, sequelize } = req.models;
     const t = await sequelize.transaction();
     try {
         const { id } = req.params;
@@ -219,7 +217,7 @@ export const update = async (req, res) => {
         }
 
         if (numero_nota) {
-            const { Op } = await import('sequelize');
+            const { Op } = sequelize.Sequelize;
             const existe = await Compra.findOne({
                 where: {
                     fornecedor_id,
@@ -318,6 +316,7 @@ export const update = async (req, res) => {
 
 
 export const remove = async (req, res) => {
+    const { Compra, sequelize } = req.models;
     const t = await sequelize.transaction();
     try {
         const { id } = req.params;

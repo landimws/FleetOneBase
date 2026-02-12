@@ -1,25 +1,23 @@
 
-import Empresa from '../models-sqlite/Empresa.js';
+import MasterDatabase from '../config/MasterDatabase.js';
 
 const EmpresasController = {
-    // Get company details (first one found)
-    // In a multi-tenant real scenario, this would filter by user.empresaId
-    // For now, we simulate a single company or the one linked to the user.
+    // Get company details (tenant context)
     getCompany: async (req, res) => {
         try {
-            // Find the first company (singleton pattern for now)
-            let empresa = await Empresa.findOne();
+            await MasterDatabase.init();
+            const { Empresa } = MasterDatabase;
+            const empresaId = req.session.empresaId;
 
-            // If no company exists, create a default blank one to avoid errors
+            if (!empresaId) {
+                return res.redirect('/login');
+            }
+
+            // Find the tenant's company
+            let empresa = await Empresa.findByPk(empresaId);
+
             if (!empresa) {
-                empresa = await Empresa.create({
-                    nome: 'Minha Locadora',
-                    cnpj: '',
-                    endereco: '',
-                    telefone: '',
-                    email: '',
-                    responsavel: ''
-                });
+                return res.status(404).render('pages/404', { message: 'Empresa não encontrada.' });
             }
 
             res.render('pages/configuracoes/empresa/index', {
@@ -33,12 +31,21 @@ const EmpresasController = {
         }
     },
 
-    // Update company details
+    // Update company details (tenant context)
     updateCompany: async (req, res) => {
         try {
-            const { id, nome, cnpj, telefone, email, responsavel, cep, logradouro, numero, bairro, cidade, estado } = req.body;
+            await MasterDatabase.init();
+            const { Empresa } = MasterDatabase;
+            const empresaId = req.session.empresaId;
 
-            let empresa = await Empresa.findByPk(id);
+            if (!empresaId) {
+                return res.status(403).json({ error: 'Sessão inválida.' });
+            }
+
+            // Campos permitidos para atualização (Sanitização)
+            const { nome, cnpj, telefone, email, responsavel, cep, logradouro, numero, bairro, cidade, estado } = req.body;
+
+            let empresa = await Empresa.findByPk(empresaId);
 
             if (!empresa) {
                 return res.status(404).json({ error: 'Empresa não encontrada.' });

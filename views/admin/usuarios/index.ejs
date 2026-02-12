@@ -1,0 +1,145 @@
+<% page='usuarios' %>
+
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <button class="btn btn-admin-primary" onclick="novoUsuario()">
+                <i class="bi bi-plus-circle me-2"></i>Novo Usuário
+            </button>
+        </div>
+        <div class="col-md-4">
+            <select class="form-select" id="filtroEmpresa" onchange="filtrarPorEmpresa()">
+                <option value="">Todas as Empresas</option>
+                <% empresas.forEach(function(empresa) { %>
+                    <option value="<%= empresa.id %>" <%=filtroEmpresaId==empresa.id ? 'selected' : '' %>>
+                        <%= empresa.nome %>
+                    </option>
+                    <% }); %>
+            </select>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <i class="bi bi-people me-2"></i>Lista de Usuários
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nome</th>
+                            <th>Username</th>
+                            <th>Empresa</th>
+                            <th>Role</th>
+                            <th>SuperAdmin</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if (usuarios && usuarios.length> 0) { %>
+                            <% usuarios.forEach(function(usuario) { %>
+                                <tr>
+                                    <td>
+                                        <%= usuario.id %>
+                                    </td>
+                                    <td><strong>
+                                            <%= usuario.nome %>
+                                        </strong></td>
+                                    <td><code><%= usuario.username %></code></td>
+                                    <td>
+                                        <% if (usuario.Empresa) { %>
+                                            <%= usuario.Empresa.nome %>
+                                                <% } else { %>
+                                                    <span class="text-muted">-</span>
+                                                    <% } %>
+                                    </td>
+                                    <td><span class="badge bg-info">
+                                            <%= usuario.role %>
+                                        </span></td>
+                                    <td>
+                                        <% if (usuario.isSuperAdmin) { %>
+                                            <i class="bi bi-shield-check text-danger" title="Super Administrador"></i>
+                                            <% } else { %>
+                                                -
+                                                <% } %>
+                                    </td>
+                                    <td>
+                                        <span class="badge <%= usuario.ativo ? 'badge-ativo' : 'badge-inativo' %>">
+                                            <%= usuario.ativo ? 'Ativo' : 'Inativo' %>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary"
+                                            onclick="editarUsuario(<%= usuario.id %>)">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button
+                                            class="btn btn-sm btn-outline-<%= usuario.ativo ? 'danger' : 'success' %>"
+                                            onclick="toggleStatusUsuario(<%= usuario.id %>, <%= usuario.ativo %>, this)">
+                                            <i class="bi bi-<%= usuario.ativo ? 'x-circle' : 'check-circle' %>"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <% }); %>
+                                    <% } else { %>
+                                        <tr>
+                                            <td colspan="8" class="text-center text-muted py-4">
+                                                Nenhum usuário encontrado.
+                                            </td>
+                                        </tr>
+                                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function novoUsuario() {
+            window.location.href = '/admin/usuarios/novo';
+        }
+
+        function editarUsuario(id) {
+            window.location.href = `/admin/usuarios/novo?id=${id}`;
+        }
+
+        function filtrarPorEmpresa() {
+            const empresaId = document.getElementById('filtroEmpresa').value;
+            const url = empresaId ? `/admin/usuarios?empresaId=${empresaId}` : '/admin/usuarios';
+            window.location.href = url;
+        }
+
+        async function toggleStatusUsuario(id, ativoAtual, btnElement) {
+            const acao = ativoAtual ? 'desativar' : 'ativar';
+
+            if (!confirm(`Tem certeza que deseja ${acao} este usuário?`)) {
+                return;
+            }
+
+            // Ativar loading
+            Loading.show(btnElement);
+
+            try {
+                const response = await fetch(`/admin/usuarios/${id}/toggle-status`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    Toast.show(data.message, 'success');
+                    setTimeout(() => window.location.reload(), 1500);
+                } else {
+                    Toast.show('Erro: ' + data.message, 'error');
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                Toast.show('Erro ao alterar status do usuário.', 'error');
+            } finally {
+                Loading.hide(btnElement);
+            }
+        }
+    </script>

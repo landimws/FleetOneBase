@@ -1,18 +1,24 @@
 
-import Usuario from '../models-sqlite/Usuario.js';
+import MasterDatabase from '../config/MasterDatabase.js';
 import bcrypt from 'bcrypt';
 
 const UsuariosController = {
-    // Listar usuários
+    // Listar usuários (Apenas da própria empresa)
     index: async (req, res) => {
         try {
+            await MasterDatabase.init();
+            const { Usuario } = MasterDatabase;
+            const empresaId = req.session.empresaId;
+
             const usuarios = await Usuario.findAll({
-                attributes: ['id', 'nome', 'username', 'role', 'ativo', 'createdAt']
+                where: { empresaId }, // FILTRO DE SEGURANÇA
+                attributes: ['id', 'nome', 'username', 'role', 'ativo', 'createdAt'],
+                order: [['nome', 'ASC']]
             });
 
             res.render('pages/configuracoes/usuarios/index', {
                 title: 'Gerenciar Usuários',
-                page: 'configuracoes_usuarios', // active menu if we add it
+                page: 'configuracoes_usuarios',
                 usuarios
             });
         } catch (error) {
@@ -21,9 +27,13 @@ const UsuariosController = {
         }
     },
 
-    // Criar usuário
+    // Criar usuário (Vinculado à própria empresa)
     create: async (req, res) => {
         try {
+            await MasterDatabase.init();
+            const { Usuario } = MasterDatabase;
+            const empresaId = req.session.empresaId;
+
             const { nome, username, password, role } = req.body;
 
             // Check existing
@@ -34,15 +44,13 @@ const UsuariosController = {
 
             const hashedPassword = await bcrypt.hash(password, 10);
 
-            // [NEW] Link to the single company in this DB
-            const empresa = await import('../models-sqlite/Empresa.js').then(m => m.default.findOne());
-
             await Usuario.create({
                 nome,
                 username,
                 password: hashedPassword,
-                role,
-                empresaId: empresa ? empresa.id : null
+                role: role || 'operador', // Default to operador checks
+                empresaId: empresaId, // VINCULA À EMPRESA LOGADA
+                ativo: true
             });
 
             res.json({ success: true });
@@ -52,13 +60,21 @@ const UsuariosController = {
         }
     },
 
-    // Atualizar usuário
+    // Atualizar usuário (Apenas da própria empresa)
     update: async (req, res) => {
         try {
+            await MasterDatabase.init();
+            const { Usuario } = MasterDatabase;
+            const empresaId = req.session.empresaId;
+
             const { id } = req.params;
             const { nome, username, password, role, ativo } = req.body;
 
-            const user = await Usuario.findByPk(id);
+            // Busca garantindo que usuário pertence à empresa
+            const user = await Usuario.findOne({
+                where: { id, empresaId }
+            });
+
             if (!user) return res.status(404).json({ error: 'Usuário não encontrado' });
 
             if (username && username !== user.username) {
@@ -71,7 +87,7 @@ const UsuariosController = {
             user.role = role;
             user.ativo = ativo === 'true' || ativo === true;
 
-            if (password) {
+            if (password && password.trim() !== '') {
                 user.password = await bcrypt.hash(password, 10);
             }
 
@@ -83,15 +99,25 @@ const UsuariosController = {
         }
     },
 
-    // Deletar usuário (Hard Delete or Soft - let's use Hard for simplicity correctly)
+    // Deletar usuário (Hard Delete - Apenas da própria empresa)
     delete: async (req, res) => {
         try {
+            await MasterDatabase.init();
+            const { Usuario } = MasterDatabase;
+            const empresaId = req.session.empresaId;
+
             const { id } = req.params;
+
+            // Proteção contra auto-exclusão
             if (parseInt(id) === req.session.userId) {
                 return res.status(400).json({ error: 'Não é possível excluir o próprio usuário logado.' });
             }
 
-            const user = await Usuario.findByPk(id);
+            // Busca garantindo que usuário pertence à empresa
+            const user = await Usuario.findOne({
+                where: { id, empresaId }
+            });
+
             if (!user) return res.status(404).json({ error: 'Usuário não encontrado' });
 
             await user.destroy();
@@ -102,9 +128,12 @@ const UsuariosController = {
         }
     },
 
-    // Update Profile (Self Service)
+    // Update Profile (Self Service - Qualquer empresa)
     updateProfile: async (req, res) => {
         try {
+            await MasterDatabase.init();
+            const { Usuario } = MasterDatabase;
+
             const id = req.session.userId;
             const { nome, username, password } = req.body;
 
@@ -115,19 +144,18 @@ const UsuariosController = {
                 const existing = await Usuario.findOne({ where: { username } });
                 if (existing) return res.status(400).json({ error: 'Nome de usuário já existe' });
                 user.username = username;
-                req.session.userUsername = username; // Update session
+                req.session.userUsername = username;
             }
 
             user.nome = nome;
-            req.session.userName = nome; // Update session
+            req.session.userName = nome;
 
-            if (password) {
+            if (password && password.trim() !== '') {
                 user.password = await bcrypt.hash(password, 10);
             }
 
             await user.save();
 
-            // Force session save to ensure updates persist
             req.session.save((err) => {
                 if (err) throw err;
                 res.json({ success: true });

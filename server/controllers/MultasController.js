@@ -1,7 +1,6 @@
 import { validationResult } from 'express-validator';
 import MultaService from '../services/MultaService.js';
 import MultaAnalyticsService from '../services/MultaAnalyticsService.js';
-import sequelize from '../config/database-sqlite.js';
 import { QueryTypes } from 'sequelize';
 
 class MultasController {
@@ -21,7 +20,7 @@ class MultasController {
                 sort_by: req.query.sort_by,
                 order: req.query.order
             };
-            const multas = await MultaService.list(filters);
+            const multas = await MultaService.list(req.models, filters);
             res.json(multas);
         } catch (error) {
             console.error('Erro ao listar multas:', error);
@@ -30,6 +29,7 @@ class MultasController {
     }
 
     async criar(req, res) {
+        const { sequelize } = req.models;
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
             return res.status(400).json({ errors: errors.array() });
@@ -45,10 +45,9 @@ class MultasController {
             // SQL Raw para SQLite: WHERE REPLACE(numero_auto, 'O', '0') = REPLACE(:auto, 'O', '0')
 
             // Passo A: Identificar se existe algo "parecido"
-            // Normalizar entrada para comparação: Troca O por 0
             const autoNormalizado = req.body.numero_auto.replace(/O/g, '0');
 
-            // Query Raw segurana
+            // Query Raw segurana usando a conexão do tenant
             const [similar] = await sequelize.query(
                 `SELECT numero_auto FROM Multas WHERE REPLACE(UPPER(numero_auto), 'O', '0') = :auto LIMIT 1`,
                 {
@@ -67,7 +66,7 @@ class MultasController {
                 // Se for idêntico, o UniqueConstraint do banco vai pegar logo abaixo, ou o Service.
             }
 
-            const multa = await MultaService.create(req.body);
+            const multa = await MultaService.create(req.models, req.body);
             res.status(201).json(multa);
         } catch (error) {
             console.error('Erro ao criar multa:', error);
@@ -80,7 +79,7 @@ class MultasController {
 
     async buscarPorId(req, res) {
         try {
-            const multa = await MultaService.getById(req.params.id);
+            const multa = await MultaService.getById(req.models, req.params.id);
             res.json(multa);
         } catch (error) {
             if (error.message === 'Multa não encontrada') {
@@ -98,7 +97,7 @@ class MultasController {
         }
 
         try {
-            const multa = await MultaService.update(req.params.id, req.body);
+            const multa = await MultaService.update(req.models, req.params.id, req.body);
             res.json(multa);
         } catch (error) {
             if (error.message === 'Multa não encontrada') {
@@ -114,7 +113,7 @@ class MultasController {
 
     async excluir(req, res) {
         try {
-            await MultaService.delete(req.params.id);
+            await MultaService.delete(req.models, req.params.id);
             res.status(204).send();
         } catch (error) {
             if (error.message === 'Multa não encontrada') {
@@ -128,13 +127,12 @@ class MultasController {
     async aplicarDesconto(req, res) {
         const { percentual } = req.body;
 
-        // Validação simples aqui ou no Schema (Schema idealmente, mas é endpoint custom)
         if (percentual === undefined) {
             return res.status(400).json({ error: 'Percentual é obrigatório' });
         }
 
         try {
-            const multa = await MultaService.aplicarDesconto(req.params.id, percentual);
+            const multa = await MultaService.aplicarDesconto(req.models, req.params.id, percentual);
             res.json(multa);
         } catch (error) {
             if (error.message === 'Multa não encontrada') {
@@ -148,13 +146,14 @@ class MultasController {
         try {
             const { id } = req.params;
             const debitData = req.body;
-            const result = await MultaService.lancarNaCarteira(id, debitData);
+            const result = await MultaService.lancarNaCarteira(req.models, id, debitData);
             res.status(201).json(result);
         } catch (error) {
             console.error('Erro ao lançar na carteira:', error);
             res.status(400).json({ error: error.message });
         }
     }
+
     async dashboard(req, res) {
         try {
             const filters = {
@@ -163,7 +162,7 @@ class MultasController {
                 search: req.query.search
             };
 
-            const analytics = await MultaAnalyticsService.getAnalytics(filters);
+            const analytics = await MultaAnalyticsService.getAnalytics(req.models, filters);
             res.json(analytics);
         } catch (error) {
             console.error('Erro no Dashboard de Multas:', error);

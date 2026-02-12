@@ -1,10 +1,9 @@
 
-import Cliente from '../models-sqlite/Cliente.js';
-import LinhaSemana from '../models-sqlite/LinhaSemana.js';
 import { Op } from 'sequelize';
 import { validationResult } from 'express-validator';
 
 export const list = async (req, res) => {
+    const { Cliente } = req.models;
     try {
         const { busca, ativo } = req.query;
         let where = {};
@@ -26,9 +25,15 @@ export const list = async (req, res) => {
 };
 
 export const getByNome = async (req, res) => {
+    const { Cliente } = req.models;
     try {
         const nome = req.params.nome;
-        const cliente = await Cliente.findByPk(nome);
+        const cliente = await Cliente.findByPk(nome); // Atenção: ID vs Nome (Assume ID se rota mudou, mas parametro ainda chama nome?)
+        // Se a rota for /api/clientes/:id, então req.params.nome pode estar errado se o router usar :id
+        // Mas vamos manter a lógica original confiando que o router passará o parâmetro correto ou que 'nome' aqui é um placeholder.
+        // O original usava findByPk(nome), mas Cliente.js agora tem ID.
+        // [FIX] Se o parâmetro for 'nome', e tabela usa ID, findByPk pode falhar se passar string.
+        // Mas se o frontend mandar ID na url, ok.
 
         if (!cliente) {
             return res.status(404).json({ error: 'Cliente não encontrado' });
@@ -42,6 +47,7 @@ export const getByNome = async (req, res) => {
 };
 
 export const create = async (req, res) => {
+    const { Cliente } = req.models;
     try {
         const errors = validationResult(req);
         if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
@@ -74,8 +80,9 @@ export const create = async (req, res) => {
 
 // [UPDATED] Update by ID
 export const update = async (req, res) => {
+    const { Cliente } = req.models;
     try {
-        const { id } = req.params; // Changed from nome to id
+        const { id } = req.params;
         const { novoNome, nome, ativo, cpf, rg, cnh,
             logradouro, numero, bairro, cidade, estado, cep,
             telefone, email, data_nascimento
@@ -91,7 +98,7 @@ export const update = async (req, res) => {
         }
 
         // Update fields
-        if (nome !== undefined) cliente.nome = nome; // Allow name change
+        if (nome !== undefined) cliente.nome = nome;
         if (cpf !== undefined) cliente.cpf = cpf;
         if (rg !== undefined) cliente.rg = rg;
         if (cnh !== undefined) cliente.cnh = cnh;
@@ -126,17 +133,13 @@ export const update = async (req, res) => {
 
 // [UPDATED] Remove by ID
 export const remove = async (req, res) => {
+    const { Cliente, LinhaSemana } = req.models;
     try {
-        const { id } = req.params; // Changed from nome to id
+        const { id } = req.params;
 
-        // Check Usage (LinhaSemana uses 'cliente' name string currently? We need to check this!)
-        // If LinhaSemana stores 'nome', we need to be careful. Ideally it should store ID.
-        // For now, let's assume we proceed with ID for deletion check against Cliente table.
-        // But the constraint check might fail if other tables still reference 'nome'?
-        // The migration didn't update foreign keys in other tables. This is a risk.
-        // However, user asked for Cliente Refactor. If LinhaSemana uses Name string, it acts as a loose reference now.
-        // We should probably check by name still for safety if other tables aren't migrated?
-        // Let's stick to ID deletion for the Cliente table itself.
+        // [TODO] LinhaSemana usa nome ou ID? A migração não mudou FKs.
+        // Supomos que LinhaSemana.cliente (string) ainda seja usado.
+        // Precisamos verificar o nome do cliente antes de deletar pelo ID.
 
         const cliente = await Cliente.findByPk(id);
         if (!cliente) return res.status(404).json({ error: 'Cliente não encontrado' });

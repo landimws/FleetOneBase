@@ -3,13 +3,14 @@ import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
-import fs from 'fs'; // [NEW] HTTPS
-import https from 'https'; // [NEW] HTTPS
-import sequelize from './config/database-sqlite.js';
-import { sessionConfig, isAuthenticated } from './middlewares/auth.js'; // [NEW] Auth
-import AuthController from './controllers/AuthController.js'; // [NEW] Auth
-import Usuario from './models-sqlite/Usuario.js'; // [NEW] User Model
-import bcrypt from 'bcrypt'; // [NEW] For default user
+import fs from 'fs';
+import https from 'https';
+// import sequelize from './config/database-sqlite.js'; // [REMOVED] Legacy
+import MasterDatabase from './config/MasterDatabase.js'; // [NEW] Master DB
+import tenantContext from './middlewares/tenantContext.js'; // [NEW] Tenant Context
+import { sessionConfig, isAuthenticated } from './middlewares/auth.js';
+import AuthController from './controllers/AuthController.js';
+import bcrypt from 'bcrypt';
 
 // Configuração de __dirname para ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -31,7 +32,7 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, '../views'));
 
 // Middlewares
-app.use(express.json({ limit: '10mb' })); // Aumentado para suportar semanas grandes
+app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(express.static(path.join(__dirname, '../public')));
 
@@ -50,30 +51,29 @@ app.use((req, res, next) => {
     next();
 });
 
-app.use(sessionConfig); // [NEW] Session Middleware
+app.use(sessionConfig);
 
-// Inicializar SQLite e Sincronizar Tabelas
+// Inicializar MasterDatabase e Criar Admin Padrão
 if (process.env.NODE_ENV !== 'test') {
     (async () => {
         try {
-            // Disable FKs temporarily (just in case)
-            await sequelize.query('PRAGMA foreign_keys = OFF;');
+            await MasterDatabase.init();
+            const { Usuario, Empresa } = MasterDatabase;
 
-            // Remove 'alter: true' to prevent risky table recreation.
-            // We rely on manual migrations for schema changes now.
-            await sequelize.sync();
+            // 1. Garantir Empresa Padrão (FleetOne Admin)
+            let fleetOne = await Empresa.findByPk(1);
+            if (!fleetOne) {
+                fleetOne = await Empresa.create({
+                    id: 1, // ID Fixo 1
+                    nome: 'FleetOne Admin',
+                    responsavel: 'Sistema',
+                    email: 'admin@fleetone.com.br',
+                    ativo: true
+                });
+                console.log('🏢 Empresa FleetOne criada (ID: 1)');
+            }
 
-            await sequelize.query('PRAGMA foreign_keys = ON;');
-            // console.log('✅ SQLite sincronizado com sucesso (database.sqlite)');
-        } catch (err) {
-            console.error('❌ Erro ao sincronizar SQLite:', err);
-        }
-    })();
-
-    // [NEW] Criar usuário admin padrão se não existir
-    (async () => {
-        try {
-            await sequelize.sync(); // Garante que a tabela existe
+            // 2. Garantir Usuário Admin
             const count = await Usuario.count();
             if (count === 0) {
                 const hashedPassword = await bcrypt.hash('admin123', 10);
@@ -81,14 +81,14 @@ if (process.env.NODE_ENV !== 'test') {
                     nome: 'Administrador',
                     username: 'admin',
                     password: hashedPassword,
-                    role: 'admin'
+                    role: 'admin',
+                    empresaId: 1, // Vincula à FleetOne
+                    isSuperAdmin: true // Flag de SuperAdmin
                 });
-                console.log('👤 Usuário padrão criado: admin / admin123');
+                console.log('👤 Usuário padrão criado: admin / admin123 (SuperAdmin)');
             }
         } catch (e) {
-            // The original instruction provided a `res.status(500).json(...)` which is not applicable here.
-            // Assuming the intent was to enhance logging for this specific error.
-            console.error('❌ Erro ao criar usuário padrão:', e);
+            console.error('❌ Erro na inicialização do MasterDB:', e);
         }
     })();
 }
@@ -101,13 +101,14 @@ import dashboardRoutes from './routes/dashboard.js';
 import relatoriosRoutes from './routes/relatorios.js';
 
 import carteiraRoutes from './routes/carteira.js';
-import multasRoutes from './routes/multas.js'; // [NEW]
+import multasRoutes from './routes/multas.js';
 import encerramentoRoutes from './routes/encerramento.js';
-import constantsRoutes from './routes/constants.js'; // [NEW]
-import financeiroRoutes from './routes/financeiro.js'; // [NEW]
-import usuariosRoutes from './routes/usuarios.js'; // [NEW] Users CRUD
-import empresasRoutes from './routes/empresas.js'; // [NEW] Company Settings
-import profileRoutes from './routes/profile.js'; // [NEW] Profile Update
+import constantsRoutes from './routes/constants.js';
+import financeiroRoutes from './routes/financeiro.js';
+import usuariosRoutes from './routes/usuarios.js';
+import empresasRoutes from './routes/empresas.js';
+import profileRoutes from './routes/profile.js';
+import adminRoutes from './routes/admin.js';
 
 // [NEW] Rotas de Autenticação (Públicas)
 app.get('/login', AuthController.loginPage);
@@ -117,21 +118,27 @@ app.get('/logout', AuthController.logout);
 // Rotas de API
 app.use('/api/semanas', semanasRoutes);
 
-// [NEW] Middleware Global de Proteção
+// [NEW] Rotas Administrativas (protegidas por isSuperAdmin internamente)
+app.use('/admin', adminRoutes);
+
+// [NEW] Middleware Global de Proteção + Tenant Context
 app.use(isAuthenticated);
+app.use(tenantContext); // [IMPORTANT] Injeta req.models baseado no login
+
+// Rotas que dependem de req.models
 app.use('/api/veiculos', veiculosRoutes);
 app.use('/api/clientes', clientesRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/relatorios', relatoriosRoutes);
 
 app.use('/api/carteira', carteiraRoutes);
-app.use('/api/multas', multasRoutes); // [NEW]
+app.use('/api/multas', multasRoutes);
 app.use('/api/encerramento', encerramentoRoutes);
-app.use('/api/constants', constantsRoutes); // [NEW]
-app.use('/api/financeiro', financeiroRoutes); // [NEW]
-app.use('/configuracoes/usuarios', usuariosRoutes); // [NEW] Admin Routes
-app.use('/configuracoes/empresa', empresasRoutes); // [NEW] Company Routes
-app.use('/api/profile', profileRoutes); // [NEW] Profile API
+app.use('/api/constants', constantsRoutes);
+app.use('/api/financeiro', financeiroRoutes);
+app.use('/configuracoes/usuarios', usuariosRoutes);
+app.use('/configuracoes/empresa', empresasRoutes);
+app.use('/api/profile', profileRoutes);
 
 // Rotas de View
 app.get('/', (req, res) => res.render('pages/dashboard', { title: 'Gestão de Locadora', page: 'grid' }));

@@ -1,0 +1,103 @@
+<% page='empresas' %>
+
+    <div class="row">
+        <div class="col-12 col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <i class="bi bi-building me-2"></i>
+                    <%= empresa.id ? 'Editar Empresa' : 'Nova Empresa' %>
+                </div>
+                <div class="card-body">
+                    <form id="formEmpresa">
+                        <input type="hidden" id="empresaId" value="<%= empresa.id || '' %>">
+
+                        <div class="row">
+                            <div class="col-md-8 mb-3">
+                                <label for="nome" class="form-label">Nome da Empresa *</label>
+                                <input type="text" class="form-control" id="nome" value="<%= empresa.nome || '' %>"
+                                    required>
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label for="cnpj" class="form-label">CNPJ</label>
+                                <input type="text" class="form-control" id="cnpj" value="<%= empresa.cnpj || '' %>"
+                                    maxlength="18">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="email" value="<%= empresa.email || '' %>">
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="telefone" class="form-label">Telefone</label>
+                                <input type="text" class="form-control" id="telefone"
+                                    value="<%= empresa.telefone || '' %>">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="responsavel" class="form-label">Responsável</label>
+                            <input type="text" class="form-control" id="responsavel"
+                                value="<%= empresa.responsavel || '' %>">
+                        </div>
+
+                        <hr class="my-4">
+
+                        <h6 class="mb-3">Endereço</h6>
+
+                        <div class="row">
+                            <div class="col-md-3 mb-3">
+                                <label for="cep" class="form-label">CEP</label>
+                                <input type="text" class="form-control" id="cep" value="<%= empresa.cep || '' %>"
+                                    maxlength="9">
+                            </div>
+
+                            <div class="col-md-7 mb-3">
+                                <label for="logradouro" class="form-label">Logradouro</label>
+                                <input type="text" class="form-control" id="logradouro"
+                                    value="<%= empresa.logradouro || '' %>">
+                            </div>
+
+                            <div class="col-md-2 mb-3">
+                                <label for="numero" class="form-label">Número</label>
+                                <input type="text" class="form-control" id="numero" value="<%= empresa.numero || '' %>">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="bairro" class="form-label">Bairro</label>
+                                <input type="text" class="form-control" id="bairro" value="<%= empresa.bairro || '' %>">
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="cidade" class="form-label">Cidade</label>
+                                <input type="text" class="form-control" id="cidade" value="<%= empresa.cidade || '' %>">
+                            </div>
+
+                            <div class="col-md-2 mb-3">
+                                <label for="estado" class="form-label">UF</label>
+                                <input type="text" class="form-control" id="estado" value="<%= empresa.estado || '' %>"
+                                    maxlength="2">
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-2 mt-4">
+                            <button type="submit" class="btn btn-admin-primary">
+                                <i class="bi bi-check-circle me-2"></i>Salvar
+                            </button>
+                            <a href="/admin/empresas" class="btn btn-outline-secondary">
+                                <i class="bi bi-x-circle me-2"></i>Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script Externo -->
+    <script src="/admin/js/empresa-form.js"></script>
