@@ -1,0 +1,94 @@
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">
+        <%= title %>
+    </h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <a href="/admin/planos" class="btn btn-sm btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Voltar
+        </a>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <form action="/admin/planos" method="POST" id="formPlano">
+                    <% if (plano.id) { %>
+                        <input type="hidden" name="id" value="<%= plano.id %>">
+                        <% } %>
+
+                            <div class="row mb-3">
+                                <div class="col-md-8">
+                                    <label class="form-label">Nome do Plano</label>
+                                    <input type="text" class="form-control" name="nome" value="<%= plano.nome || '' %>"
+                                        required>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Preço (R$)</label>
+                                    <input type="text" class="form-control money" name="preco"
+                                        value="<%= plano.preco ? parseFloat(plano.preco).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) : '0,00' %>"
+                                        required>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Descrição</label>
+                                <input type="text" class="form-control" name="descricao"
+                                    value="<%= plano.descricao || '' %>">
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Limite de Veículos</label>
+                                    <input type="number" class="form-control" name="limite_veiculos"
+                                        value="<%= plano.limite_veiculos !== undefined ? plano.limite_veiculos : 5 %>"
+                                        required>
+                                    <div class="form-text">Use -1 para Ilimitado</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Limite de Usuários</label>
+                                    <input type="number" class="form-control" name="limite_usuarios"
+                                        value="<%= plano.limite_usuarios !== undefined ? plano.limite_usuarios : 1 %>"
+                                        required>
+                                    <div class="form-text">Use -1 para Ilimitado</div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Recursos do Sistema</label>
+                                <div class="alert alert-info d-flex align-items-center" role="alert">
+                                    <i class="bi bi-info-circle-fill me-2"></i>
+                                    <div>
+                                        <strong>Acesso Total:</strong> Todos os planos incluem acesso completo a todos
+                                        os módulos.
+                                    </div>
+                                </div>
+                                <input type="hidden" name="modulos_ativos" value="todos">
+                            </div>
+
+                            <div class="mb-3 form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="ativo" id="ativo"
+                                    <%=(plano.ativo===undefined || plano.ativo) ? 'checked' : '' %>>
+                                <label class="form-check-label" for="ativo">Plano Ativo</label>
+                            </div>
+
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-save"></i> Salvar Plano
+                                </button>
+                            </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Máscara Simples de Moeda no Frontend (opcional, pode ser melhorado com InputMask)
+    document.querySelector('.money').addEventListener('input', function (e) {
+        let value = e.target.value.replace(/\D/g, '');
+        value = (Number(value) / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+        e.target.value = value;
+    });
+</script>

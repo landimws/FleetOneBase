@@ -1,0 +1,60 @@
+<link rel="stylesheet" href="/css/dashboard.css">
+
+<div class="container-fluid py-4">
+    <h2>⚙️ Configurações de Contrato</h2>
+
+    <form id="form-configuracoes">
+        <!-- Taxas -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>Taxas e Encargos</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label">Taxa Administrativa (%)</label>
+                        <input type="number" step="0.01" name="taxa_administrativa" class="form-control" value="15">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Multa por Atraso (%)</label>
+                        <input type="number" step="0.01" name="percentual_multa_atraso" class="form-control" value="2">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Juros de Mora (% ao dia)</label>
+                        <input type="number" step="0.01" name="percentual_juros_mora" class="form-control" value="1">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Padrões -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>Valores Padrão</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label">Vigência Padrão (dias)</label>
+                        <input type="number" name="vigencia_padrao_dias" class="form-control" value="30">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">KM Franquia Padrão</label>
+                        <input type="number" name="km_franquia_padrao" class="form-control" value="100">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Valor KM Excedente (R$)</label>
+                        <input type="number" step="0.01" name="valor_km_excedente_padrao" class="form-control"
+                            value="0.50">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-save"></i> Salvar Configurações
+        </button>
+    </form>
+</div>
+
+<script src="/js/admin/configuracoes-contrato.js"></script>

@@ -24,5 +24,52 @@
 <Link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <script src="https://unpkg.com/@phosphor-icons/web" defer></script>
 
-<!-- Extracted Styles -->
-<%- style %>
+<% if (locals.useTailwind) { %>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            corePlugins: {
+                preflight: false,
+            }
+        }
+    </script>
+    <% } %>
+
+        <!-- Inline Script para evitar FOUC (Flash of Unstyled Content) -->
+        <script>
+                (function () {
+                    // Tenta recuperar estado do LocalStorage
+                    const savedState = localStorage.getItem('sidebar_state_v1');
+                    // Se estiver colapsado, aplica classe IMEDIATAMENTE antes do render
+                    if (savedState === 'collapsed') {
+                        document.documentElement.classList.add('sidebar-collapsed-preload');
+                    }
+                })();
+        </script>
+
+        <style>
+            /* Aplica estilos críticos antes do CSS carregar */
+            html.sidebar-collapsed-preload body {
+                /* Garante que o body herde a classe se aplicada no html */
+            }
+
+            /* Força estado inicial se a classe estiver presente no HTML/Body */
+            html.sidebar-collapsed-preload .sidebar {
+                width: 72px !important;
+            }
+
+            html.sidebar-collapsed-preload .main-content {
+                margin-left: 72px !important;
+                width: calc(100% - 72px) !important;
+            }
+
+            html.sidebar-collapsed-preload .brand-text,
+            html.sidebar-collapsed-preload .menu-label,
+            html.sidebar-collapsed-preload .nav-text,
+            html.sidebar-collapsed-preload .brand-wrapper {
+                display: none !important;
+            }
+        </style>
+
+        <!-- Extracted Styles -->
+        <%- style %>

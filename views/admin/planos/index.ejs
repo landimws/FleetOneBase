@@ -1,0 +1,82 @@
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Gestão de Planos</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <a href="/admin/planos/novo" class="btn btn-sm btn-primary">
+            <i class="bi bi-plus-lg"></i> Novo Plano
+        </a>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Nome</th>
+                        <th>Preço</th>
+                        <th>Limites (Veíc/Usu)</th>
+                        <th>Acesso</th>
+                        <th>Empresas</th>
+                        <th>Status</th>
+                        <th class="text-end">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% if (planos && planos.length> 0) { %>
+                        <% planos.forEach(plano=> { %>
+                            <tr>
+                                <td>
+                                    <strong>
+                                        <%= plano.nome %>
+                                    </strong>
+                                    <% if (plano.descricao) { %>
+                                        <div class="small text-muted">
+                                            <%= plano.descricao %>
+                                        </div>
+                                        <% } %>
+                                </td>
+                                <td>
+                                    R$ <%= parseFloat(plano.preco).toLocaleString('pt-BR', { minimumFractionDigits: 2 })
+                                        %>
+                                </td>
+                                <td>
+                                    <div>🚗 <%= plano.limite_veiculos===-1 ? 'Ilimitado' : plano.limite_veiculos %>
+                                    </div>
+                                    <div>👥 <%= plano.limite_usuarios===-1 ? 'Ilimitado' : plano.limite_usuarios %>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-secondary text-dark border"><i class="bi bi-check-all"></i>
+                                        Completo</span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-secondary">
+                                        <%= plano.totalEmpresas || 0 %>
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge <%= plano.ativo ? 'bg-success' : 'bg-danger' %>">
+                                        <%= plano.ativo ? 'Ativo' : 'Inativo' %>
+                                    </span>
+                                </td>
+                                <td class="text-end">
+                                    <a href="/admin/planos/novo?id=<%= plano.id %>"
+                                        class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            <% }); %>
+                                <% } else { %>
+                                    <tr>
+                                        <td colspan="7" class="text-center text-muted py-4">
+                                            Nenhum plano cadastrado.
+                                        </td>
+                                    </tr>
+                                    <% } %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

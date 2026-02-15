@@ -34,9 +34,21 @@ body.sidebar-open {
     left: 0;
     height: 100vh;
     z-index: 1000;
-    transition: width 0.3s ease;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    z-index: 1000;
+    /* Transição removida do padrão para evitar FOUC */
     box-shadow: 2px 0 5px rgba(0, 0, 0, 0.02);
 }
+
+/* Permitir animação apenas quando a classe estiver presente */
+body.sidebar-animated .sidebar,
+body.sidebar-animated .main-content {
+    transition: width 0.3s ease, margin-left 0.3s ease;
+}
+
+
 
 /* Header da Sidebar (Logo) */
 .sidebar-header {
@@ -150,8 +162,9 @@ body.sidebar-open {
 /* Área Principal (Main Content) */
 .main-content {
     flex: 1;
+    flex: 1;
     margin-left: var(--sidebar-width);
-    transition: margin-left 0.3s ease;
+    /* Transition movida para body.sidebar-animated */
     width: calc(100% - var(--sidebar-width));
     overflow-x: hidden;
 }

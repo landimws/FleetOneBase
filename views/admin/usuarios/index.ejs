@@ -1,13 +1,71 @@
 <% page='usuarios' %>
 
+    <!-- Script Definido no Topo para Garantir Disponibilidade -->
+    <script>
+        console.log('🏁 [F1Admin] Inicializando namespace global...');
+
+        window.F1Admin = {
+            novoUsuario: function () {
+                console.log('🚀 Novo Usuário Clicado');
+                window.location.href = '/admin/usuarios/novo';
+            },
+
+            editarUsuario: function (id) {
+                console.log('✏️ Editar Usuário ID:', id);
+                window.location.href = `/admin/usuarios/novo?id=${id}`;
+            },
+
+            filtrarPorEmpresa: function (selectElement) {
+                const empresaId = selectElement.value;
+                console.log('🔍 Filtro alterado:', empresaId);
+                const url = empresaId ? `/admin/usuarios?empresaId=${empresaId}` : '/admin/usuarios';
+                window.location.href = url;
+            },
+
+            toggleStatus: async function (id, ativo, btnElement) {
+                console.log('🔄 Toggle Status ID:', id, ativo);
+                const acao = ativo ? 'desativar' : 'ativar';
+
+                if (!confirm(`Tem certeza que deseja ${acao} este usuário?`)) return;
+
+                // Feedback visual básico
+                if (btnElement) btnElement.disabled = true;
+
+                try {
+                    const response = await fetch(`/admin/usuarios/${id}/toggle-status`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        // Alert nativo para garantir que o usuário veja
+                        alert(data.message || 'Status alterado com sucesso!');
+                        window.location.reload();
+                    } else {
+                        alert('Erro: ' + (data.message || 'Desconhecido'));
+                        if (btnElement) btnElement.disabled = false;
+                    }
+                } catch (e) {
+                    console.error('Erro no toggle:', e);
+                    alert('Erro de conexão ou servidor.');
+                    if (btnElement) btnElement.disabled = false;
+                }
+            }
+        };
+
+        console.log('✅ [F1Admin] Funções carregadas no window.F1Admin');
+    </script>
+
     <div class="row mb-4">
         <div class="col-md-8">
-            <button class="btn btn-admin-primary" onclick="novoUsuario()">
+            <button class="btn btn-admin-primary" onclick="window.F1Admin.novoUsuario()">
                 <i class="bi bi-plus-circle me-2"></i>Novo Usuário
             </button>
         </div>
         <div class="col-md-4">
-            <select class="form-select" id="filtroEmpresa" onchange="filtrarPorEmpresa()">
+            <select class="form-select" id="filtroEmpresa" onchange="window.F1Admin.filtrarPorEmpresa(this)">
                 <option value="">Todas as Empresas</option>
                 <% empresas.forEach(function(empresa) { %>
                     <option value="<%= empresa.id %>" <%=filtroEmpresaId==empresa.id ? 'selected' : '' %>>
@@ -71,13 +129,15 @@
                                         </span>
                                     </td>
                                     <td>
+                                        <!-- Aspas garantem que ID seja tratado como string ou valor seguro -->
                                         <button class="btn btn-sm btn-outline-primary"
-                                            onclick="editarUsuario(<%= usuario.id %>)">
+                                            onclick="window.F1Admin.editarUsuario('<%= usuario.id %>')">
                                             <i class="bi bi-pencil"></i>
                                         </button>
+
                                         <button
                                             class="btn btn-sm btn-outline-<%= usuario.ativo ? 'danger' : 'success' %>"
-                                            onclick="toggleStatusUsuario(<%= usuario.id %>, <%= usuario.ativo %>, this)">
+                                            onclick="window.F1Admin.toggleStatus('<%= usuario.id %>', <%= usuario.ativo %>, this)">
                                             <i class="bi bi-<%= usuario.ativo ? 'x-circle' : 'check-circle' %>"></i>
                                         </button>
                                     </td>
@@ -95,51 +155,3 @@
             </div>
         </div>
     </div>
-
-    <script>
-        function novoUsuario() {
-            window.location.href = '/admin/usuarios/novo';
-        }
-
-        function editarUsuario(id) {
-            window.location.href = `/admin/usuarios/novo?id=${id}`;
-        }
-
-        function filtrarPorEmpresa() {
-            const empresaId = document.getElementById('filtroEmpresa').value;
-            const url = empresaId ? `/admin/usuarios?empresaId=${empresaId}` : '/admin/usuarios';
-            window.location.href = url;
-        }
-
-        async function toggleStatusUsuario(id, ativoAtual, btnElement) {
-            const acao = ativoAtual ? 'desativar' : 'ativar';
-
-            if (!confirm(`Tem certeza que deseja ${acao} este usuário?`)) {
-                return;
-            }
-
-            // Ativar loading
-            Loading.show(btnElement);
-
-            try {
-                const response = await fetch(`/admin/usuarios/${id}/toggle-status`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' }
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    Toast.show(data.message, 'success');
-                    setTimeout(() => window.location.reload(), 1500);
-                } else {
-                    Toast.show('Erro: ' + data.message, 'error');
-                }
-            } catch (error) {
-                console.error('Erro:', error);
-                Toast.show('Erro ao alterar status do usuário.', 'error');
-            } finally {
-                Loading.hide(btnElement);
-            }
-        }
-    </script>

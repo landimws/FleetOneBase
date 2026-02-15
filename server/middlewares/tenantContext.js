@@ -12,6 +12,14 @@ import defineCompra from '../models-sqlite/Compra.js';
 import defineCompraItem from '../models-sqlite/CompraItem.js';
 import defineContaPagar from '../models-sqlite/ContaPagar.js';
 
+// [NEW] Módulo de Contratos
+import defineContrato from '../models-sqlite/Contrato.js';
+import defineContratoItem from '../models-sqlite/ContratoItem.js';
+import defineConfiguracoesContrato from '../models-sqlite/ConfiguracoesContrato.js';
+import defineItensContratoPadrao from '../models-sqlite/ItensContratoPadrao.js';
+import defineTemplatesDocumento from '../models-sqlite/TemplatesDocumento.js';
+import defineTemplatesDocumentoHistorico from '../models-sqlite/TemplatesDocumentoHistorico.js';
+
 // Cache simples para models instanciados por conexão
 // Map<connection, { Veiculo, Cliente, ... }>
 const modelsCache = new WeakMap();
@@ -41,9 +49,15 @@ export default async (req, res, next) => {
         // 3. Carregar/Recuperar Models do Cache
         if (!modelsCache.has(connection)) {
             // Instanciar Models
+            // console.log('[TenantContext] Instanciando Models para Tenant:', tenantId);
             const Veiculo = defineVeiculo(connection);
             const Cliente = defineCliente(connection);
             const Semana = defineSemana(connection);
+
+            if (!Semana || typeof Semana.findAll !== 'function') {
+                console.error('CRITICAL: Semana Model failed to initialize correctly!', Semana);
+            }
+
             const LinhaSemana = defineLinhaSemana(connection);
             const Multa = defineMulta(connection);
             const Debito = defineDebito(connection);
@@ -54,9 +68,31 @@ export default async (req, res, next) => {
             const CompraItem = defineCompraItem(connection);
             const ContaPagar = defineContaPagar(connection);
 
+            // [NEW] Módulo Controle
+            const ControleVeiculo = (await import('../models-sqlite/ControleVeiculo.js')).default(connection);
+            const ControleRegistro = (await import('../models-sqlite/ControleRegistro.js')).default(connection);
+            const ControleKmHistorico = (await import('../models-sqlite/ControleKmHistorico.js')).default(connection);
+            const ControleServico = (await import('../models-sqlite/ControleServico.js')).default(connection);
+
+            // [NEW] Módulo de Contratos
+            const Contrato = defineContrato(connection);
+            const ContratoItem = defineContratoItem(connection);
+            const ConfiguracoesContrato = defineConfiguracoesContrato(connection);
+            const ItensContratoPadrao = defineItensContratoPadrao(connection);
+            const TemplatesDocumento = defineTemplatesDocumento(connection);
+            const TemplatesDocumentoHistorico = defineTemplatesDocumentoHistorico(connection);
+
+            // [NEW] Models Auxiliares (Dados Universais)
+            const MarcaVeiculo = (await import('../models-sqlite/MarcaVeiculo.js')).default(connection);
+            const ModeloVeiculo = (await import('../models-sqlite/ModeloVeiculo.js')).default(connection);
+            const FormaPagamento = (await import('../models-sqlite/FormaPagamento.js')).default(connection);
+            const TipoCombustivel = (await import('../models-sqlite/TipoCombustivel.js')).default(connection);
+            const CorVeiculo = (await import('../models-sqlite/CorVeiculo.js')).default(connection);
+            const CategoriaDespesa = (await import('../models-sqlite/CategoriaDespesa.js')).default(connection);
+
             // Associar Models (Relacionamentos)
-            Semana.hasMany(LinhaSemana, { foreignKey: 'SemanaId' });
-            LinhaSemana.belongsTo(Semana, { foreignKey: 'SemanaId' });
+            Semana.hasMany(LinhaSemana, { foreignKey: 'SemanaId', as: 'linhas' });
+            LinhaSemana.belongsTo(Semana, { foreignKey: 'SemanaId', as: 'DadosSemana' });
             LinhaSemana.belongsTo(Veiculo, { foreignKey: 'placa', targetKey: 'placa', as: 'Veiculo' });
 
             Cliente.hasMany(Debito, { foreignKey: 'cliente_id' });
@@ -83,6 +119,27 @@ export default async (req, res, next) => {
 
             CompraItem.belongsTo(Veiculo, { foreignKey: 'placa', targetKey: 'placa' });
 
+            // [NEW] Associações Módulo Controle
+            // ControleVeiculo -> Veiculo (1:1)
+            ControleVeiculo.belongsTo(Veiculo, { foreignKey: 'placa', targetKey: 'placa' });
+            Veiculo.hasOne(ControleVeiculo, { foreignKey: 'placa', sourceKey: 'placa' });
+
+            // ControleRegistro -> Semana e Veiculo
+            ControleRegistro.belongsTo(Semana, { foreignKey: 'SemanaId' });
+            ControleRegistro.belongsTo(Veiculo, { foreignKey: 'veiculo_id', targetKey: 'placa' });
+
+            // ControleKmHistorico -> ControleVeiculo
+            ControleKmHistorico.belongsTo(ControleVeiculo, { foreignKey: 'controle_veiculo_placa', targetKey: 'placa' });
+
+            // ControleServico -> Veiculo e Semana
+            ControleServico.belongsTo(Veiculo, { foreignKey: 'veiculo_id', targetKey: 'placa' });
+            ControleServico.belongsTo(Semana, { foreignKey: 'SemanaId' });
+
+            // [DEV ONLY] Auto-sync para garantir a nova coluna `motivo`
+            // Em produção, isso deve ser removido e usado migrations.
+            // console.log(`[TenantContext] Sincronizando schema para Tenant ${tenantId}...`);
+            await ControleKmHistorico.sync({ alter: true });
+
 
             // Salvar no cache
             modelsCache.set(connection, {
@@ -98,6 +155,25 @@ export default async (req, res, next) => {
                 Compra,
                 CompraItem,
                 ContaPagar,
+                // [NEW]
+                ControleVeiculo,
+                ControleRegistro,
+                ControleKmHistorico,
+                ControleServico,
+                // [NEW] Módulo de Contratos
+                Contrato,
+                ContratoItem,
+                ConfiguracoesContrato,
+                ItensContratoPadrao,
+                TemplatesDocumento,
+                TemplatesDocumentoHistorico,
+                // [NEW] Models Auxiliares
+                MarcaVeiculo,
+                ModeloVeiculo,
+                FormaPagamento,
+                TipoCombustivel,
+                CorVeiculo,
+                CategoriaDespesa,
                 sequelize: connection
             });
         }

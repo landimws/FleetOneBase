@@ -23,6 +23,8 @@ class AdminEmpresasController {
         this.update = this.update.bind(this);
         this.toggleStatus = this.toggleStatus.bind(this);
         this.delete = this.delete.bind(this);
+        this.impersonate = this.impersonate.bind(this);
+        this.revertImpersonate = this.revertImpersonate.bind(this);
     }
 
     /**
@@ -37,21 +39,24 @@ class AdminEmpresasController {
                 },
                 include: [{
                     model: MasterDatabase.Usuario,
-                    attributes: ['id'],
-                    as: 'Usuarios' // Nome do relacionamento
+                    attributes: ['id', 'username', 'primeiro_acesso', 'senha_temporaria_visivel'],
+                    as: 'Usuarios',
+                    required: false // LEFT JOIN para incluir empresas sem usuários
                 }],
                 order: [['createdAt', 'DESC']]
             });
 
-            // Contar usuários por empresa
+            // Contar usuários por empresa e identificar pendentes
             const empresasComContagem = empresas.map(empresa => ({
                 ...empresa.toJSON(),
-                numUsuarios: empresa.Usuarios ? empresa.Usuarios.length : 0
+                numUsuarios: empresa.Usuarios ? empresa.Usuarios.length : 0,
+                usuarioPendente: empresa.Usuarios?.find(u => u.primeiro_acesso) || null
             }));
 
             res.render('admin/empresas/index', {
                 title: 'Gerenciar Empresas',
                 empresas: empresasComContagem,
+                page: 'empresas',
                 layout: 'admin/layouts/admin-layout'
             });
         } catch (error) {
@@ -79,6 +84,7 @@ class AdminEmpresasController {
         res.render('admin/empresas/form', {
             title: empresa ? 'Editar Empresa' : 'Nova Empresa',
             empresa: empresa || {},
+            page: 'empresas',
             layout: 'admin/layouts/admin-layout'
         });
     }
@@ -109,9 +115,9 @@ class AdminEmpresasController {
                 if (empresaExistente) {
                     // [UX] Verificar se a requisição espera JSON ou HTML
                     if (req.xhr || req.headers.accept.indexOf('json') > -1) {
-                         return res.status(400).json({ success: false, message: 'CNPJ já cadastrado.' });
+                        return res.status(400).json({ success: false, message: 'CNPJ já cadastrado.' });
                     } else {
-                         return res.send('<script>alert("CNPJ já cadastrado!"); history.back();</script>');
+                        return res.send('<script>alert("CNPJ já cadastrado!"); history.back();</script>');
                     }
                 }
             }
@@ -148,7 +154,7 @@ class AdminEmpresasController {
                 if (req.xhr || req.headers.accept.indexOf('json') > -1) {
                     return res.status(500).json({ success: false, message: 'Erro ao criar banco de dados da empresa.' });
                 } else {
-                     return res.send('<script>alert("Erro ao criar banco de dados!"); history.back();</script>');
+                    return res.send('<script>alert("Erro ao criar banco de dados!"); history.back();</script>');
                 }
             }
 
@@ -160,11 +166,11 @@ class AdminEmpresasController {
 
         } catch (error) {
             console.error('Erro ao criar empresa:', error);
-             if (req.xhr || req.headers.accept.indexOf('json') > -1) {
+            if (req.xhr || req.headers.accept.indexOf('json') > -1) {
                 res.status(500).json({ success: false, message: 'Erro ao criar empresa: ' + error.message });
-             } else {
+            } else {
                 return res.send(`<script>alert("Erro ao criar empresa: ${error.message}"); history.back();</script>`);
-             }
+            }
         }
     }
 
@@ -231,8 +237,8 @@ class AdminEmpresasController {
         } catch (error) {
             console.error('Erro ao atualizar empresa:', error);
             const msg = 'Erro ao atualizar empresa.';
-             if (req.xhr || req.headers.accept.indexOf('json') > -1) return res.status(500).json({ success: false, message: msg });
-             else return res.send(`<script>alert("${msg}"); history.back();</script>`);
+            if (req.xhr || req.headers.accept.indexOf('json') > -1) return res.status(500).json({ success: false, message: msg });
+            else return res.send(`<script>alert("${msg}"); history.back();</script>`);
         }
     }
 
@@ -334,6 +340,113 @@ class AdminEmpresasController {
                 success: false,
                 message: 'Erro ao deletar empresa.'
             });
+        }
+    }
+
+    /**
+     * POST /admin/empresas/:id/impersonate
+     * Acessar painel como cliente para suporte
+     */
+    async impersonate(req, res) {
+        try {
+            const { id } = req.params;
+
+            // [SECURITY] Não permitir impersonate na própria empresa do sistema
+            if (parseInt(id) === 1) {
+                return res.send('<script>alert("Ação inválida para a empresa do sistema."); history.back();</script>');
+            }
+
+            const empresa = await MasterDatabase.Empresa.findByPk(id);
+            if (!empresa) return res.status(404).send('Empresa não encontrada.');
+
+            // Buscar um usuário admin dessa empresa (geralmente o primeiro criado)
+            const usuarioAlvo = await MasterDatabase.Usuario.findOne({
+                where: {
+                    empresaId: id,
+                    ativo: true
+                },
+                order: [['createdAt', 'ASC']]
+            });
+
+            if (!usuarioAlvo) {
+                return res.send('<script>alert("Empresa não possui usuários ativos para acessar."); history.back();</script>');
+            }
+
+            console.log(`[AUDIT] ADMIN ${req.session.userUsername} iniciou suporte na empresa ${empresa.nome}`);
+
+            // 1. Salvar sessão original do Admin
+            const originalSession = {
+                userId: req.session.userId,
+                userName: req.session.userName,
+                userUsername: req.session.userUsername,
+                userRole: req.session.userRole,
+                isSuperAdmin: true,
+                empresaId: req.session.empresaId
+            };
+
+            // 2. Definir sessão para Impersonate
+            req.session.originalAdmin = originalSession;
+            req.session.isImpersonating = true;
+            req.session.impersonateTarget = empresa.nome;
+
+            // 3. Substituir dados da sessão pelos do usuário alvo
+            req.session.userId = usuarioAlvo.id;
+            req.session.userName = usuarioAlvo.nome;
+            req.session.userUsername = usuarioAlvo.username;
+            req.session.userRole = usuarioAlvo.role;
+            req.session.empresaId = usuarioAlvo.empresaId;
+            req.session.isSuperAdmin = false; // Admin impersonando perde superpoderes globais
+
+            req.session.save(() => {
+                res.redirect('/'); // Redireciona para o dashboard do cliente
+            });
+
+        } catch (error) {
+            console.error('Erro no Impersonate:', error);
+            res.status(500).send('Erro ao acessar painel do cliente.');
+        }
+    }
+
+    /**
+     * POST /admin/revert-impersonate
+     * Sair do modo impersonate e voltar ao admin
+     */
+    async revertImpersonate(req, res) {
+        try {
+            if (!req.session.originalAdmin || !req.session.isImpersonating) {
+                return res.redirect('/');
+            }
+
+            // Log de auditoria deve ser seguro
+            const adminUser = req.session.originalAdmin ? req.session.originalAdmin.userUsername : 'Desconhecido';
+            console.log(`[AUDIT] ADMIN ${adminUser} encerrou suporte.`);
+
+            // Restaurar Sessão Original
+            const original = req.session.originalAdmin;
+
+            if (original) {
+                req.session.userId = original.userId;
+                req.session.userName = original.userName;
+                req.session.userUsername = original.userUsername;
+                req.session.userRole = original.userRole;
+                req.session.empresaId = Number(original.empresaId); // [FIX] Garantir Number
+                req.session.isSuperAdmin = true; // Restaura superpoderes
+
+                console.log(`[AUDIT] Sessão restaurada para ADMIN: ${original.userUsername} (Empresa ID: ${req.session.empresaId})`);
+            }
+
+            // Limpar flags de impersonate
+            delete req.session.originalAdmin;
+            delete req.session.isImpersonating;
+            delete req.session.impersonateTarget;
+
+            req.session.save(() => {
+                res.redirect('/admin/empresas');
+            });
+
+        } catch (error) {
+            console.error('Erro ao reverter impersonate:', error);
+            res.redirect('/');
         }
     }
 }

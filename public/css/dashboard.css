@@ -12,6 +12,7 @@
 body {
     background-color: var(--bg);
     margin: 0;
+    width: 100%;
 }
 
 .dashboard-container {

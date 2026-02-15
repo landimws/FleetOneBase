@@ -150,13 +150,21 @@ export const create = async (req, res) => {
 
         if (ultima && ultima.linhas) {
             for (const linhaBase of ultima.linhas) {
-                const processado = LinhaService.normalizarDados(linhaBase);
+                const processado = LinhaService.normalizarDados(linhaBase.get({ plain: true }));
+
+                // Garantir Placa (Normalização pode falhar?)
+                const placaFinal = processado.placa || linhaBase.placa;
+
+                if (!placaFinal) {
+                    console.warn(`[SemanasController] Pular linha sem placa ao copiar de ID ${ultima.id} para ${nova.id}`);
+                    continue;
+                }
 
                 await LinhaSemana.create({
                     SemanaId: nova.id,
                     status_veiculo: processado.status_veiculo || 'disponivel',
                     AS: processado.AS || false,
-                    placa: processado.placa,
+                    placa: placaFinal,
                     tipo: processado.tipo || 'Diária',
                     cliente: processado.cliente || '',
                     cliente_id: processado.cliente_id,
@@ -286,5 +294,32 @@ export const deleteLine = async (req, res) => {
     } catch (e) {
         console.error(e);
         res.status(500).json({ error: 'Erro ao excluir linha' });
+    }
+};
+
+export const deleteSemana = async (req, res) => {
+    const { Semana, ControleRegistro } = req.models; // ControleRegistro injetado pelo tenantContext
+    const { id } = req.params;
+
+    try {
+        // [VALIDAÇÃO CRÍTICA]
+        // Verificar se existe no Controle
+        const existeNoControle = await ControleRegistro.findOne({
+            where: { SemanaId: id }
+        });
+
+        if (existeNoControle) {
+            return res.status(400).json({
+                error: 'Não é possível excluir esta semana. Exclua primeiro a semana correspondente no módulo Controle.'
+            });
+        }
+
+        // Se passar, prossegue com exclusão
+        await Semana.destroy({ where: { id } });
+        res.json({ success: true });
+
+    } catch (e) {
+        console.error('Erro ao excluir semana:', e);
+        res.status(500).json({ error: 'Erro ao excluir semana' });
     }
 };

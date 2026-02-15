@@ -551,7 +551,7 @@ const GridSemanal = {
             if (linha.status_veiculo === Constants.get('STATUS_VEICULOS').ALUGADO) {
                 stats.hasAlugado = true;
                 stats.defaultStatus = Constants.get('STATUS_VEICULOS').ALUGADO; // [FIX] Salvar status base para alugado também
-                if (diasSel.length > 0) {
+                if (Array.isArray(diasSel) && diasSel.length > 0) {
                     diasSel.forEach(d => {
                         if (d >= 0 && d < 7) stats.timeline[d] = Constants.get('STATUS_VEICULOS').ALUGADO;
                     });
@@ -560,7 +560,7 @@ const GridSemanal = {
                 }
             } else if (linha.status_veiculo === Constants.get('STATUS_VEICULOS').DISPONIVEL || linha.status_veiculo === Constants.get('STATUS_VEICULOS').MANUTENCAO) {
                 stats.defaultStatus = linha.status_veiculo; // Salva o status base para fallback
-                if (diasSel.length > 0) {
+                if (Array.isArray(diasSel) && diasSel.length > 0) {
                     diasSel.forEach(d => {
                         if (d >= 0 && d < 7) stats.timeline[d] = linha.status_veiculo;
                     });

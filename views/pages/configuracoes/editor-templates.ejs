@@ -1,0 +1,67 @@
+<link rel="stylesheet" href="/css/dashboard.css">
+
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>🖊️ Editor de Templates</h2>
+        <button id="btn-novo-template" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Novo Template
+        </button>
+    </div>
+
+    <!-- Lista de Templates -->
+    <div class="row" id="lista-templates">
+        <!-- Cards preenchidos via JavaScript -->
+    </div>
+</div>
+
+<!-- Modal Editor -->
+<div class="modal fade" id="modal-editor" data-bs-backdrop="static" tabindex="-1">
+    <div class="modal-dialog modal-fullscreen">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Editor: <span id="template-titulo"></span></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row h-100">
+                    <!-- Painel Esquerdo: Editor -->
+                    <div class="col-md-6 border-end">
+                        <div class="mb-2">
+                            <button id="btn-salvar-template" class="btn btn-success btn-sm">
+                                <i class="bi bi-save"></i> Salvar
+                            </button>
+                            <button id="btn-preview" class="btn btn-info btn-sm">
+                                <i class="bi bi-eye"></i> Preview
+                            </button>
+                        </div>
+                        <div id="editor-html" style="height: 70vh; border: 1px solid #ddd;"></div>
+                    </div>
+
+                    <!-- Painel Direito: Variáveis + Preview -->
+                    <div class="col-md-6">
+                        <ul class="nav nav-tabs mb-3">
+                            <li class="nav-item">
+                                <a class="nav-link active" data-bs-toggle="tab" href="#tab-variaveis">Variáveis</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-bs-toggle="tab" href="#tab-preview">Preview</a>
+                            </li>
+                        </ul>
+
+                        <div class="tab-content">
+                            <div class="tab-pane fade show active" id="tab-variaveis">
+                                <div class="list-group" id="lista-variaveis">
+                                    <!-- Variáveis disponíveis -->
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="tab-preview">
+                                <iframe id="iframe-preview"
+                                    style="width: 100%; height: 70vh; border: 1px solid #ddd;"></iframe>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

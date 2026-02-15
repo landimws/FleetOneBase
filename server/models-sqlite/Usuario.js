@@ -44,6 +44,27 @@ export default (sequelize) => {
         isSuperAdmin: {
             type: DataTypes.BOOLEAN,
             defaultValue: false
+        },
+        // [NEW] Sistema de segurança para primeiro acesso
+        primeiro_acesso: {
+            type: DataTypes.BOOLEAN,
+            defaultValue: true,
+            comment: 'Flag para forçar trocade senha no primeiro login'
+        },
+        senha_temporaria_gerada_em: {
+            type: DataTypes.DATE,
+            allowNull: true,
+            comment: 'Data de geração da senha temporária'
+        },
+        senha_expira_em: {
+            type: DataTypes.DATE,
+            allowNull: true,
+            comment: 'Data de expiração da senha temporária (7 dias)'
+        },
+        senha_temporaria_visivel: {
+            type: DataTypes.STRING,
+            allowNull: true,
+            comment: 'Senha em texto claro temporariamente - APAGAR APÓS USO'
         }
     }, {
         tableName: 'Usuarios',

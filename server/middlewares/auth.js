@@ -102,9 +102,13 @@ export const isSuperAdmin = (req, res, next) => {
     // REGRA: SuperAdmin = empresaId da FleetOne (ID fixo = 1)
     const FLEETONE_EMPRESA_ID = 1;
 
-    if (req.session.empresaId === FLEETONE_EMPRESA_ID) {
+    // [FIX] Usar == para permitir string '1' ou number 1
+    if (req.session.empresaId == FLEETONE_EMPRESA_ID) {
         return next();
     }
+
+    // Log de segurança para debugar o 403
+    console.warn(`[SECURITY] Acesso negado ao Admin. User: ${req.session.userUsername}, Role: ${req.session.userRole}, EmpresaId: ${req.session.empresaId} (Type: ${typeof req.session.empresaId})`);
 
     return res.status(403).render('errors/403', {
         message: 'Acesso negado. Apenas administradores FleetOne têm acesso ao Painel Administrativo.',

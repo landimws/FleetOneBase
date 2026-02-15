@@ -43,6 +43,23 @@ export default (sequelize) => {
         bairro: { type: DataTypes.STRING, allowNull: true },
         cidade: { type: DataTypes.STRING, allowNull: true },
         estado: { type: DataTypes.STRING, allowNull: true },
+        // Gestão de Assinatura
+        planoId: {
+            type: DataTypes.INTEGER,
+            allowNull: true, // Pode ser null temporariamente na migração
+            references: {
+                model: 'Planos',
+                key: 'id'
+            }
+        },
+        status_assinatura: {
+            type: DataTypes.STRING, // 'ativo', 'inadimplente', 'cancelado', 'trial'
+            defaultValue: 'ativo'
+        },
+        data_renovacao: {
+            type: DataTypes.DATE,
+            allowNull: true
+        },
         ativo: {
             type: DataTypes.BOOLEAN,
             defaultValue: true

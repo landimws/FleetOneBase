@@ -5,39 +5,40 @@
     <%- include('../partials/head') %>
 </head>
 
-<div class="app-container">
-    <%- include('../partials/sidebar') %>
+<body class="<%= (locals.sidebarState === 'collapsed') ? 'sidebar-collapsed' : '' %>">
+    <div class="app-container">
+        <%- include('../partials/sidebar') %>
 
-        <div class="main-content">
-            <!-- Mobile Header (Visible only on mobile) -->
-            <div class="mobile-header">
-                <div class="brand-wrapper">
-                    <span>🚗</span>
-                    <span class="brand-text">Locações</span>
+            <div class="main-content">
+                <!-- Mobile Header (Visible only on mobile) -->
+                <div class="mobile-header">
+                    <div class="brand-wrapper">
+                        <span>🚗</span>
+                        <span class="brand-text">Locações</span>
+                    </div>
+                    <button id="mobile-menu-btn" class="mobile-menu-btn">
+                        <i class="ph ph-list"></i>
+                    </button>
                 </div>
-                <button id="mobile-menu-btn" class="mobile-menu-btn">
-                    <i class="ph ph-list"></i>
-                </button>
+
+                <!-- Global Header (Desktop/Tablet) -->
+                <%- include('../partials/header') %>
+
+                    <!-- Main Content -->
+                    <%- body %>
+
+                        <!-- Global Modals -->
+                        <%- include('../partials/modals/profile-modal') %>
+
+                            <!-- Global Scripts -->
+                            <script src="/js/system-alerts.js?v=20"></script>
+                            <script src="/js/sidebar.js?v=1"></script>
+                            <script src="/js/Masks.js?v=1"></script>
+
+                            <!-- Extracted Scripts -->
+                            <%- script %>
             </div>
-
-            <!-- Global Header (Desktop/Tablet) -->
-            <%- include('../partials/header') %>
-
-                <!-- Main Content -->
-                <%- body %>
-
-                    <!-- Global Modals -->
-                    <%- include('../partials/modals/profile-modal') %>
-
-                        <!-- Global Scripts -->
-                        <script src="/js/system-alerts.js?v=20"></script>
-                        <script src="/js/sidebar.js?v=1"></script>
-                        <script src="/js/Masks.js?v=1"></script>
-
-                        <!-- Extracted Scripts -->
-                        <%- script %>
-        </div>
-</div>
+    </div>
 </body>
 
 </html>

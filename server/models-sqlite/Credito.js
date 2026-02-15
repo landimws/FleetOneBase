@@ -19,7 +19,7 @@ export default (sequelize) => {
         descricao: { type: DataTypes.TEXT, allowNull: false },
         valor: { type: DataTypes.DECIMAL(10, 2), allowNull: false },
 
-        forma_pagamento: { type: DataTypes.STRING(50) },
+
         observacao: { type: DataTypes.TEXT }
     }, {
         tableName: 'creditos',

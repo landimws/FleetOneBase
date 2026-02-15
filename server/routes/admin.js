@@ -2,6 +2,8 @@ import express from 'express';
 import { isSuperAdmin } from '../middlewares/auth.js';
 import AdminEmpresasController from '../controllers/admin/AdminEmpresasController.js';
 import AdminUsuariosController from '../controllers/admin/AdminUsuariosController.js';
+import AdminPlanosController from '../controllers/admin/AdminPlanosController.js';
+import AdminDashboardController from '../controllers/admin/AdminDashboardController.js';
 
 const router = express.Router();
 
@@ -30,6 +32,9 @@ router.post('/empresas/:id/toggle-status', AdminEmpresasController.toggleStatus)
 // DELETE /admin/empresas/:id - Deletar empresa (soft delete)
 router.delete('/empresas/:id', AdminEmpresasController.delete);
 
+// POST /admin/empresas/:id/impersonate - Acessar como cliente
+router.post('/empresas/:id/impersonate', AdminEmpresasController.impersonate);
+
 // ====================================
 // ROTAS DE USUÁRIOS
 // ====================================
@@ -53,12 +58,23 @@ router.post('/usuarios/:id/toggle-status', AdminUsuariosController.toggleUserSta
 router.post('/usuarios/:id/transferir-empresa', AdminUsuariosController.updateUserCompany);
 
 // ====================================
+// ROTAS DE PLANOS
+// ====================================
+
+// GET /admin/planos - Listar planos
+router.get('/planos', AdminPlanosController.listAll);
+
+// GET /admin/planos/novo - Formulário de criação/edição
+router.get('/planos/novo', AdminPlanosController.renderForm);
+
+// POST /admin/planos - Salvar plano (Create/Update)
+router.post('/planos', AdminPlanosController.save);
+
+// ====================================
 // ROTA PADRÃO (Dashboard Admin)
 // ====================================
 
-// GET /admin - Redireciona para listagem de empresas
-router.get('/', (req, res) => {
-    res.redirect('/admin/empresas');
-});
+// GET /admin - Dashboard com métricas
+router.get('/', AdminDashboardController.index);
 
 export default router;

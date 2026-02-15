@@ -29,4 +29,11 @@ window.AdminUtils = {
     confirmAction
 };
 
+// Enable transitions after load
+document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+        document.body.classList.remove('preload');
+    }, 100);
+});
+
 console.log('✅ Admin Panel JS loaded');

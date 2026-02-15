@@ -177,4 +177,9 @@ class Dashboard {
 
 document.addEventListener('DOMContentLoaded', () => {
     window.dashboardApp = new Dashboard();
+
+    // Safety: Remove preload after a short delay regardless of charts
+    setTimeout(() => {
+        document.body.classList.remove('preload');
+    }, 500);
 });

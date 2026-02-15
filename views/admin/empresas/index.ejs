@@ -22,6 +22,7 @@
                             <th>CNPJ</th>
                             <th>Usuários</th>
                             <th>Status</th>
+                            <th>Credenciais</th>
                             <th>Criado em</th>
                             <th>Ações</th>
                         </tr>
@@ -50,6 +51,25 @@
                                         </span>
                                     </td>
                                     <td>
+                                        <div class="d-flex gap-1">
+                                            <% if (empresa.usuarioPendente) { %>
+                                                <button class="btn btn-sm btn-warning"
+                                                    onclick="mostrarCredenciais('<%= empresa.usuarioPendente.username %>', '<%= empresa.usuarioPendente.senha_temporaria_visivel %>', '<%= empresa.id %>')"
+                                                    title="Ver credenciais temporárias">
+                                                    <i class="bi bi-key-fill"></i>
+                                                </button>
+                                                <% } %>
+
+                                                    <!-- Botão Impersonate -->
+                                                    <!-- Botão Impersonate (Modal) -->
+                                                    <button type="button" class="btn btn-sm btn-dark"
+                                                        onclick="confirmImpersonate('<%= empresa.id %>', '<%= empresa.nome %>')"
+                                                        title="Acessar Painel (Impersonate)">
+                                                        <i class="bi bi-incognito"></i>
+                                                    </button>
+                                        </div>
+                                    </td>
+                                    <td>
                                         <%= new Date(empresa.createdAt).toLocaleDateString('pt-BR') %>
                                     </td>
                                     <td>
@@ -59,7 +79,9 @@
                                         </a>
                                         <button
                                             class="btn btn-sm btn-outline-<%= empresa.ativo ? 'danger' : 'success' %>"
-                                            onclick="toggleStatus(<%= empresa.id %>, <%= empresa.ativo %>, this)">
+                                            data-id="<%= empresa.id %>"
+                                            data-ativo="<%= empresa.ativo ? 'true' : 'false' %>"
+                                            onclick="toggleStatus(this)">
                                             <i class="bi bi-<%= empresa.ativo ? 'x-circle' : 'check-circle' %>"></i>
                                         </button>
                                     </td>
@@ -67,7 +89,7 @@
                                 <% }); %>
                                     <% } else { %>
                                         <tr>
-                                            <td colspan="7" class="text-center text-muted py-4">
+                                            <td colspan="8" class="text-center text-muted py-4">
                                                 Nenhuma empresa cadastrada.
                                             </td>
                                         </tr>
@@ -78,10 +100,113 @@
         </div>
     </div>
 
+    <!-- Modal de Credenciais Temporárias -->
+    <div class="modal fade" id="modalCredenciais" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title"><i class="bi bi-key-fill me-2"></i>Credenciais Temporárias</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-warning">
+                        <strong>⚠️ Atenção:</strong> Estas credenciais são temporárias e serão removidas após o primeiro
+                        login.
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Empresa ID:</label>
+                        <input type="text" class="form-control" id="modalEmpresaId" readonly>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Usuário:</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="modalUsername" readonly>
+                            <button class="btn btn-outline-secondary" onclick="copiar('modalUsername')"
+                                title="Copiar usuário">
+                                <i class="bi bi-clipboard"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Senha Temporária:</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control font-monospace" id="modalSenha" readonly>
+                            <button class="btn btn-outline-secondary" onclick="copiar('modalSenha')"
+                                title="Copiar senha">
+                                <i class="bi bi-clipboard"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <strong>📌 Instruções:</strong>
+                        <ol class="mb-0 mt-2">
+                            <li>Envie estas credenciais para o responsável da empresa</li>
+                            <li>No primeiro login, o sistema forçará a troca de senha</li>
+                            <li>Após a troca, estas credenciais não estarão mais disponíveis aqui</li>
+                        </ol>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Impersonate -->
+    <div class="modal fade" id="modalImpersonate" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title"><i class="bi bi-mask me-2"></i>Acesso de Suporte (Impersonate)</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-warning border-0 bg-warning bg-opacity-10 text-warning-emphasis">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        Você está prestes a acessar o painel da empresa:
+                        <div class="h5 mt-2 mb-0" id="impersonateEmpresaNome"></div>
+                    </div>
+
+                    <p class="mb-2">Ao confirmar, você será redirecionado para o ambiente do cliente com
+                        <strong>permissões administrativas</strong>.</p>
+
+                    <ul class="text-muted small mb-4">
+                        <li>Todas as ações realizadas serão registradas em auditoria.</li>
+                        <li>Seu acesso de Super Admin ficará suspenso temporariamente.</li>
+                        <li>Para retornar, utilize o botão <strong>"Sair do Suporte"</strong> no topo da tela.</li>
+                    </ul>
+
+                    <div class="d-grid">
+                        <form id="formImpersonate" action="" method="POST">
+                            <button type="submit" class="btn btn-danger w-100 fw-bold">
+                                <i class="bi bi-box-arrow-in-right me-2"></i>Confirmar e Acessar
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
+        function confirmImpersonate(empresaId, empresaNome) {
+            document.getElementById('impersonateEmpresaNome').textContent = empresaNome;
+            document.getElementById('formImpersonate').action = `/admin/empresas/${empresaId}/impersonate`;
+
+            const modal = new bootstrap.Modal(document.getElementById('modalImpersonate'));
+            modal.show();
+        }
 
 
-        async function toggleStatus(id, ativoAtual, btnElement) {
+
+        async function toggleStatus(btnElement) {
+            const id = btnElement.dataset.id;
+            const ativoAtual = btnElement.dataset.ativo === 'true';
             const acao = ativoAtual ? 'desativar' : 'ativar';
 
             if (!confirm(`Tem certeza que deseja ${acao} esta empresa?${ativoAtual ? '\n\nATENÇÃO: Todos os usuários desta empresa serão desativados automaticamente!' : ''}`)) {
@@ -112,5 +237,30 @@
             } finally {
                 Loading.hide(btnElement);
             }
+        }
+
+        // Função para exibir modal com credenciais
+        function mostrarCredenciais(username, senha, empresaId) {
+            document.getElementById('modalEmpresaId').value = empresaId;
+            document.getElementById('modalUsername').value = username;
+            document.getElementById('modalSenha').value = senha;
+
+            const modal = new bootstrap.Modal(document.getElementById('modalCredenciais'));
+            modal.show();
+        }
+
+        // Função para copiar para clipboard
+        function copiar(elementId) {
+            const element = document.getElementById(elementId);
+            element.select();
+            element.setSelectionRange(0, 99999); // Mobile
+
+            navigator.clipboard.writeText(element.value).then(() => {
+                Toast.show('Copiado para área de transferência!', 'success');
+            }).catch(err => {
+                // Fallback para navegadores antigos
+                document.execCommand('copy');
+                Toast.show('Copiado!', 'success');
+            });
         }
     </script>

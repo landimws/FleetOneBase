@@ -1,46 +1,60 @@
 <header class="app-header">
     <div class="header-left">
-        <!-- Breadcrumbs or Title could go here -->
-        <h2 class="page-title">
-            <%= title || 'Locadora' %>
-        </h2>
+        <% if (locals.session && locals.session.isImpersonating) { %>
+            <div class="impersonate-alert d-flex align-items-center bg-warning text-dark px-3 py-2 rounded me-3">
+                <i class="ph ph-mask-happy me-2"></i>
+                <small class="fw-bold me-2">Modo Suporte: <%= locals.session.impersonateTarget %></small>
+                <form action="/revert-impersonate" method="POST" class="m-0">
+                    <button type="submit" class="btn btn-xs btn-outline-dark fw-bold"
+                        style="padding: 2px 8px; font-size: 0.75rem;">
+                        Sair do Suporte
+                    </button>
+                </form>
+            </div>
+            <% } %>
+                <!-- Breadcrumbs or Title could go here -->
+                <h2 class="page-title">
+                    <%= title || 'Locadora' %>
+                </h2>
     </div>
 
     <div class="header-right">
-        <div class="user-dropdown">
-            <button class="user-btn" onclick="toggleUserMenu()">
-                <div class="avatar-circle">
-                    <%= user && user.nome ? user.nome.charAt(0).toUpperCase() : 'U' %>
-                </div>
-                <span class="user-name">
-                    <%= user ? user.nome : 'Usuário' %>
-                </span>
-                <i class="ph ph-caret-down"></i>
-            </button>
-            <div id="user-menu" class="dropdown-menu">
-                <div class="dropdown-header">
-                    <strong>
-                        <%= user ? user.nome : 'Visitante' %>
-                    </strong>
-                    <span class="role-badge">
-                        <%= user ? (user.role==='admin' ? 'Administrador' : 'Operador' ) : '' %>
+        <% if (!locals.session || !locals.session.isImpersonating) { %>
+            <div class="user-dropdown">
+                <button class="user-btn" onclick="toggleUserMenu()">
+                    <div class="avatar-circle">
+                        <%= user && user.nome ? user.nome.charAt(0).toUpperCase() : 'U' %>
+                    </div>
+                    <span class="user-name">
+                        <%= user ? user.nome : 'Usuário' %>
                     </span>
+                    <i class="ph ph-caret-down"></i>
+                </button>
+                <div id="user-menu" class="dropdown-menu">
+                    <div class="dropdown-header">
+                        <strong>
+                            <%= user ? user.nome : 'Visitante' %>
+                        </strong>
+                        <span class="role-badge">
+                            <%= user ? (user.role==='admin' ? 'Administrador' : 'Operador' ) : '' %>
+                        </span>
+                    </div>
+                    <ul class="dropdown-list">
+                        <li>
+                            <a href="#" onclick="openProfileModal()">
+                                <i class="ph ph-user"></i> Meu Perfil
+                            </a>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <a href="/logout" class="logout-link">
+                                <i class="ph ph-sign-out"></i> Sair
+                            </a>
+                        </li>
+                    </ul>
                 </div>
-                <ul class="dropdown-list">
-                    <li>
-                        <a href="#" onclick="openProfileModal()">
-                            <i class="ph ph-user"></i> Meu Perfil
-                        </a>
-                    </li>
-                    <li class="divider"></li>
-                    <li>
-                        <a href="/logout" class="logout-link">
-                            <i class="ph ph-sign-out"></i> Sair
-                        </a>
-                    </li>
-                </ul>
             </div>
-        </div>
+            <% } %>
     </div>
 </header>
 
@@ -191,7 +205,7 @@
     document.addEventListener('click', function (event) {
         const dropdown = document.querySelector('.user-dropdown');
         const menu = document.getElementById('user-menu');
-        if (!dropdown.contains(event.target)) {
+        if (dropdown && menu && !dropdown.contains(event.target)) {
             menu.classList.remove('show');
         }
     });

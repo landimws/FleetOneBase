@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        <%= title %>
+    </title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .card-troca {
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .password-requirements {
+            font-size: 0.875rem;
+        }
+
+        .password-requirements li {
+            color: #6c757d;
+        }
+
+        .password-requirements li.valid {
+            color: #198754;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container d-flex align-items-center justify-content-center min-vh-100">
+        <div class="card card-troca" style="max-width: 500px; width: 100%;">
+            <div class="card-header bg-warning text-dark py-3">
+                <h4 class="mb-0">
+                    <i class="bi bi-shield-lock-fill me-2"></i>Alterar Senha - Primeiro Acesso
+                </h4>
+            </div>
+            <div class="card-body p-4">
+                <div class="alert alert-warning">
+                    <h6 class="alert-heading"><i class="bi bi-exclamation-triangle-fill me-2"></i>Ação Obrigatória</h6>
+                    <p class="mb-0">Por segurança, você deve criar uma nova senha forte antes de continuar.</p>
+                </div>
+
+                <form id="formTrocarSenha" class="mt-4">
+                    <div class="mb-4">
+                        <label for="novaSenha" class="form-label fw-bold">Nova Senha</label>
+                        <div class="input-group">
+                            <input type="password" class="form-control form-control-lg" id="novaSenha" name="novaSenha"
+                                required autocomplete="new-password">
+                            <button class="btn btn-outline-secondary" type="button"
+                                onclick="toggleSenha('novaSenha', this)" tabindex="-1">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="confirmarSenha" class="form-label fw-bold">Confirmar Nova Senha</label>
+                        <div class="input-group">
+                            <input type="password" class="form-control form-control-lg" id="confirmarSenha"
+                                name="confirmarSenha" required autocomplete="new-password">
+                            <button class="btn btn-outline-secondary" type="button"
+                                onclick="toggleSenha('confirmarSenha', this)" tabindex="-1">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info password-requirements mb-4">
+                        <strong>📋 Requisitos da senha:</strong>
+                        <ul class="mb-0 mt-2" id="requirements">
+                            <li id="req-length"><i class="bi bi-circle me-2"></i>Mínimo de 8 caracteres</li>
+                            <li id="req-uppercase"><i class="bi bi-circle me-2"></i>Pelo menos uma letra maiúscula</li>
+                            <li id="req-lowercase"><i class="bi bi-circle me-2"></i>Pelo menos uma letra minúscula</li>
+                            <li id="req-number"><i class="bi bi-circle me-2"></i>Pelo menos um número</li>
+                        </ul>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-lg w-100 py-3" id="btnSubmit">
+                        <i class="bi bi-check-circle me-2"></i>Confirmar Nova Senha
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="position-fixed top-0 end-0 p-3" style="z-index: 11000">
+        <div id="toastSuccess" class="toast align-items-center text-white bg-success border-0" role="alert">
+            <div class="d-flex">
+                <div class="toast-body">
+                    <i class="bi bi-check-circle-fill me-2"></i><span id="toastSuccessMsg"></span>
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        </div>
+        <div id="toastError" class="toast align-items-center text-white bg-danger border-0" role="alert">
+            <div class="d-flex">
+                <div class="toast-body">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i><span id="toastErrorMsg"></span>
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const novaSenhaInput = document.getElementById('novaSenha');
+        const confirmarSenhaInput = document.getElementById('confirmarSenha');
+        const form = document.getElementById('formTrocarSenha');
+
+        // Validação em tempo real
+        novaSenhaInput.addEventListener('input', validarSenha);
+
+        function showToast(type, message) {
+            const toastEl = document.getElementById(type === 'success' ? 'toastSuccess' : 'toastError');
+            const toastMsg = document.getElementById(type === 'success' ? 'toastSuccessMsg' : 'toastErrorMsg');
+            toastMsg.textContent = message;
+            const toast = new bootstrap.Toast(toastEl);
+            toast.show();
+        }
+
+        function validarSenha() {
+            const senha = novaSenhaInput.value;
+
+            // Verificar comprimento
+            const reqLength = document.getElementById('req-length');
+            if (senha.length >= 8) {
+                reqLength.classList.add('valid');
+                reqLength.querySelector('i').className = 'bi bi-check-circle-fill me-2';
+            } else {
+                reqLength.classList.remove('valid');
+                reqLength.querySelector('i').className = 'bi bi-circle me-2';
+            }
+
+            // Verificar maiúscula
+            const reqUppercase = document.getElementById('req-uppercase');
+            if (/[A-Z]/.test(senha)) {
+                reqUppercase.classList.add('valid');
+                reqUppercase.querySelector('i').className = 'bi bi-check-circle-fill me-2';
+            } else {
+                reqUppercase.classList.remove('valid');
+                reqUppercase.querySelector('i').className = 'bi bi-circle me-2';
+            }
+
+            // Verificar minúscula
+            const reqLowercase = document.getElementById('req-lowercase');
+            if (/[a-z]/.test(senha)) {
+                reqLowercase.classList.add('valid');
+                reqLowercase.querySelector('i').className = 'bi bi-check-circle-fill me-2';
+            } else {
+                reqLowercase.classList.remove('valid');
+                reqLowercase.querySelector('i').className = 'bi bi-circle me-2';
+            }
+
+            // Verificar número
+            const reqNumber = document.getElementById('req-number');
+            if (/[0-9]/.test(senha)) {
+                reqNumber.classList.add('valid');
+                reqNumber.querySelector('i').className = 'bi bi-check-circle-fill me-2';
+            } else {
+                reqNumber.classList.remove('valid');
+                reqNumber.querySelector('i').className = 'bi bi-circle me-2';
+            }
+        }
+
+        function toggleSenha(inputId, button) {
+            const input = document.getElementById(inputId);
+            const icon = button.querySelector('i');
+
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.className = 'bi bi-eye-slash';
+            } else {
+                input.type = 'password';
+                icon.className = 'bi bi-eye';
+            }
+        }
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const novaSenha = novaSenhaInput.value;
+            const confirmarSenha = confirmarSenhaInput.value;
+            const btnSubmit = document.getElementById('btnSubmit');
+
+            // Validações
+            if (novaSenha !== confirmarSenha) {
+                showToast('error', 'As senhas não conferem!');
+                return;
+            }
+
+            if (novaSenha.length < 8) {
+                showToast('error', 'A senha deve ter no mínimo 8 caracteres!');
+                return;
+            }
+
+            if (!/[A-Z]/.test(novaSenha) || !/[a-z]/.test(novaSenha) || !/[0-9]/.test(novaSenha)) {
+                showToast('error', 'A senha deve conter pelo menos uma letra maiúscula, uma minúscula e um número!');
+                return;
+            }
+
+            // Desabilitar botão
+            btnSubmit.disabled = true;
+            btnSubmit.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processando...';
+
+            try {
+                const res = await fetch('/api/auth/trocar-senha-primeiro-acesso', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ novaSenha })
+                });
+
+                const data = await res.json();
+
+                if (data.success) {
+                    showToast('success', 'Senha alterada com sucesso! Redirecionando...');
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 2000);
+                } else {
+                    showToast('error', data.error || 'Falha ao alterar senha');
+                    btnSubmit.disabled = false;
+                    btnSubmit.innerHTML = '<i class="bi bi-check-circle me-2"></i>Confirmar Nova Senha';
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                showToast('error', 'Erro ao processar requisição');
+                btnSubmit.disabled = false;
+                btnSubmit.innerHTML = '<i class="bi bi-check-circle me-2"></i>Confirmar Nova Senha';
+            }
+        });
+    </script>
+</body>
+
+</html>

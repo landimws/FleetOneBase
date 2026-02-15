@@ -27,6 +27,19 @@ export default (sequelize) => {
             type: DataTypes.FLOAT,
             allowNull: false
         },
+        marca: {
+            type: DataTypes.STRING,
+            allowNull: true
+        },
+        cor: {
+            type: DataTypes.STRING,
+            allowNull: true
+        },
+        valor_fipe: {
+            type: DataTypes.FLOAT,
+            allowNull: true,
+            defaultValue: 0
+        },
         ativo: {
             type: DataTypes.BOOLEAN,
             defaultValue: true

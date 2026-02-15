@@ -38,6 +38,7 @@ class AdminUsuariosController {
                 usuarios,
                 empresas,
                 filtroEmpresaId: empresaId || '',
+                page: 'usuarios',
                 layout: 'admin/layouts/admin-layout'
             });
         } catch (error) {
@@ -69,6 +70,7 @@ class AdminUsuariosController {
             title: usuario ? 'Editar Usuário' : 'Novo Usuário',
             usuario: usuario || {},
             empresas,
+            page: 'usuarios',
             layout: 'admin/layouts/admin-layout'
         });
     }

@@ -1,17 +1,16 @@
-
 import { Op } from 'sequelize';
-import Semana from '../models-sqlite/Semana.js';
-import LinhaSemana from '../models-sqlite/LinhaSemana.js';
-import Veiculo from '../models-sqlite/Veiculo.js';
 
 class DashboardService {
 
     /**
      * Gera os dados do dashboard analítico.
+     * @param {Object} models Models injetados (req.models)
      * @param {Object} filters { data_inicio, data_fim, periodo }
      * @returns {Object} Dados do dashboard
      */
-    async getDashboardData(filters) {
+    async getDashboardData(models, filters) {
+        const { Semana, LinhaSemana, Veiculo } = models;
+
         // 1. Definição do Período
         let dataInicio, dataFim;
         const whereClause = {};

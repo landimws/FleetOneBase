@@ -8,7 +8,7 @@ export const getDashboard = async (req, res) => {
             periodo: req.query.periodo
         };
 
-        const data = await DashboardService.getDashboardData(filters);
+        const data = await DashboardService.getDashboardData(req.models, filters);
         res.json(data);
 
     } catch (e) {

@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contrato de Locação de Veículo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 9pt;
+            line-height: 1.2;
+            color: #000;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        .page-container {
+            width: 210mm;
+            min-height: 297mm;
+            background: white;
+            margin: 0 auto 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+            padding: 15mm 10mm 15mm 10mm;
+        }
+
+        .doc-header {
+            text-align: center;
+            margin-bottom: 10px;
+            border-bottom: 2px solid #000;
+            padding-bottom: 5px;
+        }
+
+        h1 {
+            text-align: center;
+            font-weight: bold;
+            margin: 0 0 8px 0;
+            font-size: 13pt;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .contract-number {
+            text-align: right;
+            font-weight: bold;
+            margin-bottom: 15px;
+            font-size: 9pt;
+        }
+
+        p {
+            text-align: justify;
+            margin-bottom: 4px;
+            text-indent: 0;
+        }
+
+        li {
+            text-align: justify;
+            margin-bottom: 2px;
+        }
+
+        strong {
+            font-weight: bold;
+        }
+
+        .section-title {
+            font-weight: bold;
+            margin-top: 15px;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            font-size: 9pt;
+            background-color: #f3f4f6;
+            padding: 4px 8px;
+            border-left: 3px solid #1e40af;
+        }
+
+        .parties-block {
+            margin-bottom: 15px;
+            border: 1px solid #e5e7eb;
+            padding: 12px;
+            border-radius: 3px;
+            background-color: #fafafa;
+        }
+
+        ol {
+            padding-left: 35px;
+            margin: 8px 0;
+        }
+
+        ul {
+            padding-left: 35px;
+            margin: 8px 0;
+        }
+
+        .signature-section {
+            margin-top: 30px;
+            page-break-inside: avoid;
+        }
+
+        .signature-date {
+            text-align: right;
+            margin-bottom: 30px;
+            font-size: 9pt;
+        }
+
+        .signature-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 60px;
+            margin-top: 30px;
+        }
+
+        .signature-box {
+            text-align: center;
+            width: 300px;
+        }
+
+        .signature-line {
+            width: 100%;
+            border-top: 1px solid black;
+            margin-bottom: 4px;
+        }
+
+        .signature-box p {
+            font-size: 8pt;
+            margin-bottom: 2px;
+            text-align: center;
+        }
+
+        table {
+            width: 70%;
+            margin: 10px 0;
+            border-collapse: collapse;
+            font-size: 9pt;
+        }
+
+        table th,
+        table td {
+            border-bottom: 1px solid #ddd;
+            padding: 4px 8px;
+            text-align: left;
+        }
+
+        table th {
+            border-bottom: 2px solid #000;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 8pt;
+        }
+
+        table,
+        th,
+        td {
+            border-left: none;
+            border-right: none;
+            border-top: none;
+        }
+
+        .page-break {
+            page-break-before: always;
+        }
+
+        .header-next-pages {
+            display: none;
+        }
+
+        .keep-together {
+            page-break-inside: avoid;
+        }
+
+        /* Configurações de impressão */
+        @media print {
+            * {
+                box-shadow: none !important;
+                text-shadow: none !important;
+            }
+
+            html,
+            body {
+                width: 100%;
+                margin: 0 !important;
+                padding: 0 !important;
+                background: white !important;
+                font-size: 10pt !important;
+                line-height: 1.2 !important;
+            }
+
+            .page-container {
+                width: 100% !important;
+                min-height: 0 !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                border: none !important;
+                box-shadow: none !important;
+                display: block !important;
+            }
+
+            @page {
+                margin: 20mm 15mm 35mm 15mm;
+                size: A4 portrait;
+
+                @bottom-center {
+                    content: "{{EMPRESA_NOME}} - CNPJ: {{EMPRESA_CNPJ}}" "\A" "{{EMPRESA_ENDERECO}}";
+                    font-size: 7pt;
+                    font-family: 'Times New Roman', Times, serif;
+                    white-space: pre-line;
+                    text-align: center;
+                    line-height: 1.3;
+                }
+
+                @bottom-right {
+                    content: "Página " counter(page);
+                    font-size: 8pt;
+                    font-family: 'Times New Roman', Times, serif;
+                }
+            }
+
+            .header-next-pages {
+                display: block;
+                text-align: right;
+                font-size: 9pt;
+                font-weight: bold;
+                margin-bottom: 10px;
+                padding-top: 0;
+            }
+
+            body {
+                counter-reset: page;
+            }
+
+            .section-title {
+                background-color: transparent;
+                border-bottom: 1px solid #000;
+                border-left: 2px solid #000;
+            }
+
+            .parties-block {
+                background-color: transparent;
+                border: 1px solid #999;
+                padding: 5px !important;
+                margin-bottom: 5px !important;
+            }
+
+            h1,
+            h2,
+            h3,
+            .section-title {
+                page-break-after: avoid;
+                page-break-inside: avoid;
+            }
+
+            p,
+            li {
+                margin-top: 0 !important;
+                margin-bottom: 2px !important;
+                orphans: 3;
+                widows: 3;
+                text-align: justify;
+                line-height: 1.2 !important;
+                font-size: 9pt !important;
+            }
+
+            ul,
+            ol {
+                margin-top: 0 !important;
+                margin-bottom: 2px !important;
+                padding-left: 25px !important;
+            }
+
+            h1,
+            h2,
+            h3,
+            .section-title {
+                margin-top: 5px !important;
+                margin-bottom: 2px !important;
+                page-break-after: avoid;
+            }
+
+            ol,
+            ul {
+                page-break-inside: avoid;
+            }
+
+            .signature-section {
+                page-break-before: auto;
+                page-break-inside: avoid;
+            }
+
+            .no-print {
+                display: none;
+            }
+
+            body {
+                line-height: 1.15 !important;
+                font-size: 8.5pt !important;
+            }
+
+            li {
+                margin-bottom: 1px !important;
+            }
+
+            .section-title {
+                margin-top: 10px !important;
+                margin-bottom: 1px !important;
+                padding: 2px 4px !important;
+            }
+
+            table th,
+            table td {
+                padding: 1px 4px !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="page-container" style="padding-bottom: 50px;">
+        <!-- Cabeçalho do Documento -->
+        <div class="doc-header">
+            <h1>CONTRATO DE LOCAÇÃO DE VEÍCULO</h1>
+            <div class="contract-number" style="margin-bottom: 5px;">Nº: <strong>{{CONTRATO_ID}}</strong></div>
+        </div>
+
+        <!-- Conteúdo do Contrato -->
+        <div class="content">
+
+            <div class="parties-block keep-together">
+                <p class="section-title">DAS PARTES</p>
+                <p><strong>LOCADOR:</strong> <strong>{{EMPRESA_NOME}}</strong>, pessoa jurídica de direito privado,
+                    inscrita no CNPJ:
+                    <strong>{{EMPRESA_CNPJ}}</strong>, sediada no endereço: <strong>{{EMPRESA_ENDERECO}}</strong>.
+                </p>
+                <p><strong>LOCATÁRIO:</strong> <strong>{{CLIENTE_NOME}}</strong>, portador(a) da Carteira Nacional de
+                    Habilitação (CNH)
+                    <strong>{{CLIENTE_CNH}}</strong>, CPF: <strong>{{CLIENTE_CPF}}</strong>, RG:
+                    <strong>{{CLIENTE_RG}}</strong>, data de nascimento
+                    <strong>{{CLIENTE_DATA_NASCIMENTO}}</strong>, residente e domiciliado à
+                    <strong>{{CLIENTE_ENDERECO}}</strong>. Contato:
+                    <strong>{{CLIENTE_TELEFONE1}}</strong>, Email: <strong>{{CLIENTE_EMAIL}}</strong>.
+                </p>
+                <p>As partes acima identificadas têm, entre si, justo e acertado o presente Contrato de Locação de
+                    Veículo que se regerá pelas cláusulas seguintes e pelas condições descritas no presente.</p>
+            </div>
+
+            <p class="section-title">1. CLÁUSULA PRIMEIRA – DO OBJETO</p>
+            <p>1.1. O objetivo do presente contrato é regular os termos e condições da locação de veículo, por meio do
+                qual, em conjunto com a assinatura do <strong>Termo de Vistoria</strong>, o <strong>LOCADOR</strong>
+                aluga, por prazo determinado, ao <strong>LOCATÁRIO</strong>, o veículo de Marca:
+                <strong>{{VEICULO_MARCA}}</strong>,
+                Modelo: <strong>{{VEICULO_MODELO}}</strong>, Ano: <strong>{{VEICULO_ANO_MODELO}}</strong>, Placa:
+                <strong>{{VEICULO_PLACA}}</strong>, Chassi:
+                <strong>{{VEICULO_CHASSI}}</strong>, Renavam: <strong>{{VEICULO_RENAVAM}}</strong>, Cor:
+                <strong>{{VEICULO_COR}}</strong>, de sua propriedade ou posse,
+                assim como seus acessórios e
+                equipamentos, tudo em perfeitas condições de funcionamento, conservação e segurança.
+            </p>
+            <p>1.2. O veículo objeto deste contrato está sendo entregue em perfeitas condições de uso e segurança,
+                previamente vistoriado pelo <strong>LOCATÁRIO</strong>, conforme <strong>Termo de Vistoria de
+                    Entrega</strong>, firmado e que passa a integrar este contrato. Além disso, o veículo estar em
+                conformidade com o Código de Trânsito Brasileiro e deve ser utilizado exclusivamente no Estado de
+                {{EMPRESA_UF}}, salvo expressa autorização do <strong>LOCADOR</strong>.</p>
+
+            <p class="section-title">2. CLÁUSULA SEGUNDA – DO PRAZO, DIREITO DE ARREPENDIMENTO E DA MULTA POR RESCISÃO
+                ANTECIPADA</p>
+            <p>2.1. O período de <strong>VIGÊNCIA DO CONTRATO</strong> é de <strong>{{CONTRATO_VIGENCIA_DIAS}}</strong>
+                (<strong>{{CONTRATO_VIGENCIA_EXTENSO}}</strong>) dias contínuos e ininterruptos, contados a partir da
+                data de retirada do
+                veículo na loja.</p>
+            <p>2.2. O <strong>LOCATÁRIO</strong> terá o direito de se arrepender da presente locação, sem necessidade de
+                justificativa, no prazo de <strong>7 (sete) dias corridos</strong>, contados a partir da data de
+                assinatura deste
+                contrato.</p>
+            <p>2.3. Para exercer o direito de arrependimento, o <strong>LOCATÁRIO</strong> deverá notificar o
+                <strong>LOCADOR</strong>, por escrito (e-mail e/ou WhatsApp), de sua decisão dentro do prazo estipulado
+                na cláusula anterior.
+            </p>
+            <p>2.4. O exercício do direito de arrependimento fica condicionado a:</p>
+            <ol type="a">
+                <li>Devolução do veículo locado nas mesmas condições em que foi recebido, salvo desgaste natural pelo
+                    uso regular;</li>
+                <li>Pagamento pelo <strong>LOCATÁRIO</strong> dos dias de locação efetivamente utilizados, calculado
+                    proporcionalmente ao valor total do contrato;</li>
+                <li>Pagamento, pelo <strong>LOCATÁRIO</strong>, de multa compensatória no valor de
+                    <strong>{{MULTA_ARREPENDIMENTO}}
+                        ({{MULTA_ARREPENDIMENTO_EXTENSO}})</strong>, em razão do arrependimento.
+                </li>
+            </ol>
+            <p>2.5. Exercido o direito de arrependimento pelo <strong>LOCATÁRIO</strong>, e cumpridas as condições
+                estabelecidas nesta cláusula, o presente contrato será considerado rescindido, sem que caiba às partes
+                qualquer outra indenização, além das previstas neste contrato.</p>
+            <p>2.6. O <strong>LOCADOR</strong> deverá restituir ao <strong>LOCATÁRIO</strong>, no prazo de 15 (quinze)
+                dias úteis, contados a partir da data de devolução do veículo, os valores pagos por este, deduzidos os
+                valores correspondentes aos dias de locação utilizados e à multa compensatória prevista nesta cláusula.
+            </p>
+            <p>2.7. Caso o <strong>LOCATÁRIO</strong> deseje rescindir o presente contrato após o prazo de 7 (sete) dias
+                para arrependimento e antes do período de <strong>VIGÊNCIA DO CONTRATO</strong>, deverá notificar ao
+                <strong>LOCADOR</strong>, por escrito (e-mail e/ou WhatsApp), com antecedência mínima de 7 dias.
+            </p>
+            <p>2.8. Em caso de rescisão antecipada por iniciativa do <strong>LOCATÁRIO</strong> após o prazo de
+                arrependimento, este deverá pagar ao <strong>LOCADOR</strong> uma multa compensatória equivalente a
+                <strong>{{PERCENTUAL_MULTA_RESCISAO}} ({{PERCENTUAL_MULTA_RESCISAO_EXTENSO}} por cento)</strong> do
+                valor total do contrato, calculado proporcionalmente ao tempo
+                restante para o cumprimento do período de <strong>VIGÊNCIA DO CONTRATO</strong>.
+            </p>
+            <p>2.9. A multa compensatória prevista nesta cláusula destina-se a compensar o <strong>LOCADOR</strong>
+                pelos prejuízos decorrentes da rescisão antecipada, tais como a perda de receita projetada, os custos
+                para recolocar o veículo no mercado e a possibilidade de o veículo ficar ocioso.</p>
+            <p>2.10. Não será devida a multa compensatória nos casos em que a rescisão antecipada for motivada por:</p>
+            <ol type="a">
+                <li>Vício oculto no veículo que o torne impróprio para o uso, desde que o vício seja comprovado por meio
+                    de laudo técnico;</li>
+                <li>Descumprimento, por parte do <strong>LOCADOR</strong>, de alguma cláusula do presente contrato;</li>
+                <li>Caso fortuito ou força maior que impeça o <strong>LOCATÁRIO</strong> de utilizar o veículo, desde
+                    que devidamente comprovado.</li>
+            </ol>
+            <p>2.11. Caso o <strong>LOCADOR</strong> deseje rescindir o presente contrato antes do período de
+                <strong>VIGÊNCIA DO CONTRATO</strong>, deverá notificar ao <strong>LOCATÁRIO</strong>, por escrito
+                (e-mail e/ou WhatsApp), com antecedência mínima de <strong>15 (quinze) dias</strong>, e não será devida
+                qualquer multa ao
+                <strong>LOCATÁRIO</strong>.
+            </p>
+            <p>2.12. Após o período de <strong>VIGÊNCIA DO CONTRATO</strong>, o <strong>LOCATÁRIO</strong> receberá
+                comunicações do <strong>LOCADOR</strong> por e-mail e/ou WhatsApp com o novo valor do contrato, que
+                também poderá sofrer reajustes futuros. Caso nenhuma das partes demonstre interesse em dar fim ao
+                contrato, este será automaticamente renovado por prazo indeterminado, inicialmente com o novo valor
+                informado. A multa contratual não será renovada, podendo o <strong>LOCATÁRIO</strong> encerrar a
+                qualquer momento após a renovação automática do contrato.</p>
+            <p>2.13. Caso não deseje renovar automaticamente e queira encerrar o contrato, o <strong>LOCATÁRIO</strong>
+                deve comparecer na agência para devolução do carro.</p>
+
+            <p class="section-title">3. CLÁUSULA TERCEIRA – DO PAGAMENTO E DE SUAS CONSEQUÊNCIAS</p>
+            <p>3.1. O pagamento das parcelas será efetuado na forma e prazos estabelecidos neste contrato.</p>
+            <p>3.2. O <strong>LOCATÁRIO</strong> pagará ao <strong>LOCADOR</strong> os seguintes valores:</p>
+            <p>{{CONTRATO_ITENS_TABELA}}</p>
+            <p>3.3. O pagamento terá periodicidade semanal, a ser realizado toda
+                <strong>{{CONTRATO_DIA_PAGAMENTO}}</strong>, e será feito através de boleto bancário, ou via PIX, quando
+                assim o <strong>LOCADOR</strong> autorizar.
+            </p>
+            <p>3.4. O <strong>LOCATÁRIO</strong> arcará com os custos de emissão dos boletos bancários, no valor de
+                <strong></strong>R$
+                5,00 (cinco reais)</strong> por boleto emitido. Este valor cobre as tarifas bancárias e demais despesas
+                operacionais diretamente relacionadas à geração e envio do boleto bancário. O <strong>LOCADOR</strong>
+                se reserva o direito de ajustar o valor da tarifa em caso de alteração nos custos bancários, mediante
+                comunicação prévia ao <strong>LOCATÁRIO</strong> com antecedência mínima de 30 dias.
+            </p>
+            <p>3.5. Em caso de atraso no pagamento de qualquer parcela, o devedor pagará, automaticamente e sem
+                necessidade de qualquer notificação, multa de <strong>{{PERCENTUAL_MULTA_ATRASO}}
+                    ({{PERCENTUAL_MULTA_ATRASO_EXTENSO}} por cento)</strong> sobre o valor da
+                parcela em atraso,
+                acrescida de juros de mora de <strong>{{PERCENTUAL_JUROS_MORA}} ({{PERCENTUAL_JUROS_MORA_EXTENSO}} por
+                    cento)</strong> ao mês, calculados sobre o valor da
+                parcela em atraso, a
+                partir da data do vencimento até a data do efetivo pagamento.</p>
+            <p>3.6. Fica estabelecido o limite de <strong>{{CONTRATO_KM_FRANQUIA}}</strong>
+                (<strong>{{CONTRATO_KM_FRANQUIA_EXTENSO}}</strong>)
+                quilômetros por dia, com aferição de quilometragem a cada <strong>15 (quinze) dias</strong>. No caso de
+                quilometragem
+                excedente haverá a cobrança de <strong>{{CONTRATO_VALOR_KM_EXCEDENTE}}</strong>
+                (<strong>{{CONTRATO_VALOR_KM_EXCEDENTE_EXTENSO}}</strong>)
+                por quilômetro excedente.</p>
+            <p>3.7. Ocorrendo problemas no hodômetro do veículo, o <strong>LOCADOR</strong> deverá ser imediatamente
+                informado, devendo ser atribuída <strong>200 km rodados por dia</strong>. Caso haja violação do lacre,
+                além da adoção das
+                medidas cabíveis, a quilometragem rodada será atribuída considerando <strong>500 km diários</strong>.
+            </p>
+            <p>3.8. O <strong>LOCATÁRIO</strong> pagará a taxa de <strong>{{TAXA_RETORNO}}
+                    ({{TAXA_RETORNO_EXTENSO}})</strong>, em casos
+                de entrega,
+                devolução ou de retorno, aplicáveis nos casos em que o veículo for entregue ou devolvido, em agência,
+                ponto ou local diferente da loja base de origem do veículo.</p>
+            <p>3.9. Taxa Administrativa será de {{TAXA_ADMINISTRATIVA}} ({{TAXA_ADMINISTRATIVA_EXTENSO}} por cento)
+                sobre todos os serviços prestados pelo
+                <strong>LOCADOR</strong>, incluindo multas de trânsito, avarias e outros.
+            </p>
+            <p>3.10. O PACOTE PREMIUM consiste na responsabilidade de o LOCADOR fornecer ao LOCATÁRIO os seguintes
+                benefícios: Selo de vistoria da ETUFOR, película fumê nos padrões permitidos pelo Código de
+                Trânsito Brasileiro, capas de couro nos bancos e no volante, redução de 50% (cinquenta
+                por cento) nos valores de avarias/peças, desconto de 20% (vinte por cento) a 40% (quarenta por
+                cento) no valor nominal das multas de trânsito e Tanque cheio.</p>
+            <p>3.11. O <strong>LOCATÁRIO</strong> reconhece que os itens do PACOTE PREMIUM são parte integrante do
+                veículo, sem direito de retirada ou reembolso.</p>
+
+            <p class="section-title">4. CLÁUSULA QUARTA – DA CAUÇÃO (GARANTIA REAL)</p>
+            <p>4.1. O <strong>LOCATÁRIO</strong> fornece uma caução no valor de
+                <strong>{{CONTRATO_VALOR_CAUCAO}}</strong> (<strong>{{CONTRATO_VALOR_CAUCAO_EXTENSO}}</strong>),
+                destinada exclusivamente à garantia de todas as obrigações contratuais, danos ao veículo e multas de
+                trânsito.
+            </p>
+            <p>4.2. {{CONTRATO_CLAUSULA_4_2}}</p>
+            <p>4.3. A caução não constitui crédito antecipado. É vedado ao <strong>LOCATÁRIO</strong> utilizá-la para
+                quitar diárias ou débitos durante a vigência da locação, bem como exigir seu abatimento no ato do
+                encerramento do contrato.</p>
+            <p>4.4. No encerramento da locação, a compensação de débitos (avarias, combustível ou quilometragem) com o
+                valor da caução é uma <strong>faculdade exclusiva do LOCADOR</strong>. O <strong>LOCADOR</strong>
+                poderá, a seu único critério, exigir o pagamento imediato das pendências pelo motorista, mantendo a
+                caução integralmente retida para a finalidade prevista na cláusula 4.6.</p>
+            <p>4.5. Caso o <strong>LOCADOR</strong> opte por abater débitos diretamente da caução, o
+                <strong>LOCATÁRIO</strong> será informado sobre o saldo utilizado e o motivo no ato do acerto ou
+                mediante fechamento da conta de locação.
+            </p>
+            <p>4.6. O valor remanescente da caução será devolvido ao <strong>LOCATÁRIO</strong> no prazo rigoroso de
+                <strong>30 (trinta) dias úteis</strong> após o encerramento do contrato, período indispensável para a
+                apuração de multas de trânsito e débitos processados após a entrega do veículo.
+            </p>
+
+            <p class="section-title">5. CLÁUSULA QUINTA – DAS PROTEÇÕES</p>
+            <p>5.1. As Proteções não constituem modalidades de seguro. Significam, tão-somente, que o
+                <strong>LOCADOR</strong> assume contratualmente custos, ou responsabilidades indenizatórias que
+                eventualmente possam decorrer do uso e circulação normal do veículo alugado, dentro dos limites máximos
+                fixados.
+            </p>
+            <p>5.2. As proteções oferecidas não se confundem com um seguro, têm regras próprias e coberturas limitadas.
+                Os serviços emergenciais previstos neste contrato devem ser previamente solicitados ao
+                <strong>LOCADOR</strong>, a fim de que este autorize e/ou providencie a prestação deles. Os serviços
+                executados sem autorização prévia ou participação do <strong>LOCADOR</strong> não serão reembolsados ao
+                <strong>LOCATÁRIO</strong> ou a quem tiver feito qualquer pagamento em nome deste.
+            </p>
+            <p>5.3. Para as proteções, poderá o <strong>LOCADOR</strong>, a seu exclusivo critério, contratar seguro de
+                casco e/ou facultativo de responsabilidade civil.</p>
+            <p>5.4. As modalidades de Proteções disponibilizadas para opção do <strong>LOCATÁRIO</strong> são:</p>
+            <p><strong>a. PROTEÇÃO BÁSICA (Inclusa no contrato):</strong> Esta proteção estabelece a responsabilidade
+                indenizatória do <strong>LOCATÁRIO</strong>, por dano decorrente de furto, roubo, incêndio, colisão e
+                por quaisquer avarias causadas ao veículo alugado, em:</p>
+            <ol type="i">
+                <li>12% (doze por cento) de responsabilidade indenizatória calculado sobre o valor de mercado do veículo
+                    na data da assinatura do presente contrato;</li>
+                <li>Pagamento de Taxa administrativa;</li>
+                <li>Pagamento de Lucros cessantes.</li>
+            </ol>
+            <p><strong>b. PROTEÇÃO A TERCEIROS:</strong> Esta proteção estabelece a responsabilidade indenizatória do
+                <strong>LOCATÁRIO</strong>, por danos pessoais e danos materiais causados pelo veículo alugado a
+                terceiros, em R$ 3.000,00 (três mil reais) com limites de cobertura para danos materiais de R$ 50.000,00
+                (cinquenta mil reais) e danos pessoais de R$ 100.000,00 (cem mil reais).
+            </p>
+            <p><strong>c. PROTEÇÃO EXTRA COMPLETO (De livre contratação):</strong> Confere ao <strong>LOCATÁRIO</strong>
+                os mesmos benefícios da <strong>PROTEÇÃO BÁSICA</strong> e <strong>PROTEÇÃO À TERCEIROS</strong> com os
+                seguintes valores:</p>
+            <ol type="i">
+                <li>6% (seis por cento) de responsabilidade indenizatória calculado sobre o valor de mercado do veículo
+                    na data da assinatura do presente contrato;</li>
+                <li>R$ 1.500,00 (um mil e quinhentos reais) de responsabilidade indenizatória para acionamento da
+                    <strong>PROTEÇÃO A TERCEIROS</strong>.
+                </li>
+                <li>Isenção da taxa administrativa e dos Lucros Cessantes.</li>
+            </ol>
+            <p>5.5. Não estão abrangidos pelas proteções os seguintes danos: aqueles causados aos acessórios,
+                equipamentos de som, rodas, estofamentos e tapeçaria do veículo; danos morais; danos indiretos; danos
+                decorrentes de atos de vandalismo, rebeliões e tumultos em geral, ou de fenômenos da natureza;
+                apropriação indébita; pneus; vidros; uso inadequado do veículo ou em desacordo com as disposições do
+                Contrato. Cabe ao <strong>LOCATÁRIO</strong> a reparação integral desses danos.</p>
+            <p>5.6. Ainda que contratadas as proteções, caso o veículo locado seja devolvido com pequenas avarias, não
+                limitadas, mas relativas a danos em sua funilaria, pintura, rodas, equipamentos elétricos, painel,
+                bancos, placas, espelhos e vidros, constatadas no Termo De Vistoria Veicular de Devolução, o
+                <strong>LOCADOR</strong> fará a cobrança com base nos valores orçados para os reparos, acrescido da Taxa
+                Administrativa.
+            </p>
+            <p>5.7. Em nenhuma hipótese será devolvido o valor pago a título de responsabilidade indenizatória, ainda
+                que o veículo roubado ou furtado seja posteriormente recuperado, visto que o respectivo valor é
+                utilizado para cobrir os custos e despesas incumbidos na recuperação do veículo, bem como para indenizar
+                os danos causados ao veículo.</p>
+            <p>5.8. O <strong>LOCATÁRIO</strong> concorda que a responsabilidade do <strong>LOCADOR</strong> se limita
+                às proteções contratadas, de forma que os danos não abrangidos pelas mesmas e os valores indenizatórios
+                que excederem os limites estabelecidos serão arcados integralmente pelo <strong>LOCATÁRIO</strong>.</p>
+            <p>5.9. O <strong>LOCATÁRIO</strong> perderá direito às Proteções contratadas, quando infringir qualquer
+                cláusula deste contrato.</p>
+            <p>5.10. O valor de mercado do veículo fica estabelecido em <strong>{{VEICULO_VALOR_FIPE}}</strong>
+                (<strong>{{VEICULO_VALOR_FIPE_EXTENSO}}</strong>) na data da assinatura do presente contrato.</p>
+
+            <p class="section-title">6. CLÁUSULA SEXTA – DAS MULTAS DE TRÂNSITO E INFRAÇÕES</p>
+            <p>6.1. O <strong>LOCATÁRIO</strong> declara conhecer a legislação em vigor, relativa ao Código de Trânsito
+                Brasileiro, e se responsabiliza inteiramente por quaisquer penalidades decorrentes das infrações de
+                trânsito, pecuniária e/ou pontuação. Nessa hipótese, o <strong>LOCADOR</strong> providenciará o
+                pagamento da multa e imediatamente cobrará do <strong>LOCATÁRIO</strong> o reembolso do valor
+                respectivo, acrescido dos encargos previstos no item 6.2.</p>
+            <p>6.2. O <strong>LOCATÁRIO</strong> declara que efetuará o pagamento dos débitos decorrentes das multas de
+                trânsito, reembolsando o <strong>LOCADOR</strong> os valores por ele pagos, acrescidos de
+                <strong>{{TAXA_ADMINISTRATIVA}}
+                    ({{TAXA_ADMINISTRATIVA_EXTENSO}}
+                    por cento)</strong> a título de Taxa Administrativa. O reembolso deverá ser feito imediatamente,
+                independentemente de discussão quanto à procedência ou improcedência da autuação ocorrida, ainda que
+                apresentadas após o término deste Contrato.
+            </p>
+            <p>6.3. Caso o veículo tenha sido apreendido/removido pelo poder público em razão de cometimento de infração
+                de trânsito pelo <strong>LOCATÁRIO</strong>, esse último se responsabilizará por todas as despesas
+                decorrentes da liberação do veículo incluindo, mas sem se limitar, a utilização de guinchos e depósitos
+                públicos, obrigando-se a providenciar a imediata liberação do veículo, ficando o
+                <strong>LOCADOR</strong> responsável por disponibilizar todo e qualquer documento exigido para a
+                liberação do veículo.
+            </p>
+            <p>6.4. O <strong>LOCATÁRIO</strong> declara-se ciente e concorda que caso ocorra qualquer multa ou infração
+                de trânsito durante a vigência deste Contrato, seu nome será indicado pelo <strong>LOCADOR</strong>
+                junto ao Órgão de Trânsito atuante, na qualidade de condutor do veículo, tendo assim, a pontuação
+                recebida e transferida para a sua Carteira Nacional de Habilitação.</p>
+            <p>6.5. Caso o <strong>LOCATÁRIO</strong> opte pela apresentação de recurso administrativo contra as
+                infrações, deverá efetuar antecipadamente o pagamento da respectiva multa. Nesse caso, o
+                <strong>LOCADOR</strong> fornecerá a documentação necessária. A elaboração, interposição e
+                acompanhamento do recurso serão de responsabilidade exclusiva do <strong>LOCATÁRIO</strong>. Caso tal
+                recurso venha a ser deferido pela autoridade competente, o <strong>LOCADOR</strong> reembolsará o
+                <strong>LOCATÁRIO</strong> o valor pago pela multa dentro do prazo de 5 (cinco) dias úteis contados da
+                data em que a autoridade competente disponibilizar o valor pago ao <strong>LOCADOR</strong>.
+            </p>
+            <p>6.6. O <strong>LOCATÁRIO</strong> desde já constitui o <strong>LOCADOR</strong> seu bastante procurador
+                para o fim específico de atender a Resolução n° 619/16 do CONTRAN, ou outra que a substitua, ficando a
+                mesma autorizada a assinar em seu nome no campo correspondente a "Assinatura do Condutor Infrator", no
+                formulário de identificação, em caso de infração de trânsito.</p>
+
+            <p class="section-title">7. CLÁUSULA SÉTIMA – DA MANUTENÇÃO DO VEÍCULO</p>
+            <p>7.1. A manutenção do veículo referente a troca de peças oriundas do desgaste natural de sua utilização é
+                de responsabilidade do <strong>LOCADOR</strong>.</p>
+            <p>7.2. O <strong>LOCADOR</strong> realizará o acompanhamento da quilometragem rodada pelo veículo sempre
+                que o veículo for imobilizado para realização de manutenção preventiva ou corretiva, além de poder
+                solicitar, a qualquer tempo, que o <strong>LOCATÁRIO</strong> informe a correta quilometragem do
+                veículo.</p>
+            <p>7.3. O <strong>LOCATÁRIO</strong> está ciente de que lâmpadas de faróis e lanternas são de sua
+                responsabilidade e confirma que recebeu o veículo com todas as lâmpadas funcionando conforme previsto no
+                <strong>Termo de Vistoria de Entrega</strong>.
+            </p>
+            <p>7.4. O valor de funilaria ou pintura de qualquer peça fica fixado em
+                <strong>{{CONTRATO_VALOR_AVARIA}}</strong>
+                (<strong>{{CONTRATO_VALOR_AVARIA_EXTENSO}}</strong>) mais Taxa administrativa.
+            </p>
+            <p>7.5. A substituição de peças do veículo só será feita com peças novas da autorizada, acrescentada de Taxa
+                Administrativa.</p>
+
+            <p class="section-title">8. CLÁUSULA OITAVA – DAS OBRIGAÇÕES DO LOCATÁRIO</p>
+            <p>8.1. Responsabilizar-se pela guarda e correto uso do veículo durante o aluguel, comprometendo-se a
+                devolvê-lo ao <strong>LOCADOR</strong> nas mesmas condições do recebimento, ressalvado o desgaste
+                natural decorrente do uso normal, em horário comercial, na data e local previstos no Contrato, exceto em
+                casos de comunicação prévia, aceita expressamente pelo <strong>LOCADOR</strong>.</p>
+            <p>8.2. Responsabilizar-se, independentemente de culpa, por todos os atos de condutores adicionais
+                eventualmente identificados.</p>
+            <p>8.3. Nos termos do artigo 265 do Código Civil, inexiste solidariedade, seja contratual ou legal, entre o
+                <strong>LOCADOR</strong> e o <strong>LOCATÁRIO</strong>, razão pela qual o <strong>LOCATÁRIO</strong>
+                assume, para todos os fins de direito, a responsabilidade por todos os danos, tendo culpa ou não,
+                decorrentes do uso e circulação do veículo até a efetiva devolução dele ao <strong>LOCADOR</strong>,
+                observadas as disposições da Cláusula Quinta.
+            </p>
+            <p>8.4. Atender a qualquer tempo ao chamado do <strong>LOCADOR</strong> para apresentação do veículo
+                alugado, com o fito de ser efetuada manutenção preventiva e/ou regularização documental, visando a
+                segurança mútua.</p>
+            <p>8.5. No caso de não apresentação do veículo para revisão no prazo estabelecido no manual do veículo, será
+                cobrada multa equivalente a {{MULTA_KM_NAO_REVISAO}} ({{MULTA_KM_NAO_REVISAO_EXTENSO}}) por quilômetro
+                excedido até o limite de
+                1.000 (um mil) quilômetros, após esse limite será cobrado uma indenização no valor de 10% (dez por
+                cento) calculado sobre o preço de mercado do veículo em caso de perda de garantia.</p>
+            <p>8.6. Em caso de furto, roubo, incêndio ou colisão, comunicar imediatamente ao <strong>LOCADOR</strong>,
+                no prazo máximo de 1 (uma hora), sendo obrigatório o preenchimento do Relatório de Sinistro e a
+                apresentação do laudo pericial, Boletim de Ocorrência e/ou seu protocolo, no prazo máximo de 24 (vinte e
+                quatro) horas.</p>
+            <p>8.7. Não emprestar, sublocar, ceder ou transferir o veículo a condutor não autorizado nos termos deste
+                instrumento, cabendo-lhe total e qualquer responsabilidade civil, criminal e pecuniária perante o
+                <strong>LOCADOR</strong> e/ou a terceiros pelos eventos que decorram do descumprimento dessa cláusula e
+                ocasionado a rescisão imediata do presente contrato.
+            </p>
+            <p>8.8. Intervir nas demandas em que o <strong>LOCADOR</strong> for acionado em decorrência de qualquer
+                evento ocorrido durante a locação do veículo, estando o <strong>LOCADOR</strong> legitimado a chamar o
+                <strong>LOCATÁRIO</strong> ao processo judicial (denunciação da lide, assistência litisconsorcial ou
+                nomeação à autoria, arts.119 e 125 do Código de Processo Civil), para que integre o polo passivo da
+                demanda, e ressarcir todos os custos suportado pelo <strong>LOCADOR</strong>, inclusive custas e
+                honorários advocatícios.
+            </p>
+            <p>8.9. Não utilizar o veículo em competições esportivas de qualquer natureza ou outro evento contrário às
+                especificações e às normas do Código de Trânsito Brasileiro, assim como em locais ou territórios
+                expressamente vedados pelo presente contrato, ou para destinação diversa daquela conferida pelo seu
+                fabricante, bem como não circular com o veículo em dunas, praias, vias inundadas ou em quaisquer outras
+                vias sem condições de tráfego normal, expondo-o a riscos.</p>
+            <p>8.10. Não utilizar o veículo para execução de atividades comerciais, incluindo, mas não se limitando, ao
+                uso para serviços de aplicativos de transporte individual e/ou coletivo, desde que esteja devidamente
+                registrado no Órgão competente para executar tal atividade.</p>
+            <p>8.11. Não efetuar qualquer reparo ou autorizar que se execute qualquer serviço no veículo alugado sem a
+                expressa e prévia anuência do <strong>LOCADOR</strong>. Descumprida essa obrigação, o
+                <strong>LOCADOR</strong> não reembolsará o <strong>LOCATÁRIO</strong> das despesas respectivas, ficando
+                este sujeito, ainda, às penalidades contratuais, bem como à reparação de eventuais perdas e danos que
+                causar ao <strong>LOCADOR</strong>.
+            </p>
+            <p>8.12. Informar o <strong>LOCADOR</strong>, imediatamente, sobre qualquer defeito com o cabo de
+                velocímetro, com seus lacres ou com o hodômetro do veículo.</p>
+            <p>8.13. Reconhecer e efetuar o pagamento dos débitos decorrentes do deste contrato até o efetivo
+                recebimento do veículo pelo <strong>LOCADOR</strong>. Para tanto, fica o <strong>LOCADOR</strong>
+                autorizado a cobrar os valores devidos pelo <strong>LOCATÁRIO</strong> através de boletos.</p>
+            <p>8.14. Devolver o veículo limpo, interna e externamente, sob pena de cobrança de Taxa de Limpeza Básica
+                {{TAXA_LIMPEZA_BASICA}}
+                ({{TAXA_LIMPEZA_BASICA_EXTENSO}}) ou Limpeza Especial {{TAXA_LIMPEZA_ESPECIAL}}
+                ({{TAXA_LIMPEZA_ESPECIAL_EXTENSO}}), dependendo do estado
+                do veículo. Caso o estofado ou a tapeçaria necessitem de lavagem, além da Taxa de Limpeza Especial, será
+                cobrado o valor de 1 (uma) diária de locação do veículo.</p>
+            <p>8.15. Arcar com os custos de confecção de novas chaves para o veículo, quando essas não forem devolvidas
+                em bom estado ao <strong>LOCADOR</strong>, inclusive as despesas de codificação.</p>
+            <p>8.16. Arcar com os custos para obtenção da segunda via dos documentos do veículo perante a autoridade
+                competente, quando esses não forem devolvidos ao <strong>LOCADOR</strong>. Nesse caso, diante da
+                impossibilidade de locação do veículo, será cobrado, ainda, o valor de 3 (três) diárias de locação do
+                veículo.</p>
+            <p>8.17. Arcar com os custos do reboque/guincho para distâncias superiores a 200 km (duzentos quilômetros)
+                da agência de origem, que tomará como base para a cobrança, a Taxa de Retorno correspondente.</p>
+            <p>8.18. No caso de apreensão do veículo, arcar com todas as despesas de serviços profissionais de advogados
+                e/ou despachantes para liberação do veículo alugado, além das taxas cobradas pelos órgãos competentes,
+                sem prejuízo da apuração das perdas e danos suportados pelo <strong>LOCADOR</strong>, inclusive de
+                lucros cessantes.</p>
+            <p>8.19. Pagar lucros cessantes ao <strong>LOCADOR</strong> em casos de furto, roubo, incêndio, acidente,
+                apropriação indébita, uso inadequado do veículo e, também, em caso de apreensão do veículo pelas
+                autoridades competentes. Para o cálculo dos lucros cessantes deverá ser considerado o tempo que o
+                veículo ficar indisponível para locação, fixado à razão de 70% (setenta por cento) do valor da diária
+                contratada, limitando-se ao máximo de 30 (trinta) dias.</p>
+
+            <p class="section-title">9. CLÁUSULA NONA – DAS OBRIGAÇÕES DO LOCADOR</p>
+            <p>9.1. Entregar ao <strong>LOCATÁRIO</strong> o veículo limpo, com no mínimo 30 (trinta) quilômetros de
+                autonomia, em perfeitas condições de funcionamento e segurança, com todos os documentos e equipamentos
+                exigidos pelo Código de Trânsito Brasileiro.</p>
+            <p>9.2. Assegurar a manutenção preventiva e corretiva do veículo alugado, gratuitamente, com assistência
+                técnico-mecânica, em horário comercial.</p>
+            <p>9.3. Não haverá esta gratuidade quando o problema for causado por culpa do <strong>LOCATÁRIO</strong>, em
+                função de mau uso, imperícia ou imprudência, definida por laudo técnico.</p>
+            <p>9.4. Substituir o veículo alugado por outro disponível, sem nenhum ônus para o
+                <strong>LOCATÁRIO</strong>, em caso de defeito que impossibilite a utilização, respeitando-se o tempo
+                necessário para deslocamento do <strong>LOCADOR</strong> até o local em que se encontrar o veículo, em
+                horário comercial. Caso constate-se, após remoção do veículo, que o defeito foi causado por acidente ou
+                uso inadequado, o <strong>LOCATÁRIO</strong> pagará ao <strong>LOCADOR</strong> o valor do reboque e das
+                despesas referentes ao conserto do veículo.
+            </p>
+            <p>9.5. Em caso de não haver outro veículo disponível, fica o <strong>LOCATÁRIO</strong> isento de pagar as
+                diárias do veículo até a disponibilização de outro da mesma categoria ou categoria diferente, desde que
+                o <strong>LOCATÁRIO</strong> concorde com os novos valores de locação.</p>
+            <p>9.6. Prestar os Serviços de Assistência 24 (vinte e quatro) horas para comodidade do
+                <strong>LOCATÁRIO</strong>, com garantia de serviço de guincho/reboque para distâncias de até 100 km
+                (cem quilômetros) da agência de origem.
+            </p>
+            <p>9.7. O <strong>LOCADOR</strong> não se responsabiliza por bens ou valores deixados no veículo.</p>
+
+            <p class="section-title">10. CLÁUSULA DÉCIMA - DA RESPONSABILIDADE CIVIL</p>
+            <p>10.1. Após o recebimento do veículo, o <strong>LOCATÁRIO</strong> assume a sua posse legítima e autônoma,
+                para todos os fins de direito, inexistindo solidariedade, legal ou contratual, do
+                <strong>LOCADOR</strong> pelas responsabilidades indenizatórias decorrentes do uso e/ou circulação do
+                veículo, ressalvada as responsabilidades contratualmente ajustadas. Assim, caso seja responsável, nos
+                termos deste Contrato, pelas perdas e danos causados a terceiros, o <strong>LOCATÁRIO</strong> obriga-se
+                a eximir o <strong>LOCADOR</strong> de todo e quaisquer danos, sendo certo, ainda, que tanto o
+                <strong>LOCATÁRIO</strong>, ou terceiro a quem o <strong>LOCATÁRIO</strong> tenha entregue a posse do
+                veículo, poderão vir a ser denunciados à lide em ações judiciais propostas por terceiros contra o
+                <strong>LOCADOR</strong>, na forma da legislação em vigor.
+            </p>
+            <p>10.2. O <strong>LOCADOR</strong> não será responsável por perdas e danos, diretos ou indiretos,
+                acarretados ao <strong>LOCATÁRIO</strong> ou a terceiros decorrentes de defeitos/vícios de fábrica,
+                ocultos ou aparentes, ou defeitos decorrentes de tempo de uso, apresentados no veículo. Nessa hipótese,
+                a responsabilidade do <strong>LOCADOR</strong> limita-se a prestar todo o suporte operacional ao
+                <strong>LOCATÁRIO</strong> e efetuar o reparo do veículo.
+            </p>
+
+            <p class="section-title">11. CLÁUSULA DÉCIMA PRIMEIRA - DA RESCISÃO</p>
+            <p>11.1. O <strong>LOCADOR</strong> poderá rescindir o presente contrato, independente de notificação
+                judicial ou extrajudicial, bem como qualquer outra formalidade, e sem que caiba ao
+                <strong>LOCATÁRIO</strong> qualquer direito de retenção ou ação de natureza indenizatória, reparatória
+                ou compensatória, quando: a. O <strong>LOCATÁRIO</strong> infringir quaisquer das cláusulas contratuais,
+                sem prejuízo das penalidades específicas previstas; b. ocorrer impedimentos legais ou privação de
+                liberdade; c. O <strong>LOCATÁRIO</strong> deixe de efetuar o pagamento de qualquer valor devido ao
+                <strong>LOCADOR</strong>, conforme demonstrado em boletos ou outros comprovantes de cobrança, no prazo
+                estipulado neste contrato ou em acordos posteriores.
+            </p>
+            <p>11.2. Nesses casos, o <strong>LOCADOR</strong> adotará todas as medidas necessárias à retomada do
+                veículo, cujos custos serão cobrados do <strong>LOCATÁRIO</strong>.</p>
+            <p>11.3. No caso de rescisão contratual sem a devolução espontânea do veículo, fica o
+                <strong>LOCADOR</strong> autorizado a efetuar bloqueio mecânico ou eletrônico do veículo e o seu
+                resgate, o que também poderá fazer no caso de o <strong>LOCATÁRIO</strong> adentrar com o veículo em
+                outro Estado que não seja o de {{EMPRESA_UF}}, ou, ainda, em qualquer local ou situação vedada pelo
+                presente
+                contrato.
+            </p>
+            <p>11.4. A rescisão do Contrato não eximirá o <strong>LOCATÁRIO</strong> da responsabilidade pelo pagamento
+                dos débitos decorrentes das obrigações contratuais contraídas até a data da efetiva devolução do veículo
+                alugado, nem das indenizações eventualmente devidas, mesmo que apuradas após a referida data.</p>
+
+            <p class="section-title">12. CLÁUSULA DÉCIMA SEGUNDA – DA DEVOLUÇÃO DO VEÍCULO</p>
+            <p>12.1. Quando do término da vigência do contrato ou de sua eventual rescisão antecipada, o
+                <strong>LOCATÁRIO</strong> deverá devolver o veículo ao <strong>LOCADOR</strong> em local a ser
+                previamente indicado, em perfeito estado de conservação e funcionamento (excetuando-se o seu desgaste
+                natural), mediante assinatura de um <strong>Termo de Vistoria de Devolução</strong>, pelo
+                <strong>LOCATÁRIO</strong>, atestando o estado de conservação do veículo.
+            </p>
+            <p>12.2. Caso haja necessidade, o <strong>LOCADOR</strong> poderá providenciar os serviços abaixo descritos,
+                cujos custos serão comprovados através de orçamento, Nota Fiscal ou recibos e serão cobrados do
+                <strong>LOCATÁRIO</strong>: a. Danos identificados no veículo e que não sejam decorrentes de seu uso
+                normal, tais como, mas sem se limitando a danos na pintura, lataria, motor, vidros, pneus, para-choques
+                ou no interior do veículo, ou, ainda, danos decorrentes de alteração das características originais. b.
+                Lavagem especial de Veículo devolvido com sujeira excessiva, fora dos padrões normais e razoáveis; c.
+                Polimento/restauração da pintura após a retirada de adesivos e, caso ainda seja necessário, repintura
+                das partes afetadas.
+            </p>
+            <p>12.3. O Veículo deverá ser devolvido com todos os equipamentos e acessórios que continha quando de sua
+                entrega ao <strong>LOCATÁRIO</strong>. Outrossim, o <strong>LOCATÁRIO</strong> deverá restituir ao
+                <strong>LOCADOR</strong>, no ato da devolução do veículo, o manual de uso e manutenção fornecido pelo
+                fabricante do Veículo, bem como o Certificado de Registro e Licenciamento do veículo, estepe, chave
+                reserva e qualquer outra documentação original que lhe tenha sido entregue pelo
+                <strong>LOCADOR</strong>.
+            </p>
+            <p>12.4. Eventuais adesivos, pinturas especiais, equipamentos ou acessórios incluídos ao veículo pelo
+                <strong>LOCATÁRIO</strong>, ainda que com autorização do <strong>LOCADOR</strong> e que não puderem ser
+                removidos pelo <strong>LOCATÁRIO</strong> por afetarem a originalidade do veículo, incorporar-se-ão
+                definitivamente a ele, não implicando direito de compensação, indenização, retenção, ou reivindicação do
+                <strong>LOCATÁRIO</strong>. Poderá ainda o <strong>LOCADOR</strong> cobrar eventuais despesas
+                necessárias para recompor a sua originalidade.
+            </p>
+
+            <p class="section-title">13. CLÁUSULA DÉCIMA TERCEIRA – DAS DISPOSIÇÕES GERAIS</p>
+            <p>13.1. O <strong>LOCADOR</strong> e o <strong>LOCATÁRIO</strong> atestam que o veículo está sendo entregue
+                em perfeitas condições de uso, na data da assinatura do presente instrumento, mediante Termo de Vistoria
+                de Entrega.</p>
+            <p>13.2. Este Contrato representa o único e integral acordo entre as Partes quanto ao negócio que constitui
+                o seu objeto, substituindo e superando quaisquer eventuais documentos ou ajustes prévios, propostas,
+                termos ou outros instrumentos ou minutas preparados ou celebrados anteriormente a esta data que tenham o
+                mesmo objeto.</p>
+            <p>13.3. O <strong>LOCATÁRIO</strong> não poderá ceder, emprestar ou sublocar os bens objetos do contrato,
+                nem, tampouco, os direitos e obrigações dele decorrentes, sem a prévia e expressa anuência do
+                <strong>LOCADOR</strong>.
+            </p>
+            <p>13.4. A eventual falta de aplicação das sanções previstas no contrato, bem como a abstenção do exercício
+                de quaisquer direitos pelo <strong>LOCADOR</strong>, será considerada atos de mera tolerância e não
+                implicarão novação ou renúncia, podendo o <strong>LOCADOR</strong> exercer os seus respectivos direitos
+                a qualquer momento.</p>
+            <p>13.5. O <strong>LOCATÁRIO</strong> declara que, para os fins da celebração deste contrato, tem plena
+                capacidade e entendimento no que tange ao seu objeto e às cláusulas estabelecidas neste contrato.</p>
+
+            <p class="section-title">14. CLÁUSULA DÉCIMA QUARTA – DO FORO</p>
+            <p>14.1. Fica eleito o foro da comarca de
+                <strong></strong>{{EMPRESA_CIDADE}}</strong>-<strong>{{EMPRESA_UF}}</strong>, como o único competente
+                para
+                dirimir as questões
+                oriundas do presente contrato, com renúncia expressa de qualquer outro, por mais privilegiado que seja,
+                sem prejuízo da possibilidade de requerimento pelo <strong>LOCADOR</strong> de medidas cautelares ou
+                tutelas de urgência em outro foro.
+            </p>
+            <p>E por estarem justo e contratados, assinam o presente instrumento em 02 (duas) vias de igual teor e
+                forma, na presença de 02 (duas) testemunhas abaixo assinadas.</p>
+
+            <!-- Assinaturas -->
+            <div class="signature-section">
+                <p class="signature-date"><strong>{{EMPRESA_CIDADE}}</strong> - <strong>{{EMPRESA_UF}}</strong>,
+                    <strong>{{DATA_ATUAL}}</strong>
+                </p>
+
+                <div class="signature-container">
+                    <div class="signature-box">
+                        <div class="signature-line"></div>
+                        <p style="margin-top: 5px; font-weight: bold;">{{EMPRESA_NOME}}</p>
+                        <p><strong>LOCADOR</strong></p>
+                    </div>
+                    <div class="signature-box">
+                        <div class="signature-line"></div>
+                        <p style="margin-top: 5px; font-weight: bold;">{{CLIENTE_NOME}}</p>
+                        <p><strong>LOCATÁRIO</strong></p>
+                    </div>
+                </div>
+
+                <p class="section-title" style="margin-top: 40px;">TESTEMUNHAS:</p>
+                <div class="signature-container">
+                    <div class="signature-box">
+                        <div class="signature-line"></div>
+                        <p style="margin-top: 5px;">Nome: _______________________________</p>
+                        <p>CPF: _______________________________</p>
+                    </div>
+                    <div class="signature-box">
+                        <div class="signature-line"></div>
+                        <p style="margin-top: 5px;">Nome: _______________________________</p>
+                        <p>CPF: _______________________________</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+
+    </div>
+
+</body>
+
+</html>

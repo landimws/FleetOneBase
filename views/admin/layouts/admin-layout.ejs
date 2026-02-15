@@ -180,6 +180,10 @@
             <i class="bi bi-shield-lock"></i> Admin Panel
         </div>
         <nav class="nav flex-column">
+            <a href="/admin" class="nav-link <%= (page === 'dashboard') ? 'active' : '' %>">
+                <i class="bi bi-speedometer2"></i>
+                <span>Dashboard</span>
+            </a>
             <a href="/admin/empresas" class="nav-link <%= (page === 'empresas') ? 'active' : '' %>">
                 <i class="bi bi-building"></i>
                 <span>Empresas</span>
@@ -187,6 +191,10 @@
             <a href="/admin/usuarios" class="nav-link <%= (page === 'usuarios') ? 'active' : '' %>">
                 <i class="bi bi-people"></i>
                 <span>Usuários</span>
+            </a>
+            <a href="/admin/planos" class="nav-link <%= (page === 'admin_planos') ? 'active' : '' %>">
+                <i class="bi bi-tags"></i>
+                <span>Planos</span>
             </a>
             <hr style="border-color: rgba(255, 255, 255, 0.1); margin: 1rem 0.5rem;">
             <a href="/" class="nav-link">
@@ -226,6 +234,7 @@
     <!-- Custom Admin JS -->
     <script src="/admin/js/utils.js"></script>
     <script src="/admin/js/admin-main.js"></script>
+    <%- script %>
 </body>
 
 </html>

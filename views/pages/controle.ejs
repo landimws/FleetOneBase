@@ -1,0 +1,795 @@
+<%- contentFor('body') %>
+
+    <!-- Tailwind CSS (CDN) - Scoped to avoid breaking legacy styles -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            corePlugins: {
+                preflight: false, // Disable global reset to protect sidebar/header legacy styles
+            }
+        }
+    </script>
+
+    <style>
+        /* Fix for Tailwind having preflight disabled */
+        .border-b,
+        .border-t,
+        .border-l,
+        .border-r,
+        .border {
+            border-style: solid;
+        }
+
+        /* Custom Scrollbar */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+
+    <div class="flex flex-col h-screen bg-gray-50">
+        <!-- Header -->
+        <header class="bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center shadow-sm">
+            <div class="flex items-center gap-2 bg-gray-100/50 p-1 rounded-lg">
+                <button id="tabBtnControle" onclick="switchTab('controle')"
+                    class="px-4 py-2 text-sm font-medium rounded-md bg-white text-blue-600 shadow-sm transition-all flex items-center gap-2">
+                    <i class="ph ph-table"></i> Controle
+                </button>
+                <button id="tabBtnAnalises" onclick="switchTab('analises')"
+                    class="px-4 py-2 text-sm font-medium rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-200/50 transition-all flex items-center gap-2">
+                    <i class="ph ph-chart-line-up"></i> Inteligência
+                </button>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <select id="selectSemana"
+                    class="form-select pl-3 pr-10 py-2 border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md shadow-sm transition-all duration-200">
+                    <option value="">Carregando semanas...</option>
+                </select>
+                <button id="btnNovaSemana"
+                    class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium shadow-sm transition-colors duration-200 flex items-center gap-2">
+                    <i class="ph ph-plus-circle text-lg"></i>
+                    Nova Semana
+                </button>
+                <button id="btnFecharSemana"
+                    class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium shadow-sm transition-colors duration-200 hidden flex items-center gap-2">
+                    <i class="ph ph-check-circle text-lg"></i>
+                    Fechar Semana
+                </button>
+                <button id="btnExcluirSemana"
+                    class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium shadow-sm transition-colors duration-200 hidden flex items-center gap-2">
+                    <i class="ph ph-trash text-lg"></i>
+                    Excluir
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="flex-1 overflow-hidden p-6 relative">
+            <!-- TAB: CONTROLE -->
+            <div id="tab-controle" class="h-full flex flex-col">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 h-full flex flex-col overflow-hidden">
+                    <!-- Toolbar -->
+                    <div class="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+                        <div class="flex items-center gap-4">
+                            <div class="relative">
+                                <i
+                                    class="ph ph-magnifying-glass absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                                <input type="text" id="searchInput" placeholder="Buscar veículo ou cliente..."
+                                    class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent w-64 shadow-sm">
+                            </div>
+                            <div class="flex items-center gap-2 text-sm text-gray-600">
+                                <span class="w-3 h-3 rounded-full bg-red-100 border border-red-300 block"></span> =
+                                Alerta
+                                <span
+                                    class="w-3 h-3 rounded-full bg-yellow-100 border border-yellow-300 block ml-2"></span>
+                                = Oficina
+                                <span
+                                    class="w-3 h-3 rounded-full bg-green-100 border border-green-300 block ml-2"></span>
+                                =
+                                Revisado
+                            </div>
+                        </div>
+                        <div class="text-sm text-gray-500" id="gridStats">
+                            Carregando dados...
+                        </div>
+                    </div>
+
+                    <!-- Table Container -->
+                    <div class="overflow-auto flex-1 custom-scrollbar">
+                        <table class="min-w-full divide-y divide-gray-200" id="controleTable">
+                            <thead class="bg-gray-50 sticky top-0 z-10 shadow-sm">
+                                <tr>
+                                    <th scope="col"
+                                        class="px-3 py-1 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider w-24">
+                                        Veículo</th>
+                                    <th scope="col"
+                                        class="px-3 py-1 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider w-32">
+                                        Modelo</th>
+                                    <th scope="col"
+                                        class="px-3 py-1 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider w-40">
+                                        Cliente (Dia 7)</th>
+                                    <th scope="col"
+                                        class="px-3 py-1 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider w-28">
+                                        Km Anterior</th>
+                                    <th scope="col"
+                                        class="px-3 py-1 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider w-28">
+                                        Km Atual</th>
+                                    <th scope="col"
+                                        class="px-3 py-1 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider w-28">
+                                        Rodados</th>
+                                    <th scope="col"
+                                        class="px-3 py-1 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider w-32">
+                                        Situação</th>
+                                    <th scope="col"
+                                        class="px-3 py-1 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                        Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-100" id="controleBody">
+                                <!-- Rows rendered via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Empty State -->
+                    <div id="emptyState"
+                        class="hidden flex flex-col items-center justify-center h-full text-center pb-20">
+                        <div class="bg-gray-100 p-6 rounded-full mb-4">
+                            <i class="ph ph-steering-wheel text-4xl text-gray-400"></i>
+                        </div>
+                        <h3 class="text-lg font-medium text-gray-900" id="emptyStateTitle">Selecione uma semana</h3>
+                        <p class="text-gray-500 mt-1 max-w-sm" id="emptyStateMsg">Escolha uma semana existente no topo
+                            ou
+                            crie uma nova para começar.</p>
+
+                        <button id="btnInicializarSemana"
+                            class="mt-6 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg text-sm font-medium shadow-sm transition-colors duration-200 hidden flex items-center gap-2">
+                            <i class="ph ph-play-circle text-lg"></i>
+                            Iniciar Controle da Semana
+                        </button>
+                    </div>
+
+                    <!-- Empty State -->
+                    <div id="emptyState"
+                        class="hidden flex flex-col items-center justify-center h-full text-center pb-20">
+                        <div class="bg-gray-100 p-6 rounded-full mb-4">
+                            <i class="ph ph-steering-wheel text-4xl text-gray-400"></i>
+                        </div>
+                        <h3 class="text-lg font-medium text-gray-900" id="emptyStateTitle">Selecione uma semana</h3>
+                        <p class="text-gray-500 mt-1 max-w-sm" id="emptyStateMsg">Escolha uma semana existente no topo
+                            ou
+                            crie uma nova para começar.</p>
+
+                        <button id="btnInicializarSemana"
+                            class="mt-6 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg text-sm font-medium shadow-sm transition-colors duration-200 hidden flex items-center gap-2">
+                            <i class="ph ph-play-circle text-lg"></i>
+                            Iniciar Controle da Semana
+                        </button>
+                    </div>
+                </div>
+            </div> <!-- End Tab Controle -->
+
+            <!-- TAB: INTELIGÊNCIA -->
+            <div id="tab-analises" class="hidden h-full overflow-y-auto custom-scrollbar">
+
+                <!-- KPIs -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+                    <!-- Total Km -->
+                    <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute right-[-10px] top-[-10px] bg-blue-50 w-24 h-24 rounded-full opacity-50">
+                        </div>
+                        <p class="text-sm font-medium text-gray-500 uppercase tracking-wider relative z-10">Km Rodados
+                            na Semana</p>
+                        <h3 class="text-3xl font-black text-gray-800 mt-1 relative z-10" id="kpiTotalKm">---</h3>
+                        <p class="text-xs text-blue-600 mt-2 font-medium flex items-center gap-1 relative z-10">
+                            <i class="ph-fill ph-road-horizon"></i> Total da Frota
+                        </p>
+                    </div>
+
+                    <!-- Média por Veículo -->
+                    <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute right-[-10px] top-[-10px] bg-green-50 w-24 h-24 rounded-full opacity-50">
+                        </div>
+                        <p class="text-sm font-medium text-gray-500 uppercase tracking-wider relative z-10">Média por
+                            Veículo</p>
+                        <h3 class="text-3xl font-black text-gray-800 mt-1 relative z-10" id="kpiMediaKm">---</h3>
+                        <p class="text-xs text-green-600 mt-2 font-medium flex items-center gap-1 relative z-10">
+                            <i class="ph-fill ph-chart-bar"></i> Km / Carro
+                        </p>
+                    </div>
+
+                    <!-- Alertas Críticos -->
+                    <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute right-[-10px] top-[-10px] bg-red-50 w-24 h-24 rounded-full opacity-50">
+                        </div>
+                        <p class="text-sm font-medium text-gray-500 uppercase tracking-wider relative z-10">Alertas
+                            Críticos</p>
+                        <h3 class="text-3xl font-black text-gray-800 mt-1 relative z-10" id="kpiAlertas">---</h3>
+                        <p class="text-xs text-red-600 mt-2 font-medium flex items-center gap-1 relative z-10">
+                            <i class="ph-fill ph-warning-circle"></i> Óleo / Correia / Pacote
+                        </p>
+                    </div>
+
+                    <!-- Eficiência de Frota -->
+                    <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute right-[-10px] top-[-10px] bg-purple-50 w-24 h-24 rounded-full opacity-50">
+                        </div>
+                        <p class="text-sm font-medium text-gray-500 uppercase tracking-wider relative z-10">Veículos
+                            Ativos</p>
+                        <h3 class="text-3xl font-black text-gray-800 mt-1 relative z-10" id="kpiAtivos">---</h3>
+                        <p class="text-xs text-purple-600 mt-2 font-medium flex items-center gap-1 relative z-10">
+                            <i class="ph-fill ph-check-circle"></i> Em operação
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Charts Section -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                    <!-- Top 5 Km -->
+                    <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="font-bold text-gray-800 flex items-center gap-2">
+                                <div
+                                    class="w-8 h-8 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center">
+                                    <i class="ph-fill ph-ranking"></i>
+                                </div>
+                                Top 5 - Maior Rodagem
+                            </h3>
+                        </div>
+                        <div class="relative h-64">
+                            <canvas id="chartTopKm"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Distribuição de Status -->
+                    <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="font-bold text-gray-800 flex items-center gap-2">
+                                <div
+                                    class="w-8 h-8 rounded-lg bg-orange-100 text-orange-600 flex items-center justify-center">
+                                    <i class="ph-fill ph-pie-chart"></i>
+                                </div>
+                                Situação da Frota
+                            </h3>
+                        </div>
+                        <div class="relative h-64 flex justify-center">
+                            <canvas id="chartStatus"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detalhamento de Manutenções -->
+                <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden mb-6">
+                    <div class="p-6 border-b border-gray-50 flex justify-between items-center">
+                        <h3 class="font-bold text-gray-800 flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-red-100 text-red-600 flex items-center justify-center">
+                                <i class="ph-fill ph-wrench"></i>
+                            </div>
+                            Próximas Manutenções (Críticas)
+                        </h3>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-left">
+                            <thead class="bg-gray-50 text-gray-500 font-medium uppercase text-xs">
+                                <tr>
+                                    <th class="px-6 py-3">Veículo</th>
+                                    <th class="px-6 py-3">Tipo</th>
+                                    <th class="px-6 py-3">Km Atual</th>
+                                    <th class="px-6 py-3">Próxima Troca</th>
+                                    <th class="px-6 py-3">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-50" id="tabelaManutencoes">
+                                <!-- JS Populated -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div> <!-- End Tab Analises -->
+        </main>
+    </div>
+
+    <!-- Scripts -->
+
+    <!-- Modal Nova Semana (Confirm) -->
+    <div id="modalNovaSemana" class="fixed inset-0 z-[3000] hidden" aria-labelledby="modal-title" role="dialog"
+        aria-modal="true">
+        <!-- Backdrop -->
+        <div class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity"></div>
+
+        <div class="fixed inset-0 z-10 overflow-y-auto">
+            <div class="flex min-h-full items-center justify-center p-4 text-center">
+                <div
+                    class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-2xl transition-all sm:w-full sm:max-w-sm border border-gray-100">
+                    <div class="bg-white px-6 pb-6 pt-6">
+                        <div class="text-center">
+                            <div
+                                class="mx-auto flex items-center justify-center h-14 w-14 rounded-full bg-blue-50 mb-5 ring-4 ring-blue-50/50">
+                                <i class="ph ph-calendar-plus text-3xl text-blue-600"></i>
+                            </div>
+                            <h3 class="text-xl leading-6 font-bold text-gray-900" id="modalNovaSemanaTitle">Iniciar Nova
+                                Semana</h3>
+                            <div class="mt-3">
+                                <p class="text-sm text-gray-500" id="modalNovaSemanaMsg">
+                                    Próxima semana encontrada: <br>
+                                    <span
+                                        class="font-bold text-gray-800 text-lg block mt-2 p-2 bg-gray-50 rounded-lg border border-gray-100"
+                                        id="modalNovaSemanaDate">--/-- a --/--</span>
+                                </p>
+                                <p class="text-xs text-gray-400 mt-3 px-4">Isso importará automaticamente os veículos
+                                    ativos e suas configurações.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50/50 px-6 py-4 sm:flex sm:flex-row-reverse sm:px-6 gap-3">
+                        <button type="button" id="btnConfirmarNovaSemana"
+                            class="inline-flex w-full justify-center rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 sm:w-auto transition-transform active:scale-95">
+                            Iniciar
+                        </button>
+                        <button type="button" onclick="closeModal('modalNovaSemana')"
+                            class="mt-3 inline-flex w-full justify-center rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto transition-transform active:scale-95">
+                            Cancelar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/js/controle.js"></script>
+
+    <!-- ==========================================
+         MODAIS GLOBAIS (Z-Index Elevado)
+         ========================================== -->
+
+    <!-- MODAL: REGISTRAR KM -->
+    <div id="modalKm" class="fixed inset-0 z-[3000] hidden" aria-labelledby="modal-title" role="dialog"
+        aria-modal="true">
+        <div class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity"></div>
+        <div class="fixed inset-0 z-10 overflow-y-auto">
+            <div class="flex min-h-full items-center justify-center p-4 text-center">
+                <div
+                    class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-2xl transition-all sm:w-full sm:max-w-lg border border-gray-100">
+                    <div class="bg-white px-6 pb-6 pt-6">
+                        <div class="flex items-center gap-4 mb-5 border-b border-gray-100 pb-4">
+                            <div
+                                class="h-10 w-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600">
+                                <i class="ph ph-gauge text-xl"></i>
+                            </div>
+                            <h3 class="text-lg font-bold leading-6 text-gray-900" id="modal-title-km">Registrar Km</h3>
+                        </div>
+
+                        <div class="space-y-5">
+                            <input type="hidden" id="kmRegistroId">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Km Atual</label>
+                                <div class="relative rounded-md shadow-sm">
+                                    <input type="text" id="inputKmAtual" oninput="maskNumber(this)"
+                                        class="block w-full rounded-xl border-gray-300 py-3 pl-4 pr-12 focus:border-blue-500 focus:ring-blue-500 sm:text-sm shadow-sm transition-colors bg-gray-50/50 hover:bg-white"
+                                        placeholder="000.000">
+                                    <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                        <span class="text-gray-500 sm:text-sm">km</span>
+                                    </div>
+                                </div>
+                                <p class="text-xs text-gray-500 mt-2 flex items-center gap-1">
+                                    <i class="ph ph-clock-counter-clockwise"></i> Anterior: <span id="labelKmAnterior"
+                                        class="font-semibold text-gray-700">--</span>
+                                </p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Data do Registro</label>
+                                <input type="datetime-local" id="inputDataKm"
+                                    class="block w-full rounded-xl border-gray-300 py-2.5 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm bg-gray-50/50 hover:bg-white transition-colors">
+                            </div>
+                            <div id="fieldMotivoKm" class="hidden">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Motivo da Correção <span
+                                        class="text-red-500">*</span></label>
+                                <input type="text" id="inputMotivoKm" placeholder="Ex: Erro de digitação"
+                                    class="block w-full rounded-xl border-gray-300 py-2.5 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm bg-gray-50/50 hover:bg-white transition-colors">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50/50 px-6 py-4 sm:flex sm:flex-row-reverse sm:px-6 gap-3">
+                        <button type="button" id="btnSalvarKm"
+                            class="inline-flex w-full justify-center rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 sm:w-auto transition-transform active:scale-95">
+                            Salvar Registro
+                        </button>
+                        <button type="button" onclick="closeModal('modalKm')"
+                            class="mt-3 inline-flex w-full justify-center rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto transition-transform active:scale-95">
+                            Cancelar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: SERVIÇO -->
+    <div id="modalServico" class="fixed inset-0 z-[3000] hidden overflow-y-auto" role="dialog" aria-modal="true">
+        <div class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity"></div>
+        <div class="flex min-h-full items-center justify-center p-4">
+            <div
+                class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 relative transform transition-all border border-gray-100">
+                <button onclick="closeModal('modalServico')"
+                    class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors bg-gray-50 p-1 rounded-full hover:bg-gray-100">
+                    <i class="ph ph-x text-lg"></i>
+                </button>
+
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="h-10 w-10 rounded-full bg-orange-50 flex items-center justify-center text-orange-600">
+                        <i class="ph ph-wrench text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900" id="modalTitleServico">Gestão de Serviço</h3>
+                </div>
+
+                <div id="servicoStep1" class="animate-fade-in-up">
+                    <div class="grid grid-cols-2 gap-4">
+                        <button onclick="showServicoForm('entrada')"
+                            class="flex flex-col items-center justify-center p-6 border border-gray-200 rounded-xl hover:border-blue-500 hover:bg-blue-50/50 hover:shadow-md transition-all gap-3 group bg-white">
+                            <div
+                                class="h-12 w-12 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <i class="ph ph-arrow-right-in text-2xl"></i>
+                            </div>
+                            <span class="font-semibold text-gray-700 group-hover:text-blue-700">Entrada<br><span
+                                    class="text-xs font-normal text-gray-500">(Oficina)</span></span>
+                        </button>
+                        <button onclick="showServicoForm('saida')"
+                            class="flex flex-col items-center justify-center p-6 border border-gray-200 rounded-xl hover:border-green-500 hover:bg-green-50/50 hover:shadow-md transition-all gap-3 group bg-white">
+                            <div
+                                class="h-12 w-12 rounded-full bg-green-100 text-green-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <i class="ph ph-check-circle text-2xl"></i>
+                            </div>
+                            <span class="font-semibold text-gray-700 group-hover:text-green-700">Saída<br><span
+                                    class="text-xs font-normal text-gray-500">(Pronto)</span></span>
+                        </button>
+                    </div>
+                    <button onclick="showServicoForm('agendar')"
+                        class="w-full mt-5 p-4 bg-gray-50 hover:bg-gray-100 rounded-xl text-gray-600 font-medium flex items-center justify-center gap-2 border border-dashed border-gray-300 hover:border-gray-400 transition-all">
+                        <i class="ph ph-calendar text-xl"></i> Apenas Agendar Manutenção
+                    </button>
+                </div>
+
+                <form id="formServico" class="hidden space-y-5 mt-2 animate-fade-in-up">
+                    <input type="hidden" id="servicoTipoAcao">
+                    <input type="hidden" id="servicoRegistroId">
+
+                    <div id="fieldData" class="hidden">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Data</label>
+                        <input type="date" id="inputServicoData"
+                            class="block w-full rounded-xl border-gray-300 py-2.5 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm bg-gray-50/50">
+                    </div>
+
+                    <div id="fieldKmSaida" class="hidden">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Km de Saída</label>
+                        <div class="relative rounded-md shadow-sm">
+                            <input type="text" id="inputServicoKm" oninput="maskNumber(this)"
+                                class="block w-full rounded-xl border-gray-300 py-2.5 pr-12 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm bg-gray-50/50">
+                            <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                <span class="text-gray-500 sm:text-sm">km</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="fieldCheckboxes" class="hidden bg-gray-50 p-4 rounded-xl space-y-3 border border-gray-100">
+                        <p class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Manutenções Realizadas
+                        </p>
+                        <label
+                            class="flex items-center gap-3 p-2 hover:bg-white rounded-lg transition-colors cursor-pointer">
+                            <input type="checkbox" id="checkOleo"
+                                class="rounded text-blue-600 w-5 h-5 border-gray-300 focus:ring-blue-500">
+                            <span class="text-sm font-medium text-gray-700">Trocou Óleo</span>
+                        </label>
+                        <label
+                            class="flex items-center gap-3 p-2 hover:bg-white rounded-lg transition-colors cursor-pointer">
+                            <input type="checkbox" id="checkCorreia"
+                                class="rounded text-purple-600 w-5 h-5 border-gray-300 focus:ring-purple-500">
+                            <span class="text-sm font-medium text-gray-700">Trocou Correia</span>
+                        </label>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Observação</label>
+                        <textarea id="inputServicoObs" rows="3"
+                            class="block w-full rounded-xl border-gray-300 shadow-sm p-3 border focus:ring-blue-500 focus:border-blue-500 sm:text-sm bg-gray-50/50"
+                            placeholder="Detalhes do serviço..."></textarea>
+                    </div>
+
+                    <div class="flex justify-end gap-3 pt-2">
+                        <button type="button" onclick="resetServicoModal()"
+                            class="px-5 py-2.5 text-gray-700 hover:bg-gray-100 rounded-xl font-medium transition-colors">Voltar</button>
+                        <button type="submit"
+                            class="px-5 py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-500/30 font-semibold transition-transform active:scale-95">Confirmar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: CONFIGURAÇÕES -->
+    <div id="modalConfig" class="fixed inset-0 z-[3000] hidden overflow-y-auto" role="dialog" aria-modal="true">
+        <div class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity"></div>
+        <div class="flex min-h-full items-center justify-center p-4">
+            <div
+                class="bg-white rounded-xl shadow-2xl w-full max-w-2xl p-0 relative transform transition-all border border-gray-100 overflow-hidden">
+                <!-- Config Header -->
+                <div
+                    class="bg-gray-50/80 backdrop-blur px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-900" id="modalConfigTitle">Configurações do Veículo</h3>
+                        <p class="text-xs text-gray-500 mt-0.5">Defina os parâmetros de manutenção e alertas.</p>
+                    </div>
+                    <button onclick="closeModal('modalConfig')"
+                        class="text-gray-400 hover:text-gray-600 transition-colors p-1.5 rounded-full hover:bg-gray-200/50">
+                        <i class="ph ph-x text-lg"></i>
+                    </button>
+                </div>
+
+                <div class="p-6">
+                    <form id="formConfig" onsubmit="event.preventDefault(); salvarConfig();" class="space-y-4">
+                        <input type="hidden" id="configPlaca">
+
+                        <!-- Top Row: General Settings -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <!-- Left Column: General & Oil -->
+                            <div class="space-y-4">
+                                <div class="bg-blue-50/30 p-4 rounded-xl border border-blue-100/50">
+                                    <label class="block text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
+                                        <div class="p-1 bg-blue-100 rounded text-blue-600"><i class="ph ph-package"></i>
+                                        </div>
+                                        Pacote Km Semanal
+                                    </label>
+                                    <input type="text" id="confPacoteKm" oninput="maskNumber(this)"
+                                        class="block w-full rounded-lg border-gray-300 shadow-sm p-2 border focus:ring-blue-500 focus:border-blue-500 bg-white text-sm"
+                                        placeholder="Ex: 1.000">
+                                </div>
+
+                                <div class="bg-yellow-50/50 p-4 rounded-xl border border-yellow-100/50 h-full">
+                                    <label class="block text-sm font-bold text-gray-800 mb-2 flex items-center gap-2">
+                                        <div class="p-1 bg-yellow-100 rounded text-yellow-600"><i
+                                                class="ph ph-drop"></i></div>
+                                        Troca de Óleo
+                                    </label>
+                                    <div class="space-y-3">
+                                        <div>
+                                            <label
+                                                class="block text-[10px] font-bold text-gray-500 uppercase tracking-wide mb-1">Intervalo
+                                                Padrão (Km)</label>
+                                            <input type="text" id="confIntervOleo" oninput="maskNumber(this)"
+                                                class="block w-full rounded-lg border-gray-300 shadow-sm p-2 border focus:ring-yellow-500 focus:border-yellow-500 bg-white transition-shadow focus:shadow-md text-sm"
+                                                placeholder="Ex: 5.000">
+                                        </div>
+
+                                        <div class="bg-white p-3 rounded-lg border border-gray-100 shadow-sm">
+                                            <div
+                                                class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 border-b border-gray-50 pb-1">
+                                                Última Troca</div>
+                                            <div class="grid grid-cols-2 gap-3">
+                                                <div>
+                                                    <label
+                                                        class="block text-[10px] font-medium text-gray-500 mb-0.5">Km</label>
+                                                    <input type="text" id="confUltOleoKm" oninput="maskNumber(this)"
+                                                        class="block w-full rounded border-gray-200 shadow-sm p-1.5 text-xs border bg-gray-50 focus:bg-white focus:ring-yellow-500 transition-colors">
+                                                </div>
+                                                <div>
+                                                    <label
+                                                        class="block text-[10px] font-medium text-gray-500 mb-0.5">Data</label>
+                                                    <input type="date" id="confUltOleoData"
+                                                        class="block w-full rounded border-gray-200 shadow-sm p-1.5 text-xs border bg-gray-50 focus:bg-white focus:ring-yellow-500 transition-colors">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Right Column: Belt & Info -->
+                            <div class="space-y-4">
+                                <div
+                                    class="bg-purple-50/50 p-4 rounded-xl border border-purple-100/50 h-full flex flex-col">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <label class="block text-sm font-bold text-gray-800 flex items-center gap-2">
+                                            <div class="p-1 bg-purple-100 rounded text-purple-600"><i
+                                                    class="ph ph-gear"></i></div>
+                                            Correia Dentada
+                                        </label>
+                                        <label class="relative inline-flex items-center cursor-pointer group">
+                                            <input type="checkbox" id="confUsaCorreia" class="sr-only peer">
+                                            <div
+                                                class="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-purple-300/30 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-purple-600">
+                                            </div>
+                                        </label>
+                                    </div>
+
+                                    <div class="space-y-3 flex-1">
+                                        <div>
+                                            <label
+                                                class="block text-[10px] font-bold text-gray-500 uppercase tracking-wide mb-1">Intervalo
+                                                Padrão (Km)</label>
+                                            <input type="text" id="confIntervCorreia" oninput="maskNumber(this)"
+                                                class="block w-full rounded-lg border-gray-300 shadow-sm p-2 border focus:ring-purple-500 focus:border-purple-500 bg-white transition-shadow focus:shadow-md text-sm"
+                                                placeholder="Ex: 60.000">
+                                        </div>
+
+                                        <div class="bg-white p-3 rounded-lg border border-gray-100 shadow-sm mt-auto">
+                                            <div
+                                                class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 border-b border-gray-50 pb-1">
+                                                Última Troca</div>
+                                            <div class="grid grid-cols-2 gap-3">
+                                                <div>
+                                                    <label
+                                                        class="block text-[10px] font-medium text-gray-500 mb-0.5">Km</label>
+                                                    <input type="text" id="confUltCorreiaKm" oninput="maskNumber(this)"
+                                                        class="block w-full rounded border-gray-200 shadow-sm p-1.5 text-xs border bg-gray-50 focus:bg-white focus:ring-purple-500 transition-colors">
+                                                </div>
+                                                <div>
+                                                    <label
+                                                        class="block text-[10px] font-medium text-gray-500 mb-0.5">Data</label>
+                                                    <input type="date" id="confUltCorreiaData"
+                                                        class="block w-full rounded border-gray-200 shadow-sm p-1.5 text-xs border bg-white focus:ring-purple-500 transition-colors">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-end gap-3 pt-4 border-t border-gray-100">
+                            <button type="button" onclick="closeModal('modalConfig')"
+                                class="px-5 py-2 text-gray-700 hover:bg-gray-100 rounded-lg font-medium transition-colors text-sm">Cancelar</button>
+                            <button type="submit"
+                                class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow-lg shadow-blue-500/30 font-bold transition-transform active:scale-95 flex items-center gap-2 text-sm">
+                                <i class="ph ph-check"></i> Salvar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: DETALHES -->
+    <div id="modalDetalhes" class="fixed inset-0 z-[3000] hidden overflow-y-auto" role="dialog" aria-modal="true">
+        <div class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity"></div>
+        <div class="flex min-h-full items-center justify-center p-4">
+            <div
+                class="bg-white rounded-xl shadow-2xl w-full max-w-2xl p-0 relative transform transition-all border border-gray-100 overflow-hidden">
+                <!-- Header -->
+                <div
+                    class="bg-gray-50/80 backdrop-blur px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-900 flex items-center gap-2">
+                            <span id="detalhesPlaca">PLACA</span>
+                            <span class="text-sm font-normal text-gray-400">|</span>
+                            <span id="detalhesModelo" class="text-sm font-medium text-gray-600">Modelo</span>
+                        </h3>
+                        <div class="flex items-center gap-2 mt-1">
+                            <i class="ph ph-user text-gray-400"></i>
+                            <p class="text-sm text-gray-500" id="detalhesCliente">Cliente</p>
+                        </div>
+                    </div>
+                    <button onclick="closeModal('modalDetalhes')"
+                        class="text-gray-400 hover:text-gray-600 transition-colors p-1.5 rounded-full hover:bg-gray-200/50">
+                        <i class="ph ph-x text-lg"></i>
+                    </button>
+                </div>
+
+                <div class="p-6 space-y-6">
+                    <!-- Status Badge & Main Km -->
+                    <div
+                        class="flex items-center justify-between bg-blue-50/30 p-4 rounded-xl border border-blue-100/50">
+                        <div class="flex flex-col">
+                            <span class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Km Atual</span>
+                            <span class="text-2xl font-black text-gray-800" id="detalhesKmAtual">---</span>
+                            <p class="text-[10px] text-gray-400 mt-1 hidden" id="detalhesDataAtualizacao">Atualizado em:
+                                --</p>
+                        </div>
+                        <div class="flex flex-col items-end">
+                            <span class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Situação</span>
+                            <span id="detalhesSituacao"
+                                class="px-3 py-1 rounded-full text-xs font-bold uppercase">---</span>
+                        </div>
+                    </div>
+
+                    <!-- Resumo da Semana -->
+                    <div class="grid grid-cols-3 gap-4 text-center border-t border-b border-gray-100 py-4">
+                        <div>
+                            <p class="text-xs text-gray-500 uppercase tracking-wider mb-1">Km Anterior</p>
+                            <p class="font-bold text-gray-800 text-lg" id="detalhesKmAnterior">---</p>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-500 uppercase tracking-wider mb-1">Km Rodado</p>
+                            <p class="font-bold text-blue-600 text-lg" id="detalhesKmRodado">---</p>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <p class="text-xs text-gray-500 uppercase tracking-wider mb-1">Pacote</p>
+                            <p class="font-bold text-gray-800 text-lg" id="detalhesPacote">---</p>
+                            <div id="detalhesPacoteStatus" class="hidden mt-1">
+                                <span
+                                    class="text-[10px] font-bold text-red-600 bg-red-100 px-2 py-0.5 rounded-full flex items-center gap-1">
+                                    <i class="ph-fill ph-warning-circle"></i> Excedido
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Maintenance: Oil -->
+                        <div
+                            class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm relative overflow-hidden group hover:border-yellow-200 transition-colors">
+                            <div class="absolute top-0 left-0 w-1 h-full bg-yellow-400"></div>
+                            <div class="flex items-center gap-2 mb-3">
+                                <i class="ph ph-drop text-yellow-500 text-lg"></i>
+                                <h4 class="font-bold text-gray-700">Troca de Óleo</h4>
+                            </div>
+
+                            <div class="space-y-3">
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-gray-500">Última Troca:</span>
+                                    <span class="font-medium text-gray-900" id="detalhesUltOleo">---</span>
+                                </div>
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-gray-500">Próxima Troca:</span>
+                                    <span class="font-bold text-yellow-600" id="detalhesProxOleo">---</span>
+                                </div>
+                                <!-- Progress -->
+                                <div class="w-full bg-gray-100 rounded-full h-2 mt-2">
+                                    <div id="progressoOleo" class="bg-yellow-400 h-2 rounded-full" style="width: 0%">
+                                    </div>
+                                </div>
+                                <p class="text-xs text-center text-gray-400 mt-1" id="detalhesOleoRestante">Restam ---
+                                    km</p>
+                            </div>
+                        </div>
+
+                        <!-- Maintenance: Belt -->
+                        <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm relative overflow-hidden group hover:border-purple-200 transition-colors"
+                            id="cardCorreia">
+                            <div class="absolute top-0 left-0 w-1 h-full bg-purple-500"></div>
+                            <div class="flex items-center gap-2 mb-3">
+                                <i class="ph ph-gear text-purple-500 text-lg"></i>
+                                <h4 class="font-bold text-gray-700">Correia Dentada</h4>
+                            </div>
+
+                            <div class="space-y-3">
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-gray-500">Última Troca:</span>
+                                    <span class="font-medium text-gray-900" id="detalhesUltCorreia">---</span>
+                                </div>
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-gray-500">Próxima Troca:</span>
+                                    <span class="font-bold text-purple-600" id="detalhesProxCorreia">---</span>
+                                </div>
+                                <!-- Progress -->
+                                <div class="w-full bg-gray-100 rounded-full h-2 mt-2">
+                                    <div id="progressoCorreia" class="bg-purple-500 h-2 rounded-full" style="width: 0%">
+                                    </div>
+                                </div>
+                                <p class="text-xs text-center text-gray-400 mt-1" id="detalhesCorreiaRestante">Restam
+                                    --- km</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/js/controle.js?v=29"></script>

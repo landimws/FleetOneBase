@@ -24,4 +24,7 @@ router.put('/:semanaId/linhas/:linhaId', SemanasController.updateLine);
 router.post('/:semanaId/linhas', SemanasController.createLine);
 router.delete('/:semanaId/linhas/:linhaId', SemanasController.deleteLine);
 
+// DELETE /api/semanas/:id (Excluir Semana com Validação)
+router.delete('/:id', SemanasController.deleteSemana);
+
 export default router;

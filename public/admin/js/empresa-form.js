@@ -115,7 +115,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 const response = await fetch(url, {
                     method: method,
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
                     body: JSON.stringify(data)
                 });
 
