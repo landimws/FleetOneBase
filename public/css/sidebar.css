@@ -4,7 +4,7 @@
     --sidebar-width-collapsed: 72px;
     --sidebar-bg: #ffffff;
     --sidebar-text: #4a5568;
-    --sidebar-text-hover: #9d00ff;
+    --sidebar-text-hover: var(--green);
     /* Roxo da identidade */
     --sidebar-active-bg: #f3e5ff;
     --sidebar-border: #e2e8f0;

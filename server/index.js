@@ -65,17 +65,17 @@ if (process.env.NODE_ENV !== 'test') {
             await MasterDatabase.init();
             const { Usuario, Empresa } = MasterDatabase;
 
-            // 1. Garantir Empresa Padrão (FleetOne Admin)
+            // 1. Garantir Empresa Padrão (Truvex Admin)
             let fleetOne = await Empresa.findByPk(1);
             if (!fleetOne) {
                 fleetOne = await Empresa.create({
                     id: 1, // ID Fixo 1
-                    nome: 'FleetOne Admin',
+                    nome: 'Truvex Admin',
                     responsavel: 'Sistema',
                     email: 'admin@fleetone.com.br',
                     ativo: true
                 });
-                console.log('🏢 Empresa FleetOne criada (ID: 1)');
+                console.log('🏢 Empresa Truvex criada (ID: 1)');
             }
 
             // 2. Garantir Usuário Admin
@@ -91,7 +91,7 @@ if (process.env.NODE_ENV !== 'test') {
                     username: 'admin',
                     password: hashedPassword,
                     role: 'admin',
-                    empresaId: 1, // Vincula à FleetOne
+                    empresaId: 1, // Vincula à Truvex
                     isSuperAdmin: true // Flag de SuperAdmin
                 });
 
@@ -138,6 +138,9 @@ app.get('/logout', AuthController.logout);
 app.get('/alterar-senha-obrigatoria', AuthController.paginaTrocaObrigatoria);
 app.post('/api/auth/trocar-senha-primeiro-acesso', AuthController.trocarSenhaPrimeiroAcesso);
 
+// Landing Page Pública
+app.get('/', (req, res) => res.render('pages/landing', { layout: false }));
+
 // Rotas de API
 // app.use('/api/semanas', semanasRoutes); // Movido para baixo pós-auth
 
@@ -175,7 +178,7 @@ app.use('/api/controle', controleRoutes); // [NEW] Rotas do Módulo Controle
 app.use('/api/contratos', contratosRoutes); // [NEW] Rotas do Módulo de Contratos
 
 // Rotas de View
-app.get('/', (req, res) => res.render('pages/dashboard', { title: 'Gestão de Locadora', page: 'grid' }));
+app.get('/app', (req, res) => res.render('pages/dashboard', { title: 'Gestão de Locadora', page: 'grid' }));
 app.get('/controle', (req, res) => res.render('pages/controle', { title: 'Controle Operacional', page: 'controle', layout: 'layouts/main', useTailwind: true })); // [NEW]
 app.get('/veiculos', (req, res) => res.render('pages/veiculos', { title: 'Veículos', page: 'veiculos' }));
 app.get('/clientes', (req, res) => res.render('pages/clientes', { title: 'Clientes', page: 'clientes' }));

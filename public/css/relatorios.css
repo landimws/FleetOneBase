@@ -27,7 +27,7 @@
 }
 
 .tab-btn.active {
-    background: #9d00ff;
+    background: var(--green);
     color: white;
     box-shadow: 0 4px 10px rgba(157, 0, 255, 0.3);
 }
@@ -49,7 +49,7 @@
 }
 
 .search-input-medium:focus {
-    border-color: #9d00ff;
+    border-color: var(--green);
 }
 
 /* Tabela Limpa */

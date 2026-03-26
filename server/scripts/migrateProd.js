@@ -12,7 +12,7 @@ const ROOT_DIR = path.resolve(__dirname, '../../');
 // Configurações
 const PROD_DB_PATH = path.join(ROOT_DIR, 'data/prod/database.sqlite');
 // O ID da empresa a ser criada
-const MIGRATE_TENANT_ID = 2; // ID 1 é FleetOne
+const MIGRATE_TENANT_ID = 2; // ID 1 é Truvex
 const MIGRATE_TENANT_NAME = 'Locadora Principal (Migrada)';
 
 async function migrate() {

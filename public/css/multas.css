@@ -340,15 +340,15 @@ body {
 }
 
 .tab-btn:hover {
-    color: #9d00ff;
+    color: var(--green);
     /* Roxo Tema */
     background: linear-gradient(to top, #f9f9f9, transparent);
 }
 
 .tab-btn.active {
-    color: #9d00ff;
+    color: var(--green);
     /* Roxo Tema */
-    border-bottom-color: #9d00ff;
+    border-bottom-color: var(--green);
     font-weight: 700;
 }
 
@@ -421,7 +421,7 @@ body {
 
 .form-group input:focus,
 .form-group select:focus {
-    border-color: #9d00ff;
+    border-color: var(--green);
     box-shadow: 0 0 0 3px rgba(157, 0, 255, 0.1);
     outline: none;
     background: #fff;

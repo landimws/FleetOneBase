@@ -33,7 +33,7 @@
 }
 
 .search-cliente-input:focus {
-    border-color: #9d00ff;
+    border-color: var(--green);
     box-shadow: 0 0 0 2px rgba(157, 0, 255, 0.1);
 }
 
@@ -285,7 +285,7 @@
 .form-input:focus,
 .form-select:focus,
 .form-textarea:focus {
-    border-color: #9d00ff;
+    border-color: var(--green);
     outline: none;
 }
 

@@ -47,7 +47,7 @@
     margin: 0 0 15px 0;
     font-size: 16px;
     color: #2c3e50;
-    border-bottom: 2px solid #9d00ff;
+    border-bottom: 2px solid var(--green);
     padding-bottom: 8px;
 }
 
@@ -94,7 +94,7 @@
 .form-field input:focus,
 .form-field select:focus,
 .form-field textarea:focus {
-    border-color: #9d00ff;
+    border-color: var(--green);
     box-shadow: 0 0 0 3px rgba(157, 0, 255, 0.1);
 }
 
@@ -133,7 +133,7 @@
 }
 
 .status-radio:hover {
-    border-color: #9d00ff;
+    border-color: var(--green);
     background: #f8f9ff;
 }
 
@@ -145,7 +145,7 @@
 }
 
 .status-radio input[type="radio"]:checked+.status-label {
-    color: #9d00ff;
+    color: var(--green);
     font-weight: bold;
 }
 
@@ -209,14 +209,14 @@
 }
 
 .dia-btn:hover:not(:disabled) {
-    border-color: #9d00ff;
+    border-color: var(--green);
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .dia-btn.active {
-    background: linear-gradient(135deg, #9d00ff 0%, #7a00cc 100%);
-    border-color: #9d00ff;
+    background: linear-gradient(135deg, var(--green) 0%, var(--green-dark) 100%);
+    border-color: var(--green);
     box-shadow: 0 4px 12px rgba(157, 0, 255, 0.4);
 }
 
@@ -261,8 +261,8 @@
 
 .btn-atalho:hover {
     background: #f1f2f6;
-    border-color: #9d00ff;
-    color: #9d00ff;
+    border-color: var(--green);
+    color: var(--green);
 }
 
 /* Resumo de Dias */
@@ -321,7 +321,7 @@
 }
 
 .btn-primary {
-    background: #9d00ff;
+    background: var(--green);
     color: white;
     border: none;
     padding: 12px 24px;
@@ -335,7 +335,7 @@
 }
 
 .btn-primary:hover {
-    background: #8500d9;
+    background: var(--green-dark);
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(157, 0, 255, 0.3);
 }
@@ -431,7 +431,7 @@
 }
 
 .custom-search-input:focus {
-    border-color: #9d00ff;
+    border-color: var(--green);
     box-shadow: 0 0 0 3px rgba(157, 0, 255, 0.1);
 }
 
@@ -544,7 +544,7 @@
     opacity: 1;
     background: rgba(157, 0, 255, 0.08);
     /* Fundo Roxo Bebê muito leve */
-    color: #9d00ff;
+    color: var(--green);
     /* Texto Roxo Vivo */
     transform: translateY(-1px);
     font-weight: 700;

@@ -1,157 +1,131 @@
 <% page='usuarios' %>
 
-    <!-- Script Definido no Topo para Garantir Disponibilidade -->
-    <script>
-        console.log('🏁 [F1Admin] Inicializando namespace global...');
+<script>
+    window.F1Admin = {
+        novoUsuario:    () => window.location.href = '/admin/usuarios/novo',
+        editarUsuario:  (id) => window.location.href = `/admin/usuarios/novo?id=${id}`,
+        filtrarPorEmpresa: (sel) => {
+            const url = sel.value ? `/admin/usuarios?empresaId=${sel.value}` : '/admin/usuarios';
+            window.location.href = url;
+        },
+        toggleStatus: async (id, ativo, btn) => {
+            const acao = ativo ? 'desativar' : 'ativar';
+            if (!confirm(`Tem certeza que deseja ${acao} este usuário?`)) return;
+            btn.disabled = true;
+            try {
+                const res  = await fetch(`/admin/usuarios/${id}/toggle-status`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' }
+                });
+                const data = await res.json();
+                if (data.success) { alert(data.message); window.location.reload(); }
+                else { alert('Erro: ' + data.message); btn.disabled = false; }
+            } catch (e) { alert('Erro de conexão.'); btn.disabled = false; }
+        }
+    };
+</script>
 
-        window.F1Admin = {
-            novoUsuario: function () {
-                console.log('🚀 Novo Usuário Clicado');
-                window.location.href = '/admin/usuarios/novo';
-            },
-
-            editarUsuario: function (id) {
-                console.log('✏️ Editar Usuário ID:', id);
-                window.location.href = `/admin/usuarios/novo?id=${id}`;
-            },
-
-            filtrarPorEmpresa: function (selectElement) {
-                const empresaId = selectElement.value;
-                console.log('🔍 Filtro alterado:', empresaId);
-                const url = empresaId ? `/admin/usuarios?empresaId=${empresaId}` : '/admin/usuarios';
-                window.location.href = url;
-            },
-
-            toggleStatus: async function (id, ativo, btnElement) {
-                console.log('🔄 Toggle Status ID:', id, ativo);
-                const acao = ativo ? 'desativar' : 'ativar';
-
-                if (!confirm(`Tem certeza que deseja ${acao} este usuário?`)) return;
-
-                // Feedback visual básico
-                if (btnElement) btnElement.disabled = true;
-
-                try {
-                    const response = await fetch(`/admin/usuarios/${id}/toggle-status`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' }
-                    });
-
-                    const data = await response.json();
-
-                    if (data.success) {
-                        // Alert nativo para garantir que o usuário veja
-                        alert(data.message || 'Status alterado com sucesso!');
-                        window.location.reload();
-                    } else {
-                        alert('Erro: ' + (data.message || 'Desconhecido'));
-                        if (btnElement) btnElement.disabled = false;
-                    }
-                } catch (e) {
-                    console.error('Erro no toggle:', e);
-                    alert('Erro de conexão ou servidor.');
-                    if (btnElement) btnElement.disabled = false;
-                }
-            }
-        };
-
-        console.log('✅ [F1Admin] Funções carregadas no window.F1Admin');
-    </script>
-
-    <div class="row mb-4">
-        <div class="col-md-8">
-            <button class="btn btn-admin-primary" onclick="window.F1Admin.novoUsuario()">
-                <i class="bi bi-plus-circle me-2"></i>Novo Usuário
-            </button>
-        </div>
-        <div class="col-md-4">
-            <select class="form-select" id="filtroEmpresa" onchange="window.F1Admin.filtrarPorEmpresa(this)">
-                <option value="">Todas as Empresas</option>
-                <% empresas.forEach(function(empresa) { %>
-                    <option value="<%= empresa.id %>" <%=filtroEmpresaId==empresa.id ? 'selected' : '' %>>
-                        <%= empresa.nome %>
-                    </option>
-                    <% }); %>
-            </select>
-        </div>
+<!-- Header -->
+<div class="adm-filters">
+    <div>
+        <div class="adm-page-sub">Gerencie acessos e permissões</div>
+        <h1 class="adm-page-title">Usuários</h1>
     </div>
+    <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+        <select class="form-select" id="filtroEmpresa"
+            onchange="window.F1Admin.filtrarPorEmpresa(this)"
+            style="min-width:200px; font-size:13px;">
+            <option value="">Todas as Empresas</option>
+            <% empresas.forEach(function(empresa) { %>
+                <option value="<%= empresa.id %>" <%= filtroEmpresaId == empresa.id ? 'selected' : '' %>>
+                    <%= empresa.nome %>
+                </option>
+            <% }); %>
+        </select>
+        <button class="btn-truvex" onclick="window.F1Admin.novoUsuario()">
+            <i class="ph ph-plus"></i> Novo Usuário
+        </button>
+    </div>
+</div>
 
-    <div class="card">
-        <div class="card-header">
-            <i class="bi bi-people me-2"></i>Lista de Usuários
-        </div>
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table">
-                    <thead>
+<!-- Table -->
+<div class="adm-card">
+    <div class="adm-card-header">
+        <i class="ph ph-users-three"></i>
+        Lista de Usuários
+    </div>
+    <div style="overflow-x:auto;">
+        <table class="adm-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Nome</th>
+                    <th>Username</th>
+                    <th>Empresa</th>
+                    <th>Role</th>
+                    <th>Super Admin</th>
+                    <th>Status</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% if (usuarios && usuarios.length > 0) { %>
+                    <% usuarios.forEach(function(usuario) { %>
                         <tr>
-                            <th>ID</th>
-                            <th>Nome</th>
-                            <th>Username</th>
-                            <th>Empresa</th>
-                            <th>Role</th>
-                            <th>SuperAdmin</th>
-                            <th>Status</th>
-                            <th>Ações</th>
+                            <td style="color:var(--text-muted); font-size:13px;">#<%= usuario.id %></td>
+                            <td>
+                                <div style="font-weight:600; color:var(--text-primary);"><%= usuario.nome %></div>
+                            </td>
+                            <td><code><%= usuario.username %></code></td>
+                            <td style="color:var(--text-secondary);">
+                                <% if (usuario.Empresa) { %>
+                                    <%= usuario.Empresa.nome %>
+                                <% } else { %>
+                                    <span style="color:var(--text-muted);">—</span>
+                                <% } %>
+                            </td>
+                            <td>
+                                <span class="badge-truvex info"><%= usuario.role %></span>
+                            </td>
+                            <td>
+                                <% if (usuario.isSuperAdmin) { %>
+                                    <span class="badge-truvex active">
+                                        <i class="ph ph-shield-check"></i> Sim
+                                    </span>
+                                <% } else { %>
+                                    <span style="color:var(--text-muted); font-size:13px;">—</span>
+                                <% } %>
+                            </td>
+                            <td>
+                                <span class="badge-truvex <%= usuario.ativo ? 'active' : 'inactive' %>">
+                                    <i class="ph ph-<%= usuario.ativo ? 'check-circle' : 'x-circle' %>"></i>
+                                    <%= usuario.ativo ? 'Ativo' : 'Inativo' %>
+                                </span>
+                            </td>
+                            <td>
+                                <div style="display:flex; gap:8px;">
+                                    <button class="btn-ghost-sm"
+                                        onclick="window.F1Admin.editarUsuario('<%= usuario.id %>')"
+                                        title="Editar">
+                                        <i class="ph ph-pencil-simple"></i>
+                                    </button>
+                                    <button class="btn-ghost-sm <%= usuario.ativo ? 'danger' : 'success' %>"
+                                        onclick="window.F1Admin.toggleStatus('<%= usuario.id %>', <%= usuario.ativo %>, this)"
+                                        title="<%= usuario.ativo ? 'Desativar' : 'Ativar' %>">
+                                        <i class="ph ph-<%= usuario.ativo ? 'prohibit' : 'check' %>"></i>
+                                    </button>
+                                </div>
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        <% if (usuarios && usuarios.length> 0) { %>
-                            <% usuarios.forEach(function(usuario) { %>
-                                <tr>
-                                    <td>
-                                        <%= usuario.id %>
-                                    </td>
-                                    <td><strong>
-                                            <%= usuario.nome %>
-                                        </strong></td>
-                                    <td><code><%= usuario.username %></code></td>
-                                    <td>
-                                        <% if (usuario.Empresa) { %>
-                                            <%= usuario.Empresa.nome %>
-                                                <% } else { %>
-                                                    <span class="text-muted">-</span>
-                                                    <% } %>
-                                    </td>
-                                    <td><span class="badge bg-info">
-                                            <%= usuario.role %>
-                                        </span></td>
-                                    <td>
-                                        <% if (usuario.isSuperAdmin) { %>
-                                            <i class="bi bi-shield-check text-danger" title="Super Administrador"></i>
-                                            <% } else { %>
-                                                -
-                                                <% } %>
-                                    </td>
-                                    <td>
-                                        <span class="badge <%= usuario.ativo ? 'badge-ativo' : 'badge-inativo' %>">
-                                            <%= usuario.ativo ? 'Ativo' : 'Inativo' %>
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <!-- Aspas garantem que ID seja tratado como string ou valor seguro -->
-                                        <button class="btn btn-sm btn-outline-primary"
-                                            onclick="window.F1Admin.editarUsuario('<%= usuario.id %>')">
-                                            <i class="bi bi-pencil"></i>
-                                        </button>
-
-                                        <button
-                                            class="btn btn-sm btn-outline-<%= usuario.ativo ? 'danger' : 'success' %>"
-                                            onclick="window.F1Admin.toggleStatus('<%= usuario.id %>', <%= usuario.ativo %>, this)">
-                                            <i class="bi bi-<%= usuario.ativo ? 'x-circle' : 'check-circle' %>"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                                <% }); %>
-                                    <% } else { %>
-                                        <tr>
-                                            <td colspan="8" class="text-center text-muted py-4">
-                                                Nenhum usuário encontrado.
-                                            </td>
-                                        </tr>
-                                        <% } %>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+                    <% }); %>
+                <% } else { %>
+                    <tr>
+                        <td colspan="8" style="text-align:center; padding:48px 20px; color:var(--text-muted);">
+                            <i class="ph ph-users" style="font-size:40px; display:block; margin-bottom:10px; opacity:0.3;"></i>
+                            Nenhum usuário encontrado.
+                        </td>
+                    </tr>
+                <% } %>
+            </tbody>
+        </table>
     </div>
+</div>

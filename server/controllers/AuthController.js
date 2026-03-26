@@ -5,7 +5,7 @@ const AuthController = {
     // Render Login Page
     loginPage: (req, res) => {
         if (req.session.userId) {
-            return res.redirect('/');
+            return res.redirect('/app');
         }
         res.render('pages/login', {
             layout: 'layouts/login',
@@ -68,17 +68,17 @@ const AuthController = {
             req.session.lastActivity = Date.now();
 
             req.session.save(() => {
-                // REGRA: SuperAdmin = empresa FleetOne (ID = 1)
+                // REGRA: SuperAdmin = empresa Truvex (ID = 1)
                 const FLEETONE_EMPRESA_ID = 1;
 
                 if (user.empresaId === FLEETONE_EMPRESA_ID) {
-                    console.log(`🔒 Login FleetOne (ID 1) detectado. Redirecionando para /admin.`);
-                    // Usuário da FleetOne = SuperAdmin → Painel Administrativo APENAS
+                    console.log(`🔒 Login Truvex (ID 1) detectado. Redirecionando para /admin.`);
+                    // Usuário da Truvex = SuperAdmin → Painel Administrativo APENAS
                     return res.redirect('/admin/empresas');
                 }
 
                 // Usuários de outras empresas → Dashboard do Tenant
-                res.redirect('/');
+                res.redirect('/app');
             });
 
         } catch (error) {

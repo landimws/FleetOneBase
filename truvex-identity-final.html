@@ -1,0 +1,1280 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Truvex — Identidade Visual Final</title>
+<link href="https://fonts.googleapis.com/css2?family=Epilogue:ital,wght@0,300;0,400;0,500;0,700;0,800;0,900;1,300&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  /* Core */
+  --green:        #00C278;
+  --green-dark:   #007A4D;
+  --green-pale:   #E6F7F1;
+  --green-neon:   #00E5A0;
+
+  /* Dark system */
+  --dark-bg:      #09090B;
+  --dark-surf:    #111116;
+  --dark-surf2:   #1C1C24;
+  --dark-border:  rgba(255,255,255,0.07);
+  --dark-muted:   #52525E;
+  --dark-text:    #E4E3DF;
+
+  /* Light system */
+  --light-bg:     #F0EDE6;
+  --light-surf:   #FFFFFF;
+  --light-surf2:  #E8E4DC;
+  --light-border: #D8D4CC;
+  --light-muted:  #888070;
+  --light-text:   #111111;
+
+  /* Type */
+  --font-display: 'Epilogue', sans-serif;
+  --font-body:    'Plus Jakarta Sans', sans-serif;
+}
+
+html { background: var(--dark-bg); color: var(--dark-text); font-family: var(--font-body); scroll-behavior: smooth; }
+body { overflow-x: hidden; }
+
+/* ─────────────────────────────────────────
+   COVER
+───────────────────────────────────────── */
+.cover {
+  min-height: 100vh;
+  background: var(--dark-bg);
+  display: grid;
+  grid-template-rows: 1fr auto;
+  position: relative;
+  overflow: hidden;
+  padding: 80px;
+}
+
+.cover-grid {
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px);
+  background-size: 72px 72px;
+  mask-image: radial-gradient(ellipse 80% 70% at 30% 50%, black 30%, transparent 100%);
+}
+
+.cover-glow {
+  position: absolute;
+  width: 800px; height: 800px;
+  background: radial-gradient(circle, rgba(0,194,120,0.09) 0%, transparent 65%);
+  top: -200px; right: -200px;
+  animation: floatSlow 10s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.cover-glow2 {
+  position: absolute;
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, rgba(0,194,120,0.05) 0%, transparent 65%);
+  bottom: -100px; left: 10%;
+  animation: floatSlow 14s ease-in-out infinite reverse;
+  pointer-events: none;
+}
+
+@keyframes floatSlow {
+  0%,100% { transform: scale(1) translateY(0); }
+  50% { transform: scale(1.06) translateY(-20px); }
+}
+
+.cover-top {
+  position: relative; z-index: 1;
+  display: flex; justify-content: space-between;
+  align-items: flex-start;
+}
+
+.cover-ver {
+  font-family: var(--font-body);
+  font-size: 11px; letter-spacing: 4px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.15);
+  font-weight: 500;
+}
+
+.cover-year {
+  font-family: var(--font-body);
+  font-size: 11px; letter-spacing: 3px;
+  color: rgba(255,255,255,0.1);
+}
+
+.cover-center {
+  position: relative; z-index: 1;
+  display: flex; flex-direction: column;
+  justify-content: center;
+  flex: 1;
+  padding: 80px 0 40px;
+}
+
+.cover-logo {
+  font-family: var(--font-display);
+  font-size: clamp(100px, 16vw, 200px);
+  font-weight: 900;
+  letter-spacing: -6px;
+  line-height: 0.88;
+  color: #fff;
+  opacity: 0;
+  animation: riseIn 1s cubic-bezier(0.16,1,0.3,1) 0.1s forwards;
+}
+
+.cover-logo .dot { color: var(--green); }
+
+.cover-slogan {
+  font-family: var(--font-body);
+  font-size: clamp(14px, 1.5vw, 18px);
+  font-weight: 300;
+  color: rgba(255,255,255,0.3);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-top: 24px;
+  opacity: 0;
+  animation: riseIn 1s cubic-bezier(0.16,1,0.3,1) 0.35s forwards;
+}
+
+.cover-slogan strong {
+  color: rgba(255,255,255,0.65);
+  font-weight: 500;
+}
+
+@keyframes riseIn {
+  from { opacity: 0; transform: translateY(40px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.cover-bottom {
+  position: relative; z-index: 1;
+  display: flex; justify-content: space-between;
+  align-items: flex-end;
+  padding-top: 40px;
+  border-top: 1px solid rgba(255,255,255,0.05);
+}
+
+.cover-desc {
+  font-size: 13px; color: rgba(255,255,255,0.25);
+  font-weight: 300; line-height: 1.7;
+  max-width: 380px;
+}
+
+.cover-desc strong { color: rgba(255,255,255,0.55); font-weight: 500; }
+
+.cover-sections {
+  display: flex; flex-direction: column;
+  gap: 6px; text-align: right;
+}
+
+.cover-section-item {
+  font-size: 11px; letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.12);
+  font-weight: 500;
+  font-family: var(--font-body);
+}
+
+/* ─────────────────────────────────────────
+   SECTION WRAPPER
+───────────────────────────────────────── */
+.page { padding: 100px 80px; }
+.page.light { background: var(--light-bg); color: var(--light-text); }
+.page.dark  { background: var(--dark-bg);  color: var(--dark-text); }
+.page.white { background: var(--light-surf); color: var(--light-text); }
+.page.ink   { background: #0E0E0E; color: var(--dark-text); }
+
+.section-label {
+  font-family: var(--font-body);
+  font-size: 10px; font-weight: 600;
+  letter-spacing: 5px; text-transform: uppercase;
+  margin-bottom: 60px;
+  display: flex; align-items: center; gap: 16px;
+}
+
+.page.light .section-label,
+.page.white .section-label { color: var(--green-dark); }
+.page.dark  .section-label,
+.page.ink   .section-label { color: var(--green); }
+
+.section-label::after {
+  content: ''; flex: 1; height: 1px;
+}
+.page.light .section-label::after,
+.page.white .section-label::after { background: var(--light-border); }
+.page.dark  .section-label::after,
+.page.ink   .section-label::after { background: var(--dark-border); }
+
+/* ─────────────────────────────────────────
+   01 — LOGO
+───────────────────────────────────────── */
+.logo-showcase {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+  background: var(--light-border);
+  border: 1px solid var(--light-border);
+  border-radius: 20px;
+  overflow: hidden;
+  margin-bottom: 40px;
+}
+
+.logo-cell {
+  padding: 64px 56px;
+  display: flex; flex-direction: column;
+  justify-content: space-between;
+  min-height: 240px;
+}
+
+.lc-ink    { background: #0E0E0E; }
+.lc-white  { background: #fff; }
+.lc-green  { background: var(--green); }
+.lc-cream  { background: var(--light-bg); }
+.lc-dark   { background: var(--dark-surf); border: 1px solid var(--dark-border); }
+
+.logo {
+  font-family: var(--font-display);
+  font-weight: 900;
+  letter-spacing: -2px;
+  line-height: 1;
+}
+.logo-huge  { font-size: 80px; }
+.logo-xl    { font-size: 60px; }
+.logo-lg    { font-size: 44px; }
+.logo-md    { font-size: 30px; }
+.logo-sm    { font-size: 22px; }
+
+.on-dark  .logo { color: #fff; }
+.on-dark  .logo .dot { color: var(--green); }
+.on-light .logo { color: var(--light-text); }
+.on-light .logo .dot { color: var(--green); }
+.on-green .logo { color: #000; }
+.on-green .logo .dot { color: rgba(0,0,0,0.35); }
+
+.logo-sub {
+  font-family: var(--font-body);
+  font-size: 10px; letter-spacing: 3px;
+  text-transform: uppercase; font-weight: 600;
+  margin-top: 10px;
+}
+.on-dark  .logo-sub { color: rgba(255,255,255,0.2); }
+.on-light .logo-sub { color: rgba(0,0,0,0.2); }
+.on-green .logo-sub { color: rgba(0,0,0,0.3); }
+
+.logo-cell-note {
+  font-size: 10px; letter-spacing: 2px;
+  text-transform: uppercase; font-weight: 500;
+  font-family: var(--font-body);
+  margin-top: 32px;
+}
+.on-dark  .logo-cell-note { color: rgba(255,255,255,0.1); }
+.on-light .logo-cell-note { color: rgba(0,0,0,0.15); }
+.on-green .logo-cell-note { color: rgba(0,0,0,0.25); }
+
+/* Favicon / icon */
+.icon-showcase {
+  display: flex; gap: 16px; align-items: flex-end;
+  flex-wrap: wrap;
+}
+
+.t-icon {
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 900; color: #000;
+  border-radius: calc(22% * 1);
+  flex-shrink: 0;
+}
+
+.t-icon.sz-lg  { width: 80px; height: 80px; font-size: 40px; border-radius: 18px; }
+.t-icon.sz-md  { width: 56px; height: 56px; font-size: 28px; border-radius: 13px; }
+.t-icon.sz-sm  { width: 40px; height: 40px; font-size: 20px; border-radius: 10px; }
+.t-icon.sz-xs  { width: 28px; height: 28px; font-size: 14px; border-radius: 7px; }
+.t-icon.sz-fav { width: 20px; height: 20px; font-size: 11px; border-radius: 4px; }
+
+.t-icon.v-green  { background: var(--green); }
+.t-icon.v-dark   { background: #fff; color: #0E0E0E; }
+.t-icon.v-ink    { background: #0E0E0E; color: var(--green); }
+
+/* ─────────────────────────────────────────
+   02 — PALETA
+───────────────────────────────────────── */
+.palette-strip-row {
+  display: flex; height: 90px;
+  border-radius: 14px; overflow: hidden;
+  border: 1px solid var(--light-border);
+  margin-bottom: 28px;
+}
+
+.ps {
+  flex: 1; position: relative;
+  display: flex; align-items: flex-end;
+  padding: 12px 16px;
+  transition: flex 0.35s ease;
+  cursor: default;
+}
+.ps:hover { flex: 2.5; }
+
+.ps-hex {
+  font-size: 10px; font-weight: 600;
+  font-family: monospace; letter-spacing: 1px;
+  opacity: 0; transition: opacity 0.2s;
+}
+.ps:hover .ps-hex { opacity: 1; }
+
+.ps1 { background: #00C278; } .ps1 .ps-hex { color: rgba(0,0,0,0.5); }
+.ps2 { background: #007A4D; } .ps2 .ps-hex { color: rgba(255,255,255,0.5); }
+.ps3 { background: #00E5A0; } .ps3 .ps-hex { color: rgba(0,0,0,0.4); }
+.ps4 { background: #0E0E0E; } .ps4 .ps-hex { color: rgba(255,255,255,0.3); }
+.ps5 { background: #F0EDE6; border-right: 1px solid var(--light-border); } .ps5 .ps-hex { color: rgba(0,0,0,0.3); }
+.ps6 { background: #888070; } .ps6 .ps-hex { color: rgba(255,255,255,0.5); }
+
+.palette-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.pal-card {
+  border-radius: 12px; overflow: hidden;
+  border: 1px solid var(--light-border);
+}
+
+.pal-swatch { height: 90px; }
+.pc1 .pal-swatch { background: #00C278; }
+.pc2 .pal-swatch { background: #007A4D; }
+.pc3 .pal-swatch { background: #00E5A0; }
+.pc4 .pal-swatch { background: #0E0E0E; }
+.pc5 .pal-swatch { background: #F0EDE6; border-bottom: 1px solid var(--light-border); }
+.pc6 .pal-swatch { background: #888070; }
+
+.pal-info { padding: 16px; background: #fff; }
+.pal-name { font-family: var(--font-display); font-size: 13px; font-weight: 800; color: var(--light-text); }
+.pal-hex  { font-size: 11px; color: var(--light-muted); font-family: monospace; margin-top: 2px; }
+.pal-role { font-size: 11px; color: var(--light-muted); margin-top: 6px; line-height: 1.5; }
+
+/* ─────────────────────────────────────────
+   03 — TIPOGRAFIA
+───────────────────────────────────────── */
+.type-hero {
+  font-family: var(--font-display);
+  font-size: clamp(72px, 12vw, 160px);
+  font-weight: 900;
+  letter-spacing: -5px;
+  line-height: 0.88;
+  color: #fff;
+  margin-bottom: 40px;
+}
+
+.type-hero .green  { color: var(--green); }
+.type-hero .faded  { color: rgba(255,255,255,0.08); }
+.type-hero .ghost  { -webkit-text-stroke: 1px rgba(255,255,255,0.12); color: transparent; }
+
+.type-weights-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2px;
+  background: var(--dark-border);
+  border: 1px solid var(--dark-border);
+  border-radius: 16px; overflow: hidden;
+  margin-bottom: 40px;
+}
+
+.tw-cell {
+  background: var(--dark-surf);
+  padding: 32px 28px;
+}
+
+.tw-sample {
+  font-family: var(--font-display);
+  font-size: 28px;
+  letter-spacing: -0.5px;
+  line-height: 1;
+  color: #fff;
+  margin-bottom: 12px;
+}
+
+.tw-meta {
+  font-size: 10px; letter-spacing: 3px;
+  text-transform: uppercase; color: var(--dark-muted);
+  font-weight: 500; font-family: var(--font-body);
+  line-height: 1.6;
+}
+
+.body-type-block {
+  background: var(--dark-surf2);
+  border: 1px solid var(--dark-border);
+  border-radius: 16px; padding: 48px;
+  display: grid; grid-template-columns: 220px 1fr;
+  gap: 48px; align-items: start;
+}
+
+.bt-name {
+  font-family: var(--font-display);
+  font-size: 24px; font-weight: 800;
+  color: #fff; letter-spacing: -0.5px;
+  margin-bottom: 8px;
+}
+
+.bt-role {
+  font-size: 10px; letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--dark-muted); font-weight: 500;
+  font-family: var(--font-body);
+}
+
+.bt-sample {
+  font-family: var(--font-body);
+  font-size: 16px; font-weight: 300;
+  color: var(--dark-muted); line-height: 1.8;
+}
+
+.bt-sample strong { color: var(--dark-text); font-weight: 600; }
+.bt-sample em { color: var(--green); font-style: normal; font-weight: 500; }
+
+/* ─────────────────────────────────────────
+   04 — SISTEMA DUAL (contextos)
+───────────────────────────────────────── */
+.dual-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+  background: var(--light-border);
+  border: 1px solid var(--light-border);
+  border-radius: 20px; overflow: hidden;
+}
+
+.dual-cell {
+  padding: 56px 48px;
+}
+
+.dc-dark  { background: var(--dark-bg); }
+.dc-light { background: var(--light-surf); }
+
+.dc-label {
+  font-size: 10px; letter-spacing: 4px;
+  text-transform: uppercase; font-weight: 700;
+  padding-bottom: 20px; margin-bottom: 32px;
+  font-family: var(--font-body);
+  display: flex; align-items: center; gap: 10px;
+}
+
+.dc-dark  .dc-label { color: var(--green);      border-bottom: 1px solid var(--dark-border); }
+.dc-light .dc-label { color: var(--green-dark);  border-bottom: 1px solid var(--light-border); }
+
+.dc-use {
+  font-size: 11px; opacity: 0.45;
+  font-weight: 400; letter-spacing: 1px;
+  margin-left: auto;
+}
+
+.dc-logo {
+  font-family: var(--font-display);
+  font-weight: 900; letter-spacing: -2px;
+}
+.dc-logo-xl { font-size: 64px; line-height: 1; }
+
+.dc-dark  .dc-logo { color: #fff; }
+.dc-dark  .dc-logo .dot { color: var(--green); }
+.dc-light .dc-logo { color: var(--light-text); }
+.dc-light .dc-logo .dot { color: var(--green); }
+
+.dc-tagline {
+  font-size: 10px; letter-spacing: 3px;
+  text-transform: uppercase; font-weight: 600;
+  margin-top: 10px; font-family: var(--font-body);
+}
+.dc-dark  .dc-tagline { color: rgba(255,255,255,0.2); }
+.dc-light .dc-tagline { color: rgba(0,0,0,0.2); }
+
+.dc-hero-title {
+  font-family: var(--font-display);
+  font-size: clamp(36px, 4vw, 52px);
+  font-weight: 900; letter-spacing: -2px;
+  line-height: 0.95; margin-top: 40px;
+}
+.dc-dark  .dc-hero-title { color: #fff; }
+.dc-light .dc-hero-title { color: var(--light-text); }
+.dc-hero-title .acc { color: var(--green); }
+.dc-hero-title .dim-d { color: var(--dark-muted); }
+.dc-hero-title .dim-l { color: var(--light-border); }
+
+.dc-sub {
+  font-family: var(--font-body);
+  font-size: 14px; font-weight: 300;
+  line-height: 1.7; margin-top: 16px;
+  max-width: 300px;
+}
+.dc-dark  .dc-sub { color: var(--dark-muted); }
+.dc-light .dc-sub { color: var(--light-muted); }
+.dc-sub strong { font-weight: 600; }
+.dc-dark  .dc-sub strong { color: var(--dark-text); }
+.dc-light .dc-sub strong { color: var(--light-text); }
+
+.dc-badge-dark {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(0,194,120,0.08);
+  border: 1px solid rgba(0,194,120,0.2);
+  padding: 5px 12px; border-radius: 100px;
+  font-size: 11px; color: var(--green);
+  font-weight: 500; margin-bottom: 24px;
+  font-family: var(--font-body); letter-spacing: 0.5px;
+}
+.dc-badge-dark::before {
+  content:''; width:5px; height:5px;
+  background: var(--green); border-radius:50%;
+  animation: blink 2s infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+.dc-badge-light {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 11px; color: var(--green-dark);
+  font-weight: 600; margin-bottom: 24px;
+  font-family: var(--font-body); letter-spacing: 2px;
+  text-transform: uppercase;
+}
+.dc-badge-light::before {
+  content:''; width:24px; height:1px;
+  background: var(--green);
+}
+
+.dc-cta-dark {
+  display: inline-block; margin-top: 28px;
+  background: var(--green); color: #000;
+  font-family: var(--font-display); font-weight: 800;
+  font-size: 13px; padding: 12px 28px;
+  border-radius: 8px; text-decoration: none;
+  box-shadow: 0 0 32px rgba(0,194,120,0.2);
+  letter-spacing: 0.3px;
+}
+
+.dc-cta-light {
+  display: inline-block; margin-top: 28px;
+  background: var(--green); color: #000;
+  font-family: var(--font-display); font-weight: 800;
+  font-size: 13px; padding: 12px 28px;
+  border-radius: 8px; text-decoration: none;
+  box-shadow: 0 4px 20px rgba(0,194,120,0.2);
+  letter-spacing: 0.3px;
+}
+
+/* ─────────────────────────────────────────
+   05 — COMPONENTES UI
+───────────────────────────────────────── */
+.comp-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.comp-block {
+  display: flex; flex-direction: column; gap: 12px;
+}
+
+.comp-title {
+  font-family: var(--font-body);
+  font-size: 10px; letter-spacing: 3px;
+  text-transform: uppercase; font-weight: 600;
+  color: var(--light-muted); margin-bottom: 4px;
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  font-family: var(--font-display); font-weight: 800;
+  font-size: 13px; padding: 12px 24px;
+  border-radius: 8px; cursor: pointer;
+  border: none; text-decoration: none;
+  letter-spacing: 0.3px; transition: all 0.2s;
+  width: fit-content;
+}
+.btn-green   { background: var(--green); color: #000; }
+.btn-green:hover { filter: brightness(1.08); transform: translateY(-1px); }
+.btn-outline-d { background: transparent; color: var(--dark-text); border: 1px solid var(--dark-border); }
+.btn-outline-l { background: transparent; color: var(--light-text); border: 1px solid var(--light-border); }
+.btn-ghost-d { background: rgba(255,255,255,0.04); color: var(--dark-muted); }
+
+/* Pills */
+.pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 12px; border-radius: 100px;
+  font-size: 12px; font-weight: 600;
+  font-family: var(--font-body);
+}
+.pill-green-d { background: rgba(0,194,120,0.1); color: var(--green); border: 1px solid rgba(0,194,120,0.2); }
+.pill-green-l { background: var(--green-pale); color: var(--green-dark); border: 1px solid rgba(0,122,77,0.15); }
+.pill-neutral { background: rgba(255,255,255,0.05); color: var(--dark-muted); border: 1px solid var(--dark-border); }
+.pill-warn    { background: rgba(255,180,0,0.1); color: #CC8800; border: 1px solid rgba(255,180,0,0.2); }
+.pill-dot::before { content:''; width:5px; height:5px; border-radius:50%; background:currentColor; }
+
+/* Cards sample */
+.sample-card-dark {
+  background: var(--dark-surf);
+  border: 1px solid var(--dark-border);
+  border-radius: 12px; padding: 24px;
+}
+.sample-card-dark:hover { border-color: rgba(0,194,120,0.3); }
+
+.sample-card-light {
+  background: var(--light-surf);
+  border: 1px solid var(--light-border);
+  border-radius: 12px; padding: 24px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+}
+
+.sc-metric {
+  font-family: var(--font-display);
+  font-size: 36px; font-weight: 900;
+  letter-spacing: -1.5px; line-height: 1;
+}
+.sc-metric em { color: var(--green); font-style: normal; }
+.on-dark-card .sc-metric { color: #fff; }
+.on-light-card .sc-metric { color: var(--light-text); }
+
+.sc-label {
+  font-size: 11px; letter-spacing: 2px;
+  text-transform: uppercase; font-weight: 500;
+  margin-bottom: 10px; font-family: var(--font-body);
+}
+.on-dark-card  .sc-label { color: var(--dark-muted); }
+.on-light-card .sc-label { color: var(--light-muted); }
+
+.sc-delta {
+  font-size: 12px; font-weight: 600;
+  padding: 3px 8px; border-radius: 100px;
+  margin-top: 8px; display: inline-block;
+  font-family: var(--font-body);
+}
+.sc-delta.up   { background: rgba(0,194,120,0.1); color: var(--green); }
+.sc-delta.down { background: rgba(220,60,60,0.1); color: #CC3333; }
+
+/* ─────────────────────────────────────────
+   06 — VOZ
+───────────────────────────────────────── */
+.voice-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+}
+
+.voice-col-title {
+  font-family: var(--font-display);
+  font-size: 22px; font-weight: 800;
+  letter-spacing: -0.5px; margin-bottom: 28px;
+}
+
+.voice-row {
+  padding: 18px 0;
+  border-bottom: 1px solid var(--light-border);
+  display: grid; grid-template-columns: 130px 1fr;
+  gap: 16px; align-items: baseline;
+}
+
+.vr-word {
+  font-family: var(--font-display);
+  font-size: 15px; font-weight: 800;
+}
+.vr-word.yes { color: var(--green-dark); }
+.vr-word.no  { color: #bbb; text-decoration: line-through; }
+
+.vr-why {
+  font-size: 13px; color: var(--light-muted);
+  line-height: 1.5; font-family: var(--font-body);
+}
+
+/* ─────────────────────────────────────────
+   07 — MOTION
+───────────────────────────────────────── */
+.motion-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2px;
+  background: var(--dark-border);
+  border: 1px solid var(--dark-border);
+  border-radius: 16px; overflow: hidden;
+}
+
+.motion-cell {
+  background: var(--dark-surf);
+  padding: 36px 28px;
+}
+
+.motion-demo { height: 72px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; }
+
+.m-pulse { width: 36px; height: 36px; background: var(--green); border-radius: 50%; animation: mPulse 2s ease-in-out infinite; }
+@keyframes mPulse {
+  0%,100%{ transform: scale(1); box-shadow: 0 0 0 0 rgba(0,194,120,0.4); }
+  50%    { transform: scale(1.1); box-shadow: 0 0 0 14px rgba(0,194,120,0); }
+}
+
+.m-scan { width: 80px; height: 36px; border: 1px solid rgba(0,194,120,0.25); border-radius: 4px; overflow: hidden; position: relative; }
+.m-scan::after { content:''; position:absolute; top:0; left:-100%; width:100%; height:100%; background: linear-gradient(90deg, transparent, rgba(0,194,120,0.35), transparent); animation: mScan 2s linear infinite; }
+@keyframes mScan { to { left: 200%; } }
+
+.m-num { font-family: var(--font-display); font-size: 40px; font-weight: 900; color: var(--green); letter-spacing:-2px; animation: mNum 3s ease-in-out infinite; }
+@keyframes mNum { 0%,100%{opacity:0.25} 50%{opacity:1} }
+
+.m-bars { display: flex; align-items: flex-end; gap: 5px; height: 56px; }
+.m-bar { width: 10px; border-radius: 3px 3px 0 0; background: var(--green); animation: mBar 1.6s ease-in-out infinite; }
+.m-bar:nth-child(1){ height:40%; animation-delay:0s; }
+.m-bar:nth-child(2){ height:72%; animation-delay:.15s; }
+.m-bar:nth-child(3){ height:55%; animation-delay:.3s; }
+.m-bar:nth-child(4){ height:90%; animation-delay:.45s; }
+.m-bar:nth-child(5){ height:45%; animation-delay:.6s; }
+@keyframes mBar { 0%,100%{opacity:0.2;transform:scaleY(0.75)} 50%{opacity:1;transform:scaleY(1)} }
+
+.motion-name { font-family: var(--font-display); font-size: 15px; font-weight: 800; color: #fff; margin-bottom: 6px; }
+.motion-desc { font-size: 12px; color: var(--dark-muted); line-height: 1.55; font-family: var(--font-body); }
+
+/* ─────────────────────────────────────────
+   FINAL — SUMÁRIO
+───────────────────────────────────────── */
+.summary {
+  background: var(--dark-bg);
+  padding: 100px 80px;
+  border-top: 1px solid var(--dark-border);
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: 2px;
+  background: var(--dark-border);
+  border: 1px solid var(--dark-border);
+  border-radius: 16px; overflow: hidden;
+  margin-top: 0;
+}
+
+.sum-cell {
+  background: var(--dark-surf);
+  padding: 36px 32px;
+}
+
+.sum-key {
+  font-size: 10px; letter-spacing: 3px;
+  text-transform: uppercase; color: var(--green);
+  font-weight: 600; margin-bottom: 14px;
+  font-family: var(--font-body);
+}
+
+.sum-val {
+  font-family: var(--font-display);
+  font-size: 18px; font-weight: 800;
+  color: #fff; line-height: 1.3;
+  letter-spacing: -0.3px;
+}
+
+.sum-val .green { color: var(--green); }
+.sum-val .muted { color: var(--dark-muted); font-size: 14px; font-weight: 400; display: block; margin-top: 6px; }
+
+/* ─────────────────────────────────────────
+   FOOTER
+───────────────────────────────────────── */
+.footer {
+  background: #0E0E0E;
+  padding: 48px 80px;
+  border-top: 1px solid rgba(255,255,255,0.04);
+  display: flex; justify-content: space-between; align-items: center;
+}
+
+.f-logo { font-family: var(--font-display); font-size: 28px; font-weight: 900; letter-spacing: -1px; color: #fff; }
+.f-logo .dot { color: var(--green); }
+.f-tag  { font-size: 11px; color: rgba(255,255,255,0.15); letter-spacing: 3px; text-transform: uppercase; font-family: var(--font-body); }
+.f-ver  { font-size: 11px; color: rgba(255,255,255,0.08); letter-spacing: 2px; font-family: var(--font-body); }
+
+@media (max-width: 900px) {
+  .cover, .page { padding: 48px 24px; }
+  .logo-showcase, .dual-grid, .voice-grid { grid-template-columns: 1fr; }
+  .type-weights-grid, .comp-grid, .motion-grid, .summary-grid { grid-template-columns: 1fr 1fr; }
+  .palette-grid { grid-template-columns: 1fr 1fr; }
+  .body-type-block { grid-template-columns: 1fr; }
+  .footer { padding: 40px 24px; flex-direction: column; gap: 16px; text-align: center; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ COVER ═══ -->
+<div class="cover">
+  <div class="cover-grid"></div>
+  <div class="cover-glow"></div>
+  <div class="cover-glow2"></div>
+
+  <div class="cover-top">
+    <div class="cover-ver">Truvex — Identidade Visual Final · 2025</div>
+    <div class="cover-year">v3.0</div>
+  </div>
+
+  <div class="cover-center">
+    <div class="cover-logo">Tru<span class="dot">v</span>ex<span class="dot">.</span></div>
+    <div class="cover-slogan"><strong>Cada movimento conta.</strong> &nbsp;—&nbsp; Gestão inteligente de frotas</div>
+  </div>
+
+  <div class="cover-bottom">
+    <div class="cover-desc">
+      Identidade construída sobre <strong>Epilogue 900</strong> como fonte principal.
+      Sistema dual — Dark Tech para mercado e campanhas, Warm Editorial para conversão e vendas.
+      Verde #00C278 como cor de identidade permanente.
+    </div>
+    <div class="cover-sections">
+      <div class="cover-section-item">01 — Logo e Variações</div>
+      <div class="cover-section-item">02 — Paleta de Cores</div>
+      <div class="cover-section-item">03 — Tipografia</div>
+      <div class="cover-section-item">04 — Sistema Dual</div>
+      <div class="cover-section-item">05 — Componentes</div>
+      <div class="cover-section-item">06 — Voz da Marca</div>
+      <div class="cover-section-item">07 — Movimento</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ 01 — LOGO ═══ -->
+<div class="page light">
+  <div class="section-label">01 — Logo e Variações</div>
+
+  <div class="logo-showcase">
+    <!-- ink -->
+    <div class="logo-cell lc-ink on-dark">
+      <div>
+        <div class="logo logo-huge">Tru<span class="dot">v</span>ex<span class="dot">.</span></div>
+        <div class="logo-sub">Cada movimento conta</div>
+      </div>
+      <div class="logo-cell-note">Principal — fundo escuro</div>
+    </div>
+    <!-- white -->
+    <div class="logo-cell lc-white on-light">
+      <div>
+        <div class="logo logo-huge">Tru<span class="dot">v</span>ex<span class="dot">.</span></div>
+        <div class="logo-sub">Cada movimento conta</div>
+      </div>
+      <div class="logo-cell-note">Principal — fundo claro</div>
+    </div>
+    <!-- green -->
+    <div class="logo-cell lc-green on-green">
+      <div>
+        <div class="logo logo-xl">Truvex.</div>
+        <div class="logo-sub">Cada movimento conta</div>
+      </div>
+      <div class="logo-cell-note">Acento — campanhas</div>
+    </div>
+    <!-- cream -->
+    <div class="logo-cell lc-cream on-light">
+      <div>
+        <div class="logo logo-xl">Tru<span class="dot">v</span>ex<span class="dot">.</span></div>
+        <div class="logo-sub">Cada movimento conta</div>
+      </div>
+      <div class="logo-cell-note">Editorial — site e materiais</div>
+    </div>
+  </div>
+
+  <!-- Escalas e ícone -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+    <div style="background:#fff;border:1px solid var(--light-border);border-radius:16px;padding:40px;">
+      <div class="comp-title" style="margin-bottom:28px;">Escala tipográfica</div>
+      <div style="display:flex;flex-direction:column;gap:20px;">
+        <div style="display:flex;align-items:baseline;gap:20px;">
+          <div class="logo logo-xl on-light" style="flex:0 0 auto;">Tru<span class="dot">v</span>ex</div>
+          <div style="font-size:11px;color:var(--light-muted);font-family:var(--font-body);letter-spacing:2px;text-transform:uppercase;">XL — Hero</div>
+        </div>
+        <div style="display:flex;align-items:baseline;gap:20px;">
+          <div class="logo logo-lg on-light" style="flex:0 0 auto;">Tru<span class="dot">v</span>ex</div>
+          <div style="font-size:11px;color:var(--light-muted);font-family:var(--font-body);letter-spacing:2px;text-transform:uppercase;">LG — Nav / Header</div>
+        </div>
+        <div style="display:flex;align-items:baseline;gap:20px;">
+          <div class="logo logo-md on-light" style="flex:0 0 auto;">Tru<span class="dot">v</span>ex</div>
+          <div style="font-size:11px;color:var(--light-muted);font-family:var(--font-body);letter-spacing:2px;text-transform:uppercase;">MD — Email / Doc</div>
+        </div>
+        <div style="display:flex;align-items:baseline;gap:20px;">
+          <div class="logo logo-sm on-light" style="flex:0 0 auto;">Tru<span class="dot">v</span>ex</div>
+          <div style="font-size:11px;color:var(--light-muted);font-family:var(--font-body);letter-spacing:2px;text-transform:uppercase;">SM — Rodapé / Watermark</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="background:#fff;border:1px solid var(--light-border);border-radius:16px;padding:40px;">
+      <div class="comp-title" style="margin-bottom:28px;">Ícone — App · Favicon · Avatar</div>
+      <div class="icon-showcase">
+        <div>
+          <div class="t-icon sz-lg v-green">T</div>
+          <div style="font-size:10px;color:var(--light-muted);margin-top:8px;font-family:var(--font-body);">80px</div>
+        </div>
+        <div>
+          <div class="t-icon sz-md v-green">T</div>
+          <div style="font-size:10px;color:var(--light-muted);margin-top:8px;font-family:var(--font-body);">56px</div>
+        </div>
+        <div>
+          <div class="t-icon sz-sm v-green">T</div>
+          <div style="font-size:10px;color:var(--light-muted);margin-top:8px;font-family:var(--font-body);">40px</div>
+        </div>
+        <div>
+          <div class="t-icon sz-xs v-green">T</div>
+          <div style="font-size:10px;color:var(--light-muted);margin-top:8px;font-family:var(--font-body);">28px</div>
+        </div>
+        <div>
+          <div class="t-icon sz-fav v-green">T</div>
+          <div style="font-size:10px;color:var(--light-muted);margin-top:8px;font-family:var(--font-body);">Fav</div>
+        </div>
+      </div>
+      <div style="margin-top:28px;display:flex;gap:12px;">
+        <div class="t-icon sz-md v-ink">T</div>
+        <div class="t-icon sz-md v-dark">T</div>
+        <div style="display:flex;flex-direction:column;justify-content:center;margin-left:8px;">
+          <div style="font-size:11px;color:var(--light-muted);font-family:var(--font-body);line-height:1.6;">Variações para fundo claro<br>e modo escuro</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ 02 — PALETA ═══ -->
+<div class="page white">
+  <div class="section-label">02 — Paleta de Cores</div>
+
+  <div class="palette-strip-row">
+    <div class="ps ps1"><span class="ps-hex">#00C278</span></div>
+    <div class="ps ps2"><span class="ps-hex">#007A4D</span></div>
+    <div class="ps ps3"><span class="ps-hex">#00E5A0</span></div>
+    <div class="ps ps4"><span class="ps-hex">#0E0E0E</span></div>
+    <div class="ps ps5"><span class="ps-hex">#F0EDE6</span></div>
+    <div class="ps ps6"><span class="ps-hex">#888070</span></div>
+  </div>
+
+  <div class="palette-grid">
+    <div class="pal-card pc1">
+      <div class="pal-swatch"></div>
+      <div class="pal-info">
+        <div class="pal-name">Truvex Green</div>
+        <div class="pal-hex">#00C278</div>
+        <div class="pal-role">Cor primária. CTAs, ícones, destaques. Presente em todo contexto.</div>
+      </div>
+    </div>
+    <div class="pal-card pc2">
+      <div class="pal-swatch"></div>
+      <div class="pal-info">
+        <div class="pal-name">Deep Green</div>
+        <div class="pal-hex">#007A4D</div>
+        <div class="pal-role">Hover, texto em verde sobre fundo claro. Versão sólida da primária.</div>
+      </div>
+    </div>
+    <div class="pal-card pc3">
+      <div class="pal-swatch"></div>
+      <div class="pal-info">
+        <div class="pal-name">Neon Green</div>
+        <div class="pal-hex">#00E5A0</div>
+        <div class="pal-role">Uso restrito. Glows, animações, destaques em dark mode.</div>
+      </div>
+    </div>
+    <div class="pal-card pc4">
+      <div class="pal-swatch"></div>
+      <div class="pal-info">
+        <div class="pal-name">Ink Black</div>
+        <div class="pal-hex">#0E0E0E</div>
+        <div class="pal-role">Fundo escuro. Hero, rodapé, modo escuro do app.</div>
+      </div>
+    </div>
+    <div class="pal-card pc5">
+      <div class="pal-swatch"></div>
+      <div class="pal-info">
+        <div class="pal-name">Warm Cream</div>
+        <div class="pal-hex">#F0EDE6</div>
+        <div class="pal-role">Fundo claro principal. Quente e humano. Site de conversão.</div>
+      </div>
+    </div>
+    <div class="pal-card pc6">
+      <div class="pal-swatch"></div>
+      <div class="pal-info">
+        <div class="pal-name">Warm Gray</div>
+        <div class="pal-hex">#888070</div>
+        <div class="pal-role">Texto secundário. Nunca frio. Consistente nos dois sistemas.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ 03 — TIPOGRAFIA ═══ -->
+<div class="page ink">
+  <div class="section-label">03 — Tipografia</div>
+
+  <div class="type-hero">
+    Aa<span class="green">.</span><br>
+    <span class="ghost">Bb</span><span class="faded">Cc</span>
+  </div>
+
+  <div class="type-weights-grid">
+    <div class="tw-cell">
+      <div class="tw-sample" style="font-weight:900;">Truvex.</div>
+      <div class="tw-meta">Black 900<br>Logo · Headline</div>
+    </div>
+    <div class="tw-cell">
+      <div class="tw-sample" style="font-weight:800;">Cada movimento</div>
+      <div class="tw-meta">ExtraBold 800<br>Títulos · CTAs</div>
+    </div>
+    <div class="tw-cell">
+      <div class="tw-sample" style="font-weight:700;">Gestão inteligente</div>
+      <div class="tw-meta">Bold 700<br>Subtítulos · Cards</div>
+    </div>
+    <div class="tw-cell">
+      <div class="tw-sample" style="font-weight:300;color:var(--dark-muted);">Descrição do produto</div>
+      <div class="tw-meta">Light 300<br>Corpo · Parágrafos</div>
+    </div>
+  </div>
+
+  <div class="body-type-block">
+    <div>
+      <div class="bt-name">Plus Jakarta Sans</div>
+      <div class="bt-role">Corpo · Interface · Comunicação</div>
+    </div>
+    <div class="bt-sample">
+      Truvex foi construído para o dono de locadora que <strong>sabe que pode crescer mais</strong>, mas ainda está preso na operação. Nossa plataforma transforma dados de frota em <em>decisões reais</em> — sem planilha, sem achismo, sem surpresa.<br><br>
+      <strong>Cada movimento conta.</strong> Cada quilômetro rodado, cada revisão feita, cada contrato fechado. Tudo vira inteligência de negócio na sua mão.
+    </div>
+  </div>
+</div>
+
+<!-- ═══ 04 — SISTEMA DUAL ═══ -->
+<div class="page light">
+  <div class="section-label">04 — Sistema Dual de Identidade</div>
+
+  <div class="dual-grid">
+    <div class="dual-cell dc-dark on-dark">
+      <div class="dc-label">
+        Dark Tech
+        <span class="dc-use">Anúncios · App · Investidor</span>
+      </div>
+      <div class="dc-badge-dark">Novo — IA generativa</div>
+      <div class="dc-logo dc-logo-xl">Tru<span class="dot">v</span>ex<span class="dot">.</span></div>
+      <div class="dc-tagline">Cada movimento conta</div>
+      <div class="dc-hero-title">
+        Cada<br>
+        <span class="acc">movimento</span><br>
+        <span class="dim-d">conta.</span>
+      </div>
+      <div class="dc-sub">Truvex transforma sua frota em <strong>inteligência de negócio.</strong></div>
+      <a href="#" class="dc-cta-dark">Testar 14 dias grátis</a>
+    </div>
+
+    <div class="dual-cell dc-light on-light">
+      <div class="dc-label">
+        Warm Editorial
+        <span class="dc-use">Site · Vendas · Locadora</span>
+      </div>
+      <div class="dc-badge-light">Gestão inteligente de frotas</div>
+      <div class="dc-logo dc-logo-xl">Tru<span class="dot">v</span>ex<span class="dot">.</span></div>
+      <div class="dc-tagline">Cada movimento conta</div>
+      <div class="dc-hero-title">
+        Cada<br>
+        <span class="acc">movimento</span><br>
+        <span class="dim-l">conta.</span>
+      </div>
+      <div class="dc-sub">Truvex transforma sua frota em <strong>inteligência de negócio.</strong></div>
+      <a href="#" class="dc-cta-light">Testar 14 dias grátis</a>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ 05 — COMPONENTES ═══ -->
+<div class="page dark">
+  <div class="section-label">05 — Componentes UI</div>
+
+  <div class="comp-grid">
+    <!-- Botões -->
+    <div class="comp-block">
+      <div class="comp-title">Botões</div>
+      <a href="#" class="btn btn-green">Começar grátis</a>
+      <a href="#" class="btn btn-outline-d">Ver demonstração</a>
+      <a href="#" class="btn btn-ghost-d">Saiba mais</a>
+      <a href="#" class="btn btn-outline-l" style="background:#fff;color:var(--light-text);border-color:var(--light-border);">Versão clara</a>
+    </div>
+
+    <!-- Pills e badges -->
+    <div class="comp-block">
+      <div class="comp-title">Pills e Status</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;">
+        <span class="pill pill-green-d pill-dot">Ao vivo</span>
+        <span class="pill pill-green-d">Pro</span>
+        <span class="pill pill-neutral">Em rota</span>
+        <span class="pill pill-warn pill-dot">Rev. pendente</span>
+        <span class="pill pill-green-l" style="background:var(--green-pale);color:var(--green-dark);">Disponível</span>
+      </div>
+    </div>
+
+    <!-- Cards -->
+    <div class="comp-block">
+      <div class="comp-title">Cards de Métrica</div>
+      <div class="sample-card-dark on-dark-card">
+        <div class="sc-label">Frota ativa</div>
+        <div class="sc-metric">24<em>.</em></div>
+        <div class="sc-delta up">↑ 8% essa semana</div>
+      </div>
+      <div class="sample-card-light on-light-card">
+        <div class="sc-label" style="color:var(--light-muted);">Custo / veículo</div>
+        <div class="sc-metric" style="color:var(--light-text);">R$87<em>.</em></div>
+        <div class="sc-delta down">↓ 12% vs mês passado</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ 06 — VOZ ═══ -->
+<div class="page white">
+  <div class="section-label">06 — Voz da Marca</div>
+
+  <div class="voice-grid">
+    <div>
+      <div class="voice-col-title">Truvex fala assim</div>
+      <div class="voice-row">
+        <div class="vr-word yes">Direto</div>
+        <div class="vr-why">"Seu custo por veículo hoje é R$87." Não explica — mostra o número.</div>
+      </div>
+      <div class="voice-row">
+        <div class="vr-word yes">Seguro</div>
+        <div class="vr-why">Não pede desculpa. Não exagera. Fala como quem sabe o que está dizendo.</div>
+      </div>
+      <div class="voice-row">
+        <div class="vr-word yes">Humano</div>
+        <div class="vr-why">O dono de locadora não é técnico. A linguagem respeita isso.</div>
+      </div>
+      <div class="voice-row">
+        <div class="vr-word yes">Ativo</div>
+        <div class="vr-why">Verbos no presente. Ação sempre. Nunca voz passiva.</div>
+      </div>
+      <div class="voice-row">
+        <div class="vr-word yes">Parceiro</div>
+        <div class="vr-why">Fala como sócio, não como fornecedor. O cliente sabe o negócio — Truvex traz o dado.</div>
+      </div>
+    </div>
+
+    <div>
+      <div class="voice-col-title">Truvex nunca fala assim</div>
+      <div class="voice-row">
+        <div class="vr-word no">Complexo</div>
+        <div class="vr-why">Sem jargão técnico, sem siglas sem contexto, sem linguagem de TI.</div>
+      </div>
+      <div class="voice-row">
+        <div class="vr-word no">Genérico</div>
+        <div class="vr-why">"Solução completa" não diz nada. Cada frase precisa ser concreta.</div>
+      </div>
+      <div class="voice-row">
+        <div class="vr-word no">Ansioso</div>
+        <div class="vr-why">Sem exclamações excessivas, sem urgência artificial, sem FOMO forçado.</div>
+      </div>
+      <div class="voice-row">
+        <div class="vr-word no">Condescendente</div>
+        <div class="vr-why">O cliente gerencia um negócio real. Truvex não ensina — amplia.</div>
+      </div>
+      <div class="voice-row">
+        <div class="vr-word no">Passivo</div>
+        <div class="vr-why">"Pode ser utilizado para..." — nunca. "Você decide com dado real." — sempre.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ 07 — MOVIMENTO ═══ -->
+<div class="page dark">
+  <div class="section-label">07 — Linguagem de Movimento</div>
+
+  <div class="motion-grid">
+    <div class="motion-cell">
+      <div class="motion-demo"><div class="m-pulse"></div></div>
+      <div class="motion-name">Status ao vivo</div>
+      <div class="motion-desc">Pulse suave indica sistema ativo. Verde sempre presente, nunca piscando ansioso.</div>
+    </div>
+    <div class="motion-cell">
+      <div class="motion-demo"><div class="m-scan"></div></div>
+      <div class="motion-name">Leitura de dados</div>
+      <div class="motion-desc">Scan horizontal comunica processamento. Confiança, não espera.</div>
+    </div>
+    <div class="motion-cell">
+      <div class="motion-demo"><div class="m-num">24</div></div>
+      <div class="motion-name">Métricas vivas</div>
+      <div class="motion-desc">Números como elementos visuais centrais. Tipografia é o design.</div>
+    </div>
+    <div class="motion-cell">
+      <div class="motion-demo">
+        <div class="m-bars">
+          <div class="m-bar"></div><div class="m-bar"></div>
+          <div class="m-bar"></div><div class="m-bar"></div>
+          <div class="m-bar"></div>
+        </div>
+      </div>
+      <div class="motion-name">Performance</div>
+      <div class="motion-desc">Barras respiram. Representam ocupação e rentabilidade em tempo real.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SUMÁRIO ═══ -->
+<div class="summary">
+  <div class="section-label">Sumário da Identidade</div>
+
+  <div class="summary-grid">
+    <div class="sum-cell">
+      <div class="sum-key">Nome</div>
+      <div class="sum-val">
+        Truvex<span class="green">.</span>
+        <span class="muted">Criado. Não existe em nenhuma língua.</span>
+      </div>
+    </div>
+    <div class="sum-cell">
+      <div class="sum-key">Slogan</div>
+      <div class="sum-val">
+        Cada movimento<span class="green"> conta.</span>
+        <span class="muted">Escala para qualquer mercado de ativos móveis.</span>
+      </div>
+    </div>
+    <div class="sum-cell">
+      <div class="sum-key">Tipografia</div>
+      <div class="sum-val">
+        Epilogue <span class="green">900</span>
+        <span class="muted">Display · Plus Jakarta Sans para corpo.</span>
+      </div>
+    </div>
+    <div class="sum-cell">
+      <div class="sum-key">Cor primária</div>
+      <div class="sum-val">
+        <span class="green">#00C278</span>
+        <span class="muted">Verde quente. Presente em todo contexto.</span>
+      </div>
+    </div>
+    <div class="sum-cell">
+      <div class="sum-key">Sistema</div>
+      <div class="sum-val">
+        Dual
+        <span class="muted">Dark Tech para campanhas. Warm Editorial para conversão.</span>
+      </div>
+    </div>
+    <div class="sum-cell">
+      <div class="sum-key">Ícone</div>
+      <div class="sum-val">
+        T <span class="green">verde</span>
+        <span class="muted">App, favicon, avatar. Funciona em 20px.</span>
+      </div>
+    </div>
+    <div class="sum-cell">
+      <div class="sum-key">Tom</div>
+      <div class="sum-val">
+        Direto<span class="green">.</span> Seguro<span class="green">.</span>
+        <span class="muted">Nunca complexo. Nunca ansioso.</span>
+      </div>
+    </div>
+    <div class="sum-cell">
+      <div class="sum-key">Mercado de entrada</div>
+      <div class="sum-val">
+        Locadoras <span class="green">pequenas</span>
+        <span class="muted">Fortaleza → expansão nacional.</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <div class="f-logo">Tru<span class="dot">v</span>ex<span class="dot">.</span></div>
+  <div class="f-tag">Cada movimento conta</div>
+  <div class="f-ver">Identidade Final · v3.0 · 2025</div>
+</div>
+
+</body>
+</html>

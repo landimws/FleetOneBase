@@ -35,7 +35,7 @@ class AdminEmpresasController {
         try {
             const empresas = await MasterDatabase.Empresa.findAll({
                 where: {
-                    id: { [Op.ne]: 1 } // [FIX] Ocultar FleetOne (Sistema)
+                    id: { [Op.ne]: 1 } // [FIX] Ocultar Truvex (Sistema)
                 },
                 include: [{
                     model: MasterDatabase.Usuario,

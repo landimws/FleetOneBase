@@ -12,7 +12,7 @@ class MasterSeeder {
             adminUsername: process.env.ADMIN_USERNAME || 'admin',
             adminPassword: process.env.ADMIN_PASSWORD || 'admin123',
             adminNome: process.env.ADMIN_NOME || 'Super Administrador',
-            empresaNome: process.env.EMPRESA_NOME || 'FleetOne Admin',
+            empresaNome: process.env.EMPRESA_NOME || 'Truvex Admin',
             empresaCnpj: process.env.EMPRESA_CNPJ || '00.000.000/0000-00'
         };
     }
@@ -27,37 +27,37 @@ class MasterSeeder {
     }
 
     /**
-     * Cria empresa FleetOne (ID fixo = 1)
+     * Cria empresa Truvex (ID fixo = 1)
      * Todos os usuários desta empresa são SuperAdmins
      */
     async createDefaultCompany() {
-        console.log('\n📦 Criando empresa FleetOne (SuperAdmin)...');
+        console.log('\n📦 Criando empresa Truvex (SuperAdmin)...');
 
-        // Verificar se FleetOne já existe (ID = 1)
+        // Verificar se Truvex já existe (ID = 1)
         const empresaExistente = await MasterDatabase.Empresa.findByPk(1);
 
         if (empresaExistente) {
-            console.log(`⚠️  Empresa FleetOne já existe (ID: ${empresaExistente.id}).`);
+            console.log(`⚠️  Empresa Truvex já existe (ID: ${empresaExistente.id}).`);
             return empresaExistente;
         }
 
-        // IMPORTANTE: Criar com ID = 1 (identificador único do FleetOne)
+        // IMPORTANTE: Criar com ID = 1 (identificador único do Truvex)
         const empresa = await MasterDatabase.Empresa.create({
-            id: 1, // ID fixo para FleetOne
-            nome: 'FleetOne - Administração',
+            id: 1, // ID fixo para Truvex
+            nome: 'Truvex - Administração',
             cnpj: '00.000.000/0000-00',
             email: 'admin@fleetone.com',
             telefone: '(00) 0000-0000',
             ativo: true
         });
 
-        console.log(`✅ Empresa FleetOne criada (ID: ${empresa.id})`);
+        console.log(`✅ Empresa Truvex criada (ID: ${empresa.id})`);
         console.log(`   ℹ️  Usuários desta empresa = SuperAdmins automáticos`);
         return empresa;
     }
 
     /**
-     * Cria SuperAdmin inicial vinculado à empresa FleetOne
+     * Cria SuperAdmin inicial vinculado à empresa Truvex
      * SuperAdmin = empresaId === 1
      */
     async createSuperAdmin(empresaId) {
@@ -70,10 +70,10 @@ class MasterSeeder {
         if (usuarioExistente) {
             console.log(`⚠️  Usuário "${usuarioExistente.username}" já existe (ID: ${usuarioExistente.id}).`);
 
-            // Garantir que está vinculado à empresa FleetOne
+            // Garantir que está vinculado à empresa Truvex
             if (usuarioExistente.empresaId !== empresaId) {
                 await usuarioExistente.update({ empresaId });
-                console.log('✅ Usuário vinculado à empresa FleetOne.');
+                console.log('✅ Usuário vinculado à empresa Truvex.');
             }
 
             return usuarioExistente;
@@ -88,14 +88,14 @@ class MasterSeeder {
             password: passwordHash,
             role: 'admin',
             ativo: true,
-            empresaId: empresaId // Vinculado à FleetOne (ID = 1)
+            empresaId: empresaId // Vinculado à Truvex (ID = 1)
         });
 
         console.log(`✅ SuperAdmin criado: "${usuario.username}" (ID: ${usuario.id})`);
         console.log(`   Nome: ${usuario.nome}`);
         console.log(`   Username: ${this.config.adminUsername}`);
         console.log(`   Password: ${this.config.adminPassword}`);
-        console.log(`   Empresa: FleetOne (ID: ${empresaId})`);
+        console.log(`   Empresa: Truvex (ID: ${empresaId})`);
 
         return usuario;
     }
@@ -108,12 +108,12 @@ class MasterSeeder {
         console.log('✅ SEED DO MASTER DATABASE CONCLUÍDO');
         console.log('='.repeat(60));
         console.log('\n📊 Resumo:');
-        console.log(`   Empresa FleetOne: ${empresa.nome} (ID: ${empresa.id})`);
+        console.log(`   Empresa Truvex: ${empresa.nome} (ID: ${empresa.id})`);
         console.log(`   CNPJ: ${empresa.cnpj}`);
         console.log(`\n   SuperAdmin: ${usuario.nome} (ID: ${usuario.id})`);
         console.log(`   Username: ${usuario.username}`);
         console.log(`   Password: ${this.config.adminPassword}`);
-        console.log(`   Empresa ID: ${usuario.empresaId} (FleetOne = SuperAdmin)`);
+        console.log(`   Empresa ID: ${usuario.empresaId} (Truvex = SuperAdmin)`);
         console.log('\n💡 Regra: Todos os usuários com empresaId = 1 são SuperAdmins');
         console.log('\n🔐 Credenciais de acesso:');
         console.log(`   Username: ${this.config.adminUsername}`);

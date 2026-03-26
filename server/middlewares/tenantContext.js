@@ -25,8 +25,8 @@ import defineTemplatesDocumentoHistorico from '../models-sqlite/TemplatesDocumen
 const modelsCache = new WeakMap();
 
 export default async (req, res, next) => {
-    // Ignorar assets estáticos
-    if (req.path.startsWith('/css') || req.path.startsWith('/js') || req.path.startsWith('/images')) {
+    // Ignorar assets estáticos e rotas protegidas que não pertencem a tenants
+    if (req.path.startsWith('/css') || req.path.startsWith('/js') || req.path.startsWith('/images') || req.path.match(/\.(ico|png|jpg|jpeg|svg|css|js|woff|woff2|ttf|otf|json)$/)) {
         return next();
     }
 
@@ -139,7 +139,7 @@ export default async (req, res, next) => {
             // Em produção, isso deve ser removido e usado migrations.
             // console.log(`[TenantContext] Sincronizando schema para Tenant ${tenantId}...`);
             await ControleKmHistorico.sync({ alter: true });
-
+            await Veiculo.sync({ alter: true });
 
             // Salvar no cache
             modelsCache.set(connection, {

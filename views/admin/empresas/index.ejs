@@ -1,266 +1,235 @@
 <% page='empresas' %>
 
-    <div class="row mb-4">
-        <div class="col-12 col-md-8">
-            <a href="/admin/empresas/novo" class="btn btn-admin-primary">
-                <i class="bi bi-plus-circle me-2"></i>Nova Empresa
-            </a>
-        </div>
+<!-- Ação: Nova Empresa -->
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+    <div>
+        <div style="font-size: 13px; color: #52525E; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600;">Empresas cadastradas</div>
+        <h2 style="font-family: 'Epilogue', sans-serif; font-weight: 800; font-size: 28px; letter-spacing: -1px; color: #fff; margin: 0;">Gestão de Locadoras</h2>
     </div>
+    <a href="/admin/empresas/novo" class="btn-truvex">
+        <i class="ph ph-plus"></i> Nova Empresa
+    </a>
+</div>
 
-    <div class="card">
-        <div class="card-header">
-            <i class="bi bi-building me-2"></i>Lista de Empresas
-        </div>
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table">
-                    <thead>
+<!-- Tabela -->
+<div class="adm-card">
+    <div class="adm-card-header">
+        <i class="ph ph-buildings"></i>
+        Lista de Empresas
+    </div>
+    <div style="overflow-x: auto;">
+        <table class="adm-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Empresa</th>
+                    <th>CNPJ</th>
+                    <th>Usuários</th>
+                    <th>Status</th>
+                    <th>Credenciais</th>
+                    <th>Criado em</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% if (empresas && empresas.length > 0) { %>
+                    <% empresas.forEach(function(empresa) { %>
                         <tr>
-                            <th>ID</th>
-                            <th>Nome</th>
-                            <th>CNPJ</th>
-                            <th>Usuários</th>
-                            <th>Status</th>
-                            <th>Credenciais</th>
-                            <th>Criado em</th>
-                            <th>Ações</th>
+                            <td style="color: #52525E; font-size: 13px;">#<%= empresa.id %></td>
+                            <td>
+                                <div style="font-weight: 600; color: #fff;"><%= empresa.nome %></div>
+                                <div style="font-size: 12px; color: #52525E; margin-top: 2px;"><%= empresa.email || '' %></div>
+                            </td>
+                            <td style="color: #A1A1AA; font-size: 13px; font-variant-numeric: tabular-nums;"><%= empresa.cnpj || '—' %></td>
+                            <td>
+                                <span class="badge-truvex neutral">
+                                    <i class="ph ph-user"></i>
+                                    <%= empresa.numUsuarios %> usuário<%= empresa.numUsuarios !== 1 ? 's' : '' %>
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge-truvex <%= empresa.ativo ? 'active' : 'inactive' %>">
+                                    <i class="ph ph-<%= empresa.ativo ? 'check-circle' : 'x-circle' %>"></i>
+                                    <%= empresa.ativo ? 'Ativo' : 'Inativo' %>
+                                </span>
+                            </td>
+                            <td>
+                                <% if (empresa.usuarioPendente) { %>
+                                    <button class="btn-ghost-sm warn"
+                                        onclick="mostrarCredenciais('<%= empresa.usuarioPendente.username %>', '<%= empresa.usuarioPendente.senha_temporaria_visivel %>', '<%= empresa.id %>')"
+                                        title="Ver credenciais temporárias">
+                                        <i class="ph ph-key"></i> Ver chave
+                                    </button>
+                                <% } else { %>
+                                    <span style="color: #52525E; font-size: 13px;">—</span>
+                                <% } %>
+                            </td>
+                            <td style="color: #A1A1AA; font-size: 13px; font-variant-numeric: tabular-nums;">
+                                <%= new Date(empresa.createdAt).toLocaleDateString('pt-BR') %>
+                            </td>
+                            <td>
+                                <div style="display: flex; gap: 8px; align-items: center;">
+                                    <!-- Impersonate -->
+                                    <button class="btn-ghost-sm"
+                                        onclick="confirmImpersonate('<%= empresa.id %>', '<%= empresa.nome %>')"
+                                        title="Acessar como este cliente">
+                                        <i class="ph ph-user-switch"></i>
+                                    </button>
+                                    <!-- Editar -->
+                                    <a href="/admin/empresas/novo?id=<%= empresa.id %>" class="btn-ghost-sm" title="Editar empresa">
+                                        <i class="ph ph-pencil-simple"></i>
+                                    </a>
+                                    <!-- Toggle status -->
+                                    <button class="btn-ghost-sm <%= empresa.ativo ? 'danger' : 'success' %>"
+                                        data-id="<%= empresa.id %>"
+                                        data-ativo="<%= empresa.ativo ? 'true' : 'false' %>"
+                                        onclick="toggleStatus(this)"
+                                        title="<%= empresa.ativo ? 'Desativar' : 'Ativar' %> empresa">
+                                        <i class="ph ph-<%= empresa.ativo ? 'prohibit' : 'check' %>"></i>
+                                    </button>
+                                </div>
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        <% if (empresas && empresas.length> 0) { %>
-                            <% empresas.forEach(function(empresa) { %>
-                                <tr>
-                                    <td>
-                                        <%= empresa.id %>
-                                    </td>
-                                    <td><strong>
-                                            <%= empresa.nome %>
-                                        </strong></td>
-                                    <td>
-                                        <%= empresa.cnpj || '-' %>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-secondary">
-                                            <%= empresa.numUsuarios %> usuário<%= empresa.numUsuarios !==1 ? 's' : '' %>
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <span class="badge <%= empresa.ativo ? 'badge-ativo' : 'badge-inativo' %>">
-                                            <%= empresa.ativo ? 'Ativo' : 'Inativo' %>
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <div class="d-flex gap-1">
-                                            <% if (empresa.usuarioPendente) { %>
-                                                <button class="btn btn-sm btn-warning"
-                                                    onclick="mostrarCredenciais('<%= empresa.usuarioPendente.username %>', '<%= empresa.usuarioPendente.senha_temporaria_visivel %>', '<%= empresa.id %>')"
-                                                    title="Ver credenciais temporárias">
-                                                    <i class="bi bi-key-fill"></i>
-                                                </button>
-                                                <% } %>
+                    <% }); %>
+                <% } else { %>
+                    <tr>
+                        <td colspan="8" style="text-align: center; padding: 48px 20px; color: #52525E;">
+                            <i class="ph ph-buildings" style="font-size: 40px; display: block; margin-bottom: 12px; opacity: 0.3;"></i>
+                            Nenhuma empresa cadastrada ainda.
+                        </td>
+                    </tr>
+                <% } %>
+            </tbody>
+        </table>
+    </div>
+</div>
 
-                                                    <!-- Botão Impersonate -->
-                                                    <!-- Botão Impersonate (Modal) -->
-                                                    <button type="button" class="btn btn-sm btn-dark"
-                                                        onclick="confirmImpersonate('<%= empresa.id %>', '<%= empresa.nome %>')"
-                                                        title="Acessar Painel (Impersonate)">
-                                                        <i class="bi bi-incognito"></i>
-                                                    </button>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <%= new Date(empresa.createdAt).toLocaleDateString('pt-BR') %>
-                                    </td>
-                                    <td>
-                                        <a href="/admin/empresas/novo?id=<%= empresa.id %>"
-                                            class="btn btn-sm btn-outline-primary">
-                                            <i class="bi bi-pencil"></i>
-                                        </a>
-                                        <button
-                                            class="btn btn-sm btn-outline-<%= empresa.ativo ? 'danger' : 'success' %>"
-                                            data-id="<%= empresa.id %>"
-                                            data-ativo="<%= empresa.ativo ? 'true' : 'false' %>"
-                                            onclick="toggleStatus(this)">
-                                            <i class="bi bi-<%= empresa.ativo ? 'x-circle' : 'check-circle' %>"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                                <% }); %>
-                                    <% } else { %>
-                                        <tr>
-                                            <td colspan="8" class="text-center text-muted py-4">
-                                                Nenhuma empresa cadastrada.
-                                            </td>
-                                        </tr>
-                                        <% } %>
-                    </tbody>
-                </table>
+<!-- ===== MODAL: Credenciais Temporárias ===== -->
+<div class="modal fade" id="modalCredenciais" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="ph ph-key" style="color: #eab308;"></i> &nbsp;Credenciais Temporárias</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-warning mb-4">
+                    <strong>⚠ Atenção:</strong> Estas credenciais são temporárias e expiram após o primeiro login.
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">ID da Empresa</label>
+                    <input type="text" class="form-control" id="modalEmpresaId" readonly>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Usuário</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="modalUsername" readonly>
+                        <button class="btn" onclick="copiar('modalUsername')" title="Copiar"><i class="ph ph-clipboard"></i></button>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label">Senha Temporária</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control font-monospace" id="modalSenha" readonly>
+                        <button class="btn" onclick="copiar('modalSenha')" title="Copiar"><i class="ph ph-clipboard"></i></button>
+                    </div>
+                </div>
+
+                <div class="alert alert-info">
+                    <strong>Instruções:</strong>
+                    <ol class="mb-0 mt-2">
+                        <li>Envie estas credenciais para o responsável</li>
+                        <li>No primeiro login o sistema forçará troca de senha</li>
+                        <li>Após a troca as credenciais somem deste painel</li>
+                    </ol>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-ghost-sm" data-bs-dismiss="modal">Fechar</button>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Modal de Credenciais Temporárias -->
-    <div class="modal fade" id="modalCredenciais" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header bg-warning text-dark">
-                    <h5 class="modal-title"><i class="bi bi-key-fill me-2"></i>Credenciais Temporárias</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+<!-- ===== MODAL: Impersonate ===== -->
+<div class="modal fade" id="modalImpersonate" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="ph ph-user-switch" style="color: #f87171;"></i> &nbsp;Acesso de Suporte</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-danger mb-4">
+                    <strong>Atenção:</strong> Você está prestes a acessar o painel da empresa:
+                    <div style="font-family: 'Epilogue', sans-serif; font-size: 20px; font-weight: 700; margin-top: 8px; color: #fff;" id="impersonateEmpresaNome"></div>
                 </div>
-                <div class="modal-body">
-                    <div class="alert alert-warning">
-                        <strong>⚠️ Atenção:</strong> Estas credenciais são temporárias e serão removidas após o primeiro
-                        login.
-                    </div>
 
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Empresa ID:</label>
-                        <input type="text" class="form-control" id="modalEmpresaId" readonly>
-                    </div>
+                <p style="font-size: 14px; color: #A1A1AA; margin-bottom: 20px;">Ao confirmar, você será redirecionado para o ambiente do cliente com permissões administrativas. Esta ação é auditada.</p>
 
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Usuário:</label>
-                        <div class="input-group">
-                            <input type="text" class="form-control" id="modalUsername" readonly>
-                            <button class="btn btn-outline-secondary" onclick="copiar('modalUsername')"
-                                title="Copiar usuário">
-                                <i class="bi bi-clipboard"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Senha Temporária:</label>
-                        <div class="input-group">
-                            <input type="text" class="form-control font-monospace" id="modalSenha" readonly>
-                            <button class="btn btn-outline-secondary" onclick="copiar('modalSenha')"
-                                title="Copiar senha">
-                                <i class="bi bi-clipboard"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="alert alert-info">
-                        <strong>📌 Instruções:</strong>
-                        <ol class="mb-0 mt-2">
-                            <li>Envie estas credenciais para o responsável da empresa</li>
-                            <li>No primeiro login, o sistema forçará a troca de senha</li>
-                            <li>Após a troca, estas credenciais não estarão mais disponíveis aqui</li>
-                        </ol>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                <div class="d-grid">
+                    <form id="formImpersonate" action="" method="POST">
+                        <button type="submit" class="btn-truvex" style="width:100%; justify-content: center; background: #ef4444;">
+                            <i class="ph ph-arrow-square-in"></i> Confirmar e Acessar
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Modal de Impersonate -->
-    <div class="modal fade" id="modalImpersonate" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header bg-danger text-white">
-                    <h5 class="modal-title"><i class="bi bi-mask me-2"></i>Acesso de Suporte (Impersonate)</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="alert alert-warning border-0 bg-warning bg-opacity-10 text-warning-emphasis">
-                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                        Você está prestes a acessar o painel da empresa:
-                        <div class="h5 mt-2 mb-0" id="impersonateEmpresaNome"></div>
-                    </div>
+<script>
+    function confirmImpersonate(empresaId, empresaNome) {
+        document.getElementById('impersonateEmpresaNome').textContent = empresaNome;
+        document.getElementById('formImpersonate').action = `/admin/empresas/${empresaId}/impersonate`;
+        new bootstrap.Modal(document.getElementById('modalImpersonate')).show();
+    }
 
-                    <p class="mb-2">Ao confirmar, você será redirecionado para o ambiente do cliente com
-                        <strong>permissões administrativas</strong>.</p>
+    async function toggleStatus(btnElement) {
+        const id      = btnElement.dataset.id;
+        const ativoAtual = btnElement.dataset.ativo === 'true';
+        const acao    = ativoAtual ? 'desativar' : 'ativar';
 
-                    <ul class="text-muted small mb-4">
-                        <li>Todas as ações realizadas serão registradas em auditoria.</li>
-                        <li>Seu acesso de Super Admin ficará suspenso temporariamente.</li>
-                        <li>Para retornar, utilize o botão <strong>"Sair do Suporte"</strong> no topo da tela.</li>
-                    </ul>
+        if (!confirm(`Tem certeza que deseja ${acao} esta empresa?${ativoAtual ? '\n\nATENÇÃO: Todos os usuários serão desativados!' : ''}`)) return;
 
-                    <div class="d-grid">
-                        <form id="formImpersonate" action="" method="POST">
-                            <button type="submit" class="btn btn-danger w-100 fw-bold">
-                                <i class="bi bi-box-arrow-in-right me-2"></i>Confirmar e Acessar
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        function confirmImpersonate(empresaId, empresaNome) {
-            document.getElementById('impersonateEmpresaNome').textContent = empresaNome;
-            document.getElementById('formImpersonate').action = `/admin/empresas/${empresaId}/impersonate`;
-
-            const modal = new bootstrap.Modal(document.getElementById('modalImpersonate'));
-            modal.show();
-        }
-
-
-
-        async function toggleStatus(btnElement) {
-            const id = btnElement.dataset.id;
-            const ativoAtual = btnElement.dataset.ativo === 'true';
-            const acao = ativoAtual ? 'desativar' : 'ativar';
-
-            if (!confirm(`Tem certeza que deseja ${acao} esta empresa?${ativoAtual ? '\n\nATENÇÃO: Todos os usuários desta empresa serão desativados automaticamente!' : ''}`)) {
-                return;
-            }
-
-            // Ativar loading no botão clicado
-            Loading.show(btnElement);
-
-            try {
-                const response = await fetch(`/admin/empresas/${id}/toggle-status`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' }
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    Toast.show(data.message, 'success');
-                    // Pequeno delay para usuário ver o toast antes do reload
-                    setTimeout(() => window.location.reload(), 1500);
-                } else {
-                    Toast.show('Erro: ' + data.message, 'error');
-                }
-            } catch (error) {
-                console.error('Erro:', error);
-                Toast.show('Erro ao alterar status da empresa.', 'error');
-            } finally {
-                Loading.hide(btnElement);
-            }
-        }
-
-        // Função para exibir modal com credenciais
-        function mostrarCredenciais(username, senha, empresaId) {
-            document.getElementById('modalEmpresaId').value = empresaId;
-            document.getElementById('modalUsername').value = username;
-            document.getElementById('modalSenha').value = senha;
-
-            const modal = new bootstrap.Modal(document.getElementById('modalCredenciais'));
-            modal.show();
-        }
-
-        // Função para copiar para clipboard
-        function copiar(elementId) {
-            const element = document.getElementById(elementId);
-            element.select();
-            element.setSelectionRange(0, 99999); // Mobile
-
-            navigator.clipboard.writeText(element.value).then(() => {
-                Toast.show('Copiado para área de transferência!', 'success');
-            }).catch(err => {
-                // Fallback para navegadores antigos
-                document.execCommand('copy');
-                Toast.show('Copiado!', 'success');
+        Loading.show(btnElement);
+        try {
+            const res  = await fetch(`/admin/empresas/${id}/toggle-status`, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' }
             });
+            const data = await res.json();
+            if (data.success) {
+                Toast.show(data.message, 'success');
+                setTimeout(() => window.location.reload(), 1500);
+            } else {
+                Toast.show('Erro: ' + data.message, 'error');
+            }
+        } catch (e) {
+            Toast.show('Erro ao alterar status.', 'error');
+        } finally {
+            Loading.hide(btnElement);
         }
-    </script>
+    }
+
+    function mostrarCredenciais(username, senha, empresaId) {
+        document.getElementById('modalEmpresaId').value = empresaId;
+        document.getElementById('modalUsername').value  = username;
+        document.getElementById('modalSenha').value     = senha;
+        new bootstrap.Modal(document.getElementById('modalCredenciais')).show();
+    }
+
+    function copiar(elementId) {
+        const el = document.getElementById(elementId);
+        el.select();
+        navigator.clipboard.writeText(el.value).then(() => {
+            Toast.show('Copiado!', 'success');
+        }).catch(() => {
+            document.execCommand('copy');
+            Toast.show('Copiado!', 'success');
+        });
+    }
+</script>

@@ -40,7 +40,7 @@ export default (sequelize) => {
                 key: 'id'
             }
         },
-        // [NEW] Para identificar se é usuário Super Admin do FleetOne
+        // [NEW] Para identificar se é usuário Super Admin do Truvex
         isSuperAdmin: {
             type: DataTypes.BOOLEAN,
             defaultValue: false

@@ -1,106 +1,325 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
-
+<html lang="pt-BR" style="background-color: #09090B;">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Locadora</title>
+    <title>Login - Truvex</title>
 
     <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Epilogue:ital,wght@0,300;0,400;0,500;0,700;0,800;0,900;1,300&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
     <style>
+        :root {
+            --green: #00C278;
+            --green-glow: rgba(0, 194, 120, 0.4);
+            --dark-bg: #09090B;
+            --dark-surf: #111116;
+            --text-main: #E4E3DF;
+            --border: rgba(255,255,255,0.08);
+        }
+
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f3f4f6;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--dark-bg);
+            margin: 0;
+            color: var(--text-main);
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* Split Screen Layout */
+        .login-split {
+            display: flex;
+            width: 100%;
+            height: 100%;
+        }
+
+        .login-left {
+            flex: 1;
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 100vh;
-            margin: 0;
+            padding: 40px;
+            position: relative;
+            background: radial-gradient(circle at 50% 0%, rgba(0, 194, 120, 0.05) 0%, var(--dark-bg) 70%);
         }
 
-        .login-card {
-            background: white;
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        .login-right {
+            flex: 1;
+            background: linear-gradient(135deg, #050506 0%, #111116 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 80px;
+            position: relative;
+            border-left: 1px solid var(--border);
+            overflow: hidden;
+        }
+
+        @media (max-width: 900px) {
+            .login-right { display: none; }
+        }
+
+        /* Ambient Glow in Right Panel */
+        .glow-orb {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, var(--green-glow) 0%, transparent 60%);
+            top: -200px;
+            right: -200px;
+            filter: blur(80px);
+            opacity: 0.5;
+            animation: pulse 8s infinite alternate;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1) translate(0, 0); opacity: 0.3; }
+            100% { transform: scale(1.1) translate(-20px, 20px); opacity: 0.6; }
+        }
+
+        /* Right Panel Content */
+        .right-content {
+            position: relative;
+            z-index: 2;
+            max-width: 500px;
+        }
+
+        .right-content h2 {
+            font-family: 'Epilogue', sans-serif;
+            font-size: 48px;
+            font-weight: 800;
+            line-height: 1.1;
+            letter-spacing: -2px;
+            margin-bottom: 24px;
+            color: #FFF;
+        }
+
+        .right-content h2 span {
+            color: var(--green);
+        }
+
+        .right-content p {
+            font-size: 18px;
+            color: #A1A1AA;
+            line-height: 1.6;
+        }
+
+        /* CSS Grid Graphic Mockup */
+        .mockup-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-top: 60px;
             width: 100%;
-            max-width: 400px;
+        }
+
+        .mockup-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            height: 80px;
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .mockup-card::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: var(--green);
+            opacity: 0.5;
+        }
+
+        /* Login Card (Left Panel) */
+        .login-card {
+            background: rgba(17, 17, 22, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 50px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.05);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255,255,255,0.05);
+            width: 100%;
+            max-width: 440px;
+            z-index: 10;
         }
 
         .brand {
-            text-align: center;
+            margin-bottom: 40px;
+            font-family: 'Epilogue', sans-serif;
+            font-weight: 900;
+            font-size: 32px;
+            letter-spacing: -1.5px;
+            color: #FFFFFF;
+        }
+
+        .brand span {
+            color: var(--green);
+        }
+
+        .login-header {
             margin-bottom: 30px;
+        }
+
+        .login-header h1 {
+            font-family: 'Epilogue', sans-serif;
             font-size: 24px;
             font-weight: 700;
-            color: #4c1d95;
+            margin: 0 0 8px 0;
+            color: #FFF;
+        }
+
+        .login-header p {
+            margin: 0;
+            font-size: 14px;
+            color: #A1A1AA;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+            position: relative;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #A1A1AA;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper i {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #52525E;
+            font-size: 20px;
+            transition: color 0.2s;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 14px 16px 14px 48px;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 10px;
+            color: #FFFFFF;
+            font-size: 15px;
+            outline: none;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        
+        .form-input::placeholder {
+            color: #52525E;
+        }
+
+        .form-input:focus {
+            border-color: var(--green);
+            background: rgba(0, 194, 120, 0.05);
+            box-shadow: 0 0 0 4px rgba(0, 194, 120, 0.1);
+        }
+
+        .form-input:focus + i, .form-input:focus ~ i {
+            color: var(--green);
+        }
+
+        .btn-login {
+            width: 100%;
+            background-color: var(--green);
+            color: #000000;
+            padding: 16px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 700;
+            font-family: 'Epilogue', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+            box-shadow: 0 4px 15px rgba(0, 194, 120, 0.3);
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 10px;
         }
 
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-label {
-            display: block;
-            margin-bottom: 8px;
-            font-size: 14px;
-            font-weight: 500;
-            color: #374151;
-        }
-
-        .form-input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            font-size: 16px;
-            outline: none;
-            transition: border-color 0.2s;
-            box-sizing: border-box;
-        }
-
-        .form-input:focus {
-            border-color: #8b5cf6;
-            ring: 2px solid #ddd6fe;
-        }
-
-        .btn-login {
-            width: 100%;
-            background-color: #7c3aed;
-            color: white;
-            padding: 12px;
-            border: none;
-            border-radius: 6px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-
         .btn-login:hover {
-            background-color: #6d28d9;
+            background-color: #00E5A0;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 194, 120, 0.4);
+        }
+
+        .btn-login:active {
+            transform: translateY(0);
         }
 
         .error-msg {
-            background-color: #fee2e2;
-            color: #b91c1c;
-            padding: 10px;
-            border-radius: 6px;
-            margin-bottom: 20px;
+            background-color: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            color: #ff6b6b;
+            padding: 14px;
+            border-radius: 10px;
+            margin-bottom: 24px;
             font-size: 14px;
-            text-align: center;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        /* Interactive Particles (simulate with CSS) */
+        .particle {
+            position: absolute;
+            background: var(--green);
+            border-radius: 50%;
+            opacity: 0.3;
+            animation: float 10s infinite linear;
+        }
+        .p1 { width: 4px; height: 4px; top: 20%; left: 10%; animation-duration: 15s; }
+        .p2 { width: 6px; height: 6px; top: 70%; left: 80%; animation-duration: 25s; }
+        .p3 { width: 3px; height: 3px; top: 40%; left: 60%; animation-duration: 20s; }
+
+        @keyframes float {
+            0% { transform: translateY(0) translateX(0); }
+            50% { transform: translateY(-100px) translateX(20px); }
+            100% { transform: translateY(0) translateX(0); }
         }
     </style>
 </head>
-
 <body>
-    <%- body %>
+    <div class="login-split">
+        <div class="login-left">
+            <div class="particle p1"></div>
+            <div class="particle p2"></div>
+            <div class="particle p3"></div>
+            <%- body %>
+        </div>
+        <div class="login-right">
+            <div class="glow-orb"></div>
+            <div class="right-content">
+                <h2>O sistema operacional da sua <span>frota.</span></h2>
+                <p>Acesse o Truvex e transforme dados complexos em decisões de negócio claras e lucrativas, com monitoramento em tempo real.</p>
+                <div class="mockup-grid">
+                    <div class="mockup-card"></div>
+                    <div class="mockup-card" style="opacity: 0.6"></div>
+                    <div class="mockup-card" style="opacity: 0.3"></div>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
-
 </html>

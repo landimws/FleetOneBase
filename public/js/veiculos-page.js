@@ -15,12 +15,25 @@ async function carregarVeiculos(busca = '') {
             : '/api/veiculos';
 
         const response = await fetch(url);
-        veiculos = await response.json();
+        if (!response.ok) {
+            throw new Error(`Erro API: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        veiculos = Array.isArray(data) ? data : [];
         renderizarLista();
     } catch (error) {
         console.error('Erro ao carregar veículos:', error);
         veiculos = [];
         renderizarLista();
+        
+        // Exibir feedback para o usuário
+        const tbody = document.querySelector('#lista-veiculos tbody');
+        if (tbody) {
+            tbody.innerHTML = `<tr><td colspan="10" style="text-align: center; color: red; padding: 20px;">
+                Ocorreu um erro ao carregar os veículos. Verifique o servidor.
+            </td></tr>`;
+        }
     }
 }
 

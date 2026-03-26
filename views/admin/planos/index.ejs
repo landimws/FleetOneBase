@@ -1,82 +1,96 @@
-<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-    <h1 class="h2">Gestão de Planos</h1>
-    <div class="btn-toolbar mb-2 mb-md-0">
-        <a href="/admin/planos/novo" class="btn btn-sm btn-primary">
-            <i class="bi bi-plus-lg"></i> Novo Plano
-        </a>
+<% page='admin_planos' %>
+
+<!-- Header -->
+<div class="adm-filters">
+    <div>
+        <div class="adm-page-sub">Configure os planos de assinatura</div>
+        <h1 class="adm-page-title">Planos</h1>
     </div>
+    <a href="/admin/planos/novo" class="btn-truvex">
+        <i class="ph ph-plus"></i> Novo Plano
+    </a>
 </div>
 
-<div class="card shadow-sm">
-    <div class="card-body">
-        <div class="table-responsive">
-            <table class="table table-hover align-middle">
-                <thead class="table-light">
+<!-- Table -->
+<div class="adm-card">
+    <div class="adm-card-header">
+        <i class="ph ph-tag"></i>
+        Lista de Planos
+    </div>
+    <div style="overflow-x:auto;">
+        <table class="adm-table">
+            <thead>
+                <tr>
+                    <th>Plano</th>
+                    <th>Preço / mês</th>
+                    <th>Veículos</th>
+                    <th>Usuários</th>
+                    <th>Acesso</th>
+                    <th>Empresas</th>
+                    <th>Status</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% if (planos && planos.length > 0) { %>
+                    <% planos.forEach(plano => { %>
+                        <tr>
+                            <td>
+                                <div style="font-weight:600; color:var(--text-primary);"><%= plano.nome %></div>
+                                <% if (plano.descricao) { %>
+                                    <div style="font-size:12px; color:var(--text-muted); margin-top:2px;"><%= plano.descricao %></div>
+                                <% } %>
+                            </td>
+                            <td>
+                                <span style="font-family:'Epilogue',sans-serif; font-weight:700; font-size:16px; color:var(--text-primary);">
+                                    R$ <%= parseFloat(plano.preco).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) %>
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge-truvex neutral">
+                                    <i class="ph ph-car"></i>
+                                    <%= plano.limite_veiculos === -1 ? 'Ilimitado' : plano.limite_veiculos %>
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge-truvex neutral">
+                                    <i class="ph ph-user"></i>
+                                    <%= plano.limite_usuarios === -1 ? 'Ilimitado' : plano.limite_usuarios %>
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge-truvex info">
+                                    <i class="ph ph-check-fat"></i> Completo
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge-truvex neutral">
+                                    <i class="ph ph-buildings"></i>
+                                    <%= plano.totalEmpresas || 0 %>
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge-truvex <%= plano.ativo ? 'active' : 'inactive' %>">
+                                    <i class="ph ph-<%= plano.ativo ? 'check-circle' : 'x-circle' %>"></i>
+                                    <%= plano.ativo ? 'Ativo' : 'Inativo' %>
+                                </span>
+                            </td>
+                            <td>
+                                <a href="/admin/planos/novo?id=<%= plano.id %>" class="btn-ghost-sm" title="Editar plano">
+                                    <i class="ph ph-pencil-simple"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    <% }); %>
+                <% } else { %>
                     <tr>
-                        <th>Nome</th>
-                        <th>Preço</th>
-                        <th>Limites (Veíc/Usu)</th>
-                        <th>Acesso</th>
-                        <th>Empresas</th>
-                        <th>Status</th>
-                        <th class="text-end">Ações</th>
+                        <td colspan="8" style="text-align:center; padding:48px 20px; color:var(--text-muted);">
+                            <i class="ph ph-tag" style="font-size:40px; display:block; margin-bottom:10px; opacity:0.3;"></i>
+                            Nenhum plano cadastrado ainda.
+                        </td>
                     </tr>
-                </thead>
-                <tbody>
-                    <% if (planos && planos.length> 0) { %>
-                        <% planos.forEach(plano=> { %>
-                            <tr>
-                                <td>
-                                    <strong>
-                                        <%= plano.nome %>
-                                    </strong>
-                                    <% if (plano.descricao) { %>
-                                        <div class="small text-muted">
-                                            <%= plano.descricao %>
-                                        </div>
-                                        <% } %>
-                                </td>
-                                <td>
-                                    R$ <%= parseFloat(plano.preco).toLocaleString('pt-BR', { minimumFractionDigits: 2 })
-                                        %>
-                                </td>
-                                <td>
-                                    <div>🚗 <%= plano.limite_veiculos===-1 ? 'Ilimitado' : plano.limite_veiculos %>
-                                    </div>
-                                    <div>👥 <%= plano.limite_usuarios===-1 ? 'Ilimitado' : plano.limite_usuarios %>
-                                    </div>
-                                </td>
-                                <td>
-                                    <span class="badge bg-secondary text-dark border"><i class="bi bi-check-all"></i>
-                                        Completo</span>
-                                </td>
-                                <td>
-                                    <span class="badge bg-secondary">
-                                        <%= plano.totalEmpresas || 0 %>
-                                    </span>
-                                </td>
-                                <td>
-                                    <span class="badge <%= plano.ativo ? 'bg-success' : 'bg-danger' %>">
-                                        <%= plano.ativo ? 'Ativo' : 'Inativo' %>
-                                    </span>
-                                </td>
-                                <td class="text-end">
-                                    <a href="/admin/planos/novo?id=<%= plano.id %>"
-                                        class="btn btn-sm btn-outline-primary">
-                                        <i class="bi bi-pencil"></i>
-                                    </a>
-                                </td>
-                            </tr>
-                            <% }); %>
-                                <% } else { %>
-                                    <tr>
-                                        <td colspan="7" class="text-center text-muted py-4">
-                                            Nenhum plano cadastrado.
-                                        </td>
-                                    </tr>
-                                    <% } %>
-                </tbody>
-            </table>
-        </div>
+                <% } %>
+            </tbody>
+        </table>
     </div>
 </div>

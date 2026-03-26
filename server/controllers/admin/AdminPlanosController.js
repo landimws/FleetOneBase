@@ -19,7 +19,7 @@ class AdminPlanosController {
             res.render('admin/planos/index', {
                 title: 'Gestão de Planos',
                 planos: planosComContagem,
-                page: 'planos',
+                page: 'admin_planos',
                 layout: 'admin/layouts/admin-layout'
             });
         } catch (error) {

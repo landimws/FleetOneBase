@@ -2,11 +2,34 @@
    VARIÁVEIS CSS GLOBAIS
    ======================================== */
 :root {
-  /* Cores Primárias */
-  --color-primary: #9d00ff;
-  --color-primary-dark: #7a00cc;
-  --color-primary-darker: #8500d9;
-  --color-primary-light: #b84dff;
+  /* Truvex Identity */
+  --green:        #00C278;
+  --green-dark:   #007A4D;
+  --green-pale:   #E6F7F1;
+  --green-neon:   #00E5A0;
+
+  /* Dark system */
+  --dark-bg:      #09090B;
+  --dark-surf:    #111116;
+  --dark-border:  rgba(255,255,255,0.07);
+  --dark-muted:   #52525E;
+  --dark-text:    #E4E3DF;
+
+  /* Light system */
+  --light-bg:     #F0EDE6;
+  --light-surf:   #FFFFFF;
+  --light-border: #D8D4CC;
+  --light-text:   #111111;
+
+  /* Type */
+  --font-display: 'Epilogue', sans-serif;
+  --font-body:    'Plus Jakarta Sans', sans-serif;
+
+  /* Cores Primárias Legadas (retrocompatibilidade) */
+  --color-primary: var(--green);
+  --color-primary-dark: var(--green-dark);
+  --color-primary-darker: #00A666;
+  --color-primary-light: var(--green-neon);
 
   /* Cores Secundárias */
   --color-success: #27ae60;
@@ -34,7 +57,7 @@
 }
 
 body {
-  font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+  font-family: var(--font-body);
   font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
   font-variant-numeric: tabular-nums;
   font-size: 14px;
@@ -72,7 +95,7 @@ body {
   cursor: pointer;
   position: relative;
   transition: color 0.2s;
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-body, 'Plus Jakarta Sans'), sans-serif;
 }
 
 .tab-btn.active {
@@ -107,7 +130,7 @@ body {
   height: 36px;
   /* Altura padrão para alinhar com botões */
   transition: border-color 0.2s, box-shadow 0.2s;
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-body, 'Plus Jakarta Sans'), sans-serif;
 }
 
 .form-modern:focus {
@@ -133,7 +156,7 @@ body {
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-body, 'Plus Jakarta Sans'), sans-serif;
 }
 
 .filter-chip:hover {
@@ -219,16 +242,16 @@ body {
 
 .menu-item:hover {
   background-color: transparent;
-  color: #9d00ff;
+  color: var(--green);
   /* Texto Roxo no hover */
 }
 
-/* MUDANÇA DE TEMA: ROXO #9d00ff */
+/* MUDANÇA DE TEMA: ROXO var(--green) */
 
 .menu-item.active {
-  color: #9d00ff;
+  color: var(--green);
   /* Texto Roxo */
-  border-bottom-color: #9d00ff;
+  border-bottom-color: var(--green);
   background-color: transparent;
   /* Remove bg escuro */
 }
@@ -236,7 +259,7 @@ body {
 /* ... */
 
 .btn-table.btn-primary {
-  background-color: #9d00ff;
+  background-color: var(--green);
   /* ROXO */
   color: white;
 }
@@ -486,10 +509,6 @@ body {
   background-color: #fef3c7;
 }
 
-background-color: #e74c3c;
-color: white;
-}
-
 /* Badges */
 .badge {
   padding: 4px 10px;
@@ -547,7 +566,7 @@ color: white;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-primary, #9d00ff);
+  background: var(--color-primary, var(--green));
   /* Roxo no hover */
 }
 
@@ -557,7 +576,7 @@ color: white;
 }
 
 .table-container::-webkit-scrollbar-thumb:hover {
-  background: var(--color-primary, #9d00ff);
+  background: var(--color-primary, var(--green));
 }
 
 /* Utilitários */

@@ -57,7 +57,7 @@ export const isAuthenticated = (req, res, next) => {
         empresaId: req.session.empresaId // [NEW] Disponível na view
     };
 
-    // [SECURITY] Bloqueio Total para FleetOne em Rotas Operacionais
+    // [SECURITY] Bloqueio Total para Truvex em Rotas Operacionais
     const FLEETONE_EMPRESA_ID = 1;
     if (req.session.empresaId === FLEETONE_EMPRESA_ID) {
         // Rotas permitidas para SuperAdmin
@@ -92,14 +92,14 @@ export const isAdmin = (req, res, next) => {
 };
 
 // Middleware de Super Admin (Painel Administrativo)
-// SuperAdmin = Usuários da empresa FleetOne (empresaId === 1)
+// SuperAdmin = Usuários da empresa Truvex (empresaId === 1)
 export const isSuperAdmin = (req, res, next) => {
     // Verificar se usuário está autenticado
     if (!req.session.userId) {
         return res.redirect('/login');
     }
 
-    // REGRA: SuperAdmin = empresaId da FleetOne (ID fixo = 1)
+    // REGRA: SuperAdmin = empresaId da Truvex (ID fixo = 1)
     const FLEETONE_EMPRESA_ID = 1;
 
     // [FIX] Usar == para permitir string '1' ou number 1
@@ -111,7 +111,7 @@ export const isSuperAdmin = (req, res, next) => {
     console.warn(`[SECURITY] Acesso negado ao Admin. User: ${req.session.userUsername}, Role: ${req.session.userRole}, EmpresaId: ${req.session.empresaId} (Type: ${typeof req.session.empresaId})`);
 
     return res.status(403).render('errors/403', {
-        message: 'Acesso negado. Apenas administradores FleetOne têm acesso ao Painel Administrativo.',
+        message: 'Acesso negado. Apenas administradores Truvex têm acesso ao Painel Administrativo.',
         layout: false
     });
 };
